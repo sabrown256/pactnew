@@ -172,7 +172,7 @@ static void _SC_server_handler(int sig)
  *                     - this is a server side routine
  */
 
-static int _SC_server_complete(taskdesc *job, char *msg)
+static int _SC_server_complete(taskdesc *job, const char *msg)
    {int rtry, pid, sgn, sts, ok;
     char tag[MAXLINE];
     char *stm;
@@ -544,7 +544,8 @@ static void _SC_server_command(parstate *state, char *t)
 static void _SC_server_job(parstate *state, char *t)
    {int jid, ok;
     char tag[MAXLINE];
-    char *shell, *dir, *cmd, *p;
+    char *dir, *cmd, *p;
+    const char *shell;
     taskdesc *job;
     jobinfo *inf;
     asyncstate *as;
@@ -702,7 +703,7 @@ static void _SC_server_in_reject(int fd, int mask, void *a)
 
 /* _SC_EXEC_SRV_CORE - do the core work of SC_exec_server */
 
-static int _SC_exec_srv_core(char *shell, char *fname, int na,
+static int _SC_exec_srv_core(const char *shell, char *fname, int na,
 			     int show, int ignore, int debug,
 			     parstate *state, fspec *filter)
    {int np, pi, dt, sig, st, sz, pid;
@@ -818,7 +819,7 @@ static int _SC_exec_srv_core(char *shell, char *fname, int na,
  *                - return TRUE iff all commands succeed
  */
 
-int SC_exec_server(char *shell, char *fname, int na, int show, int ignore,
+int SC_exec_server(const char *shell, char *fname, int na, int show, int ignore,
 		   int debug)
    {int ia, st, sz, rst;
     fspec *filter;

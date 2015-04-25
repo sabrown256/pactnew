@@ -145,7 +145,7 @@ long _PD_number_refd(memdes *meml, void *svr, memdes *desc, void *vr,
  *                 - i.e. has a "*" as the last non-blank character
  */
 
-int _PD_indirection(char *s)
+int _PD_indirection(const char *s)
    {int rv;
     char *t;
 

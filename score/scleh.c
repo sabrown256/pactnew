@@ -89,7 +89,7 @@ static FILE
 
 void
  SC_leh_cmp_set_cb_cmp_cb(PFlehcb *f), 
- SC_leh_cmp_add(lehcmp *lc, char *s);
+ SC_leh_cmp_add(lehcmp *lc, const char *s);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -1174,7 +1174,7 @@ void SC_leh_cmp_set_cb(PFlehcb f)
 
 /* SC_LEH_CMP_ADD - add S to the list of completions LC */
 
-void SC_leh_cmp_add(lehcmp *lc, char *s)
+void SC_leh_cmp_add(lehcmp *lc, const char *s)
    {
 
     CREMAKE(lc->cvec, char *, lc->len+1);
@@ -1256,7 +1256,7 @@ int SC_leh_hist_set_n(int n)
  *                  - return TRUE iff successful
  */
 
-int SC_leh_hist_save(char *fname)
+int SC_leh_hist_save(const char *fname)
    {int rv, i;
     FILE *fp;
 
@@ -1280,7 +1280,7 @@ int SC_leh_hist_save(char *fname)
  *                  - return TRUE iff successful
  */
 
-int SC_leh_hist_load(char *fname)
+int SC_leh_hist_load(const char *fname)
    {int rv;
     char t[MAX_BFSZ];
     char *p;

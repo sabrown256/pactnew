@@ -27,10 +27,10 @@
  * if a suspected race condition is confirmed
  */
 
-#define GET_CONNECTION(cp, ic)                                                   \
+#define GET_CONNECTION(cp, ic)                                               \
    *(connectdes **) SC_array_get(cp->pool, ic)
 
-#define GET_TASK(pt, it)                                                         \
+#define GET_TASK(pt, it)                                                     \
    *(contask **) SC_array_get(pt, it)
 
 typedef struct s_connectdes connectdes;
@@ -64,7 +64,7 @@ struct s_connectdes
     int na;                   /* number of attempts to run any task */
     char *system;
     char *host;
-    char *shell;
+    const char *shell;
     char **env;
     PROCESS *pp;
     SC_array *taska;
@@ -87,7 +87,7 @@ static void
 /* _SC_MAKE_CONTASK - allocate and initialize a contask instance */
 
 static contask *_SC_make_contask(int jid, int na,
-				 char *shell, char *dir, char *cmnd,
+				 const char *shell, char *dir, char *cmnd,
 				 connectdes *pco)
    {contask *pto;
 
@@ -221,7 +221,7 @@ static void SC_init_connection(connectdes *pc, int na, int fl)
 /* _SC_MAKE_CONNECTDES - allocate and initialize a connectdes instance */
 
 static connectdes *_SC_make_connectdes(int na, char *sys,
-				       char *hst, char *shell, char **env)
+				       char *hst, const char *shell, char **env)
    {connectdes *pc;
 
     pc = CMAKE(connectdes);
@@ -533,7 +533,7 @@ static void _SC_exec_pool_job(conpool *cp, int ic, contask *pt)
  */
 
 static void _SC_pool_job(conpool *cp, int ic, int na,
-			 char *shell, char *dir, char *cmnd)
+			 const char *shell, char *dir, char *cmnd)
    {int jid;
     contask *pto;
     connectdes *pco;
@@ -1497,7 +1497,7 @@ static void _SC_pulse_servers(conpool *cp)
  *                         - client side routine
  */
 
-conpool *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
+conpool *SC_open_connection_pool(int n, char *sys, const char *shell, char **env,
 				 int na, int show, int ignore,
 				 int th, fspec *filter)
    {int i, nh;
@@ -1947,7 +1947,7 @@ static void _SC_reconnect_pool(conpool *cp, int ic, char *msg, int recon)
  */
 
 int _SC_launch_pool_task(conpool *cp, int na, int reset,
-			 char *shell, char *dir, char *cmnd)
+			 const char *shell, char *dir, char *cmnd)
    {int ic, ih, nc, nh, rv;
     connectdes *pco;
     asyncstate *as;
@@ -2022,7 +2022,7 @@ int _SC_launch_pool_task(conpool *cp, int na, int reset,
  */
 
 int SC_launch_pool_job(conpool *cp, int na, int reset,
-		       char *shell, char *dir, char *cmnd)
+		       const char *shell, char *dir, char *cmnd)
    {int ncn, rv;
     asyncstate *as;
 

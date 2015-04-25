@@ -372,7 +372,7 @@ extern void
  *_SX_opt_defstr(defstr *x, bind_opt wh, void *a),
  *_SX_opt_memdes(memdes *x, bind_opt wh, void *a),
  *_SX_opt_PD_cksumdes(PD_cksumdes *x, bind_opt wh, void *a),
- _SX_type_container(char *dtype, char *stype);
+ _SX_type_container(char *d, size_t nd, const char *s, size_t ns);
 
 extern object
  *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode),

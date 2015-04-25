@@ -1250,26 +1250,26 @@ extern void
 /* SCSYSA.C declarations */
 
 extern int
- SC_exec(char ***out, CONST char *cmnd, CONST char *shell, int to),
- SC_execa(char ***out, CONST char *shell, int to, const char *fmt, ...),
- SC_execs(char *out, int nc, CONST char *shell, int to, const char *fmt, ...),
- SC_exec_commands(CONST char *shell, char **cmnds, char **env, int to,
+ SC_exec(char ***out, CONST char *cmnd, const char *shell, int to),
+ SC_execa(char ***out, const char *shell, int to, const char *fmt, ...),
+ SC_execs(char *out, int nc, const char *shell, int to, const char *fmt, ...),
+ SC_exec_commands(const char *shell, char **cmnds, char **env, int to,
 		  CONST char *lname, CONST char *fname, int na, int show,
 		  int ignore, int dmp),
  SC_signal_async(int sig),
- SC_exec_async(CONST char *shell, char **cmnds, char **dirs,
-	       CONST char *consh, char **conenv, int nc,
-	       CONST char *lname, CONST char *fname, int na, int show,
+ SC_exec_async(const char *shell, char **cmnds, char **dirs,
+	       const char *consh, char **conenv, int nc,
+	       const char *lname, const char *fname, int na, int show,
 	       int ignore, int log),
- SC_exec_async_h(CONST char *shell, char **env, char **hstl, char **cmnds,
+ SC_exec_async_h(const char *shell, char **env, char **hstl, char **cmnds,
 		 char **dirs, int to, CONST char *fname, int na,
 		 int show, int ignore),
- SC_exec_async_s(CONST char *shell, char **env, char **sysl, char **cmnds,
+ SC_exec_async_s(const char *shell, char **env, char **sysl, char **cmnds,
 		 char **dirs, int to, CONST char *fname, int na,
 		 int show, int ignore),
- SC_exec_server(CONST char *shell, CONST char *fname, int na, int show,
+ SC_exec_server(const char *shell, CONST char *fname, int na, int show,
 		int ignore, int debug),
- SC_system(CONST char *cmd);
+ SC_system(const char *cmd);
 
 extern char
  **SC_syscmnd(const char *fmt, ...);
@@ -1290,8 +1290,8 @@ extern int
 extern int
  SC_leh_hist_add(const char *s),
  SC_leh_hist_set_n(int nh),
- SC_leh_hist_save(CONST char *fname),
- SC_leh_hist_load(CONST char *fname);
+ SC_leh_hist_save(const char *fname),
+ SC_leh_hist_load(const char *fname);
 
 extern char
  *SC_leh(const char *prompt);
@@ -1310,7 +1310,7 @@ extern PFfgets
 
 extern int
  SC_close_log(SC_logfile log),
- SC_log(SC_logfile log, CONST char *format, ...);
+ SC_log(SC_logfile log, const char *format, ...);
 
 extern SC_logfile
  SC_open_log(void);
@@ -1334,8 +1334,8 @@ extern SC_tree_node
 /* SCTRK.C declarations */
 
 extern int
- SC_send_tracker(CONST char *code, CONST char *version,
-		 int status, CONST char *dst);
+ SC_send_tracker(const char *code, const char *version,
+		 int status, const char *dst);
 
 
 #ifdef __cplusplus

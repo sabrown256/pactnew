@@ -3840,7 +3840,7 @@ static object *_SXI_unp_bitstrm(SS_psides *si, object *argl)
 
 /* _SX_TYPE_CONTAINER - function to hang on SC_contain_hook */
 
-void _SX_type_container(char *dtype, char *stype)
+void _SX_type_container(char *d, size_t nd, const char *s, size_t ns)
    {defstr *sp, *dp;
     PDBfile *file;
     SX_file *po;
@@ -3848,7 +3848,7 @@ void _SX_type_container(char *dtype, char *stype)
 
     si = SC_GET_CONTEXT(_SX_type_container);
 
-    dtype[0] = '\0';
+    d[0] = '\0';
 
     po = NULL;
     SS_args(si, SS_lk_var_val(si, SX_gs.curfile),
@@ -3860,13 +3860,13 @@ void _SX_type_container(char *dtype, char *stype)
     else
        file = FILE_FILE(PDBfile, po);
 
-    sp = PD_inquire_type(file, stype);
+    sp = PD_inquire_type(file, s);
     if (sp != NULL)
        {dp = _PD_type_container(file, sp);
 	if (dp != NULL)
-	   strcpy(dtype, dp->type);
+	   PS_nstrncpy(d, nd, dp->type, -1);
 	else
-	   strcpy(dtype, stype);};
+	   PS_nstrncpy(d, nd, s, -1);};
 
     return;}
 

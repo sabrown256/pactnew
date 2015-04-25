@@ -105,16 +105,16 @@ int _SC_chg_dir(char *dir, char **pndir)
 
 /* SC_GET_SHELL - given a string SHELL return an explicit shell */
 
-char *SC_get_shell(char *shell)
-   {
+char *SC_get_shell(const char *shell)
+   {char *rv;
 
     if (shell == NULL)
-       shell = getenv("SHELL");
+       rv = getenv("SHELL");
 
     if (shell == NULL)
-       shell = SHELL_Default;
+       rv = SHELL_Default;
 
-    return(shell);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -155,7 +155,7 @@ static int _SC_state_log(parstate *state, const char *fmt, ...)
 
 /* _SC_READ_FILTER - parse the filter file FNAME */
 
-fspec *_SC_read_filter(char *fname)
+fspec *_SC_read_filter(const char *fname)
    {int n;
     char s[MAXLINE];
     char *tok, *txt, *p;
@@ -339,11 +339,11 @@ static void _SC_exec_free_logs(parstate *state)
  *                      - the SC_exec family of functions 
  */
 
-void _SC_exec_setup_state(parstate *state, char *shell, char **env,
+void _SC_exec_setup_state(parstate *state, const char *shell, char **env,
 			  int na, int show, int tag, int srv,
 			  int ign, fspec *flt, SC_evlpdes *pe,
 			  PFFileCallback acc, PFFileCallback rej,
-			  int (*finish)(taskdesc *job, char *msg))
+			  int (*finish)(taskdesc *job, const char *msg))
    {int dtw, to;
     char *s;
 
@@ -941,7 +941,7 @@ static void _SC_unquote_subtask(subtask *ps)
  *                  - parts SF, TF and DOSH
  */
 
-static void _SC_push_subtask(subtask *sub, int it, char *shell,
+static void _SC_push_subtask(subtask *sub, int it, const char *shell,
 			     SC_array *tf, int dosh, char *ios)
    {int nt;
     char **sa, *sc;
@@ -998,7 +998,7 @@ static void _SC_push_token(SC_array *tf, char *t)
  *                   - return the real number of subtasks
  */
 
-static int _SC_init_subtasks(subtask *sub, char *shell, char **ta, int na)
+static int _SC_init_subtasks(subtask *sub, const char *shell, char **ta, int na)
    {int it, n, dosh, doif, term;
     char *t, *ios;
     SC_array *tf;
@@ -1591,7 +1591,7 @@ static int _SC_do_command(taskdesc *job, asyncstate *as, int it)
 
 /* _SC_MAKE_TASKLST - initialize a task list from a command string CMD */
 
-static tasklst *_SC_make_tasklst(char *shell, char *cmd)
+static tasklst *_SC_make_tasklst(const char *shell, char *cmd)
    {int n, na, nt;
     char **ta, *s;
     subtask *sub;
@@ -2287,7 +2287,7 @@ static int _SC_remove_job(taskdesc *job)
 /* SC_MAKE_TASKDESC - allocate and initialize a taskdesc */
 
 taskdesc *SC_make_taskdesc(parstate *state, int jid,
-			   char *host, char *shell, char *dir, char *cmd)
+			   char *host, const char *shell, char *dir, char *cmd)
    {taskdesc *job;
     jobinfo *inf;
 

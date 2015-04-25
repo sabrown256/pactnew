@@ -1485,7 +1485,7 @@ static PROCESS *_SC_open_proc(int rcpu, const char *name, char **argv,
  *                - return (PROCESS *) st-2  if the host cannot be verified
  */
 
-PROCESS *SC_open_remote(char *host, char *cmnd,
+PROCESS *SC_open_remote(const char *host, const char *cmnd,
 			char **argv, char **envp, const char *mode,
 			PFProcInit init)
    {int i, ia, na, st, ok;
@@ -1511,8 +1511,8 @@ PROCESS *SC_open_remote(char *host, char *cmnd,
 	    ca[i++] = "-o";
 	    ca[i++] = "SendEnv=SC_EXEC_RLIMIT_AS";
 	    ca[i++] = "-q";
-	    ca[i++] = host;
-	    ca[i++] = cmnd;
+	    ca[i++] = (char *) host;
+	    ca[i++] = (char *) cmnd;
 
 	    for (ia = 0; ia < na; ia++)
 	        ca[i++] = argv[ia];

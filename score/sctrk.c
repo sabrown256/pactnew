@@ -18,7 +18,8 @@
  *                 - return TRUE iff successful
  */
 
-int SC_send_tracker(char *code, char *version, int status, char *dst)
+int SC_send_tracker(const char *code, const char *version,
+		    int status, const char *dst)
    {int rv;
 
     rv = FALSE;

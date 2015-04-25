@@ -1196,7 +1196,7 @@ extern dimdes
  *PD_entry_dimensions(syment *ep);
 
 extern defstr
- *PD_inquire_type(PDBfile *file, CONST char *name),
+ *PD_inquire_type(PDBfile *file, const char *name),
  *PD_inquire_host_type(PDBfile *file, CONST char *name);
 
 extern char
@@ -1327,7 +1327,7 @@ extern int
  PD_read_bits(PDBfile *file, CONST char *name, CONST char *type,
               int64_t ni, int sgned, int nbits, int padsz, int fpp,
               int64_t offs, long *pan, char **pdata),
- _PD_indirection(CONST char *s);
+ _PD_indirection(const char *s);
 
 
 /* PDSER.C declarations */

@@ -33,7 +33,7 @@ SC_thread_lock
  *          Returns -1 on error, otherwise 0.
  */
 
-int SC_log(SC_logfile lg, char *format, ...)
+int SC_log(SC_logfile lg, const char *format, ...)
    {int status;
     va_list p_arg;
     char timestamp[MAXLINE];

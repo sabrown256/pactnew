@@ -287,7 +287,7 @@ int _PD_safe_flush(PDBfile *file)
  * #bind PD_inquire_type fortran() scheme() python()
  */
 
-defstr *PD_inquire_type(PDBfile *file ARG(,,cls), char *name)
+defstr *PD_inquire_type(PDBfile *file ARG(,,cls), const char *name)
    {defstr *dp;
 
     dp = NULL;

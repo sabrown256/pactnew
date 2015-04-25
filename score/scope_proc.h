@@ -306,7 +306,7 @@ struct s_parstate
     int doing;             /* diagnostic indicating activity at moment of interrupt */
     double tstart;
     char *directory;       /* initial or starting directory */
-    char *shell;
+    const char *shell;
     char **env;
     fspec *filter;
     PFFileCallback acc;
@@ -314,7 +314,7 @@ struct s_parstate
     SC_evlpdes *loop;
     SC_array *tasks;
     SC_array *log;
-    int (*finish)(taskdesc *job, char *msg);
+    int (*finish)(taskdesc *job, const char *msg);
     int (*print)(parstate *state, const char *fmt, ...);
     void (*free_logs)(parstate *state);
     void (*free_tasks)(parstate *state);};
@@ -423,7 +423,7 @@ struct s_execdes
     int dmp;
     int ignore;
     int *res;
-    char *shell;
+    const char *shell;
     char **cmnds;
     char **env;
     fspec *filter;};
@@ -532,7 +532,7 @@ extern void
  _SC_copy_filedes(SC_iodes *fb, SC_iodes *fa);
 
 extern PROCESS
- *SC_open_remote(char *host, char *cmnd,
+ *SC_open_remote(const char *host, const char *cmnd,
 		 char **argv, char **envp, const char *mode,
 		 PFProcInit init);
 
@@ -596,10 +596,10 @@ extern void
 /* SCSYSA.C declarations */
 
 extern char
- *_SC_shell_no_rc_cmd(char *shell);
+ *_SC_shell_no_rc_cmd(const char *shell);
 
 extern void
- _SC_setup_output(jobinfo *inf, char *name),
+ _SC_setup_output(jobinfo *inf, const char *name),
  _SC_process_output(int fd, int mask, void *a),
  _SC_process_out_reject(int fd, int mask, void *a);
 
@@ -617,24 +617,24 @@ extern void
 /* SCSYSC.C declarations */
 
 extern fspec
- *_SC_read_filter(char *fname);
+ *_SC_read_filter(const char *fname);
 
 extern taskdesc
  *SC_make_taskdesc(parstate *state, int jid,
-		   char *host, char *shell, char *dir, char *cmd);
+		   char *host, const char *shell, char *dir, char *cmd);
 
 extern char
  *_SC_show_command(asyncstate *as, char *s, int show),
  *_SC_put_command(SC_array *out, char *s, int show),
- *SC_get_shell(char *shell);
+ *SC_get_shell(const char *shell);
 
 extern void
  _SC_set_run_task_state(parstate *state),
- _SC_exec_setup_state(parstate *state, char *shell, char **env,
+ _SC_exec_setup_state(parstate *state, const char *shell, char **env,
 		      int na, int show, int tag, int srv,
 		      int ign, fspec *flt, SC_evlpdes *pe,
 		      PFFileCallback acc, PFFileCallback rej,
-		      int (*finish)(taskdesc *job, char *msg)),
+		      int (*finish)(taskdesc *job, const char *msg)),
  _SC_exec_free_state(parstate *state, int flt),
  _SC_free_filter(fspec *filter),
  _SC_print_filtered(asyncstate *as, char **msg, fspec *filter,
@@ -651,7 +651,7 @@ extern int
 /* SCSYSD.C declarations */
 
 extern conpool
- *SC_open_connection_pool(int n, char *sys, char *shell, char **env,
+ *SC_open_connection_pool(int n, char *sys, const char *shell, char **env,
 			  int na, int show, int ignore,
 			  int th, fspec *filter);
 
@@ -662,7 +662,7 @@ extern void
 
 extern int
  SC_launch_pool_job(conpool *cp, int na, int reset,
-		    char *shell, char *dir, char *cmnd),
+		    const char *shell, char *dir, char *cmnd),
  SC_wait_pool_job(conpool *cp, int to),
  SC_connection_pool_status(conpool *cp),
  SC_query_connection_pool(conpool *cp);

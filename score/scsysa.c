@@ -81,7 +81,7 @@ static void _SC_rejected_process(asyncstate *as, parstate *state,
 
 /* _SC_SETUP_OUTPUT - setup the output string arrays for INF */
 
-void _SC_setup_output(jobinfo *inf, char *name)
+void _SC_setup_output(jobinfo *inf, const char *name)
    {int ns;
 
 /* initial guess at number of output strings needed by job
@@ -207,7 +207,7 @@ fprintf(stderr, "%-16s: %4d %8d (%d/%d)\n", "out_reject", SC_current_thread(), p
  *                  - this is a client side routine
  */
 
-static int _SC_job_complete(taskdesc *job, char *msg)
+static int _SC_job_complete(taskdesc *job, const char *msg)
    {int rtry;
     asyncstate *as;
     parstate *state;
@@ -328,7 +328,7 @@ void SC_show_state_log(parstate *state)
  *                     - so other shells all return blank
  */
 
-char *_SC_shell_no_rc_cmd(char *shell)
+char *_SC_shell_no_rc_cmd(const char *shell)
    {static char rv[80];
 
     SC_strncpy(rv, 80, " ", -1);
@@ -372,9 +372,9 @@ char *_SC_shell_no_rc_cmd(char *shell)
  *               - this version uses a command pool
  */
 
-int SC_exec_async(char *shell, char **cmnds, char **dirs,
-		  char *consh, char **conenv, int nc,
-		  char *lname, char *fname,
+int SC_exec_async(const char *shell, char **cmnds, char **dirs,
+		  const char *consh, char **conenv, int nc,
+		  const char *lname, const char *fname,
 		  int na, int show, int ignore, int lg)
    {int is, id, nd, ns, ja, st, sig;
     int nhst, reset, ioi;
@@ -498,7 +498,7 @@ int SC_exec_async(char *shell, char **cmnds, char **dirs,
  *                 - this version does one SSH per command
  */
 
-int SC_exec_async_s(char *shell, char **env,
+int SC_exec_async_s(const char *shell, char **env,
 		    char **sysl, char **cmnds, char **dirs,
 		    int to, char *fname, int na, int show, int ignore)
    {int ic, id, is, nc, nd, ns;
@@ -615,7 +615,7 @@ int SC_exec_async_s(char *shell, char **env,
  *                 - this version does one SSH per command
  */
 
-int SC_exec_async_h(char *shell, char **env,
+int SC_exec_async_h(const char *shell, char **env,
 		    char **hstl, char **cmnds, char **dirs,
 		    int to, char *fname, int na, int show, int ignore)
    {int ic, id, ih, nc, nd, nh;
@@ -730,8 +730,8 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
    {int ns, rv, ioi, sto, st, nf, ok;
     int to, toi, na, dbg;
     int *res;
-    char *cmnd, *shell, **env;
-    char *cwd;
+    char *cmnd, *cwd, **env;
+    const char *shell;
     SC_evlpdes *pe;
     taskdesc *job;
     asyncstate *as;
@@ -847,7 +847,7 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
  *         - return the exit status
  */
 
-int SC_exec(char ***out, char *cmnd, char *shell, int to)
+int SC_exec(char ***out, char *cmnd, const char *shell, int to)
    {int st;
     SC_array *str;
     SC_thread_proc *ps;
@@ -890,7 +890,7 @@ int SC_exec(char ***out, char *cmnd, char *shell, int to)
  *          - return the exit status
  */
 
-int SC_execa(char ***out, char *shell, int to, const char *fmt, ...)
+int SC_execa(char ***out, const char *shell, int to, const char *fmt, ...)
    {int rv;
     char *cmd;
 
@@ -919,7 +919,7 @@ int SC_execa(char ***out, char *shell, int to, const char *fmt, ...)
  *          - return the exit status or -1 on timeout
  */
 
-int SC_execs(char *out, int nc, char *shell, int to, const char *fmt, ...)
+int SC_execs(char *out, int nc, const char *shell, int to, const char *fmt, ...)
    {int n, rv;
     char *s, *t, *p, *cmd, **res;
 
@@ -955,7 +955,7 @@ int SC_execs(char *out, int nc, char *shell, int to, const char *fmt, ...)
  *           - are too nasty to deal with given the prototype constraint
  */
 
-int SC_system(char *cmd)
+int SC_system(const char *cmd)
    {int rv;
 
 #ifdef HAVE_FORK_EXEC
@@ -1053,7 +1053,7 @@ int _SC_exec_one(void **a, int *it)
  *                  - return TRUE iff all commands succeed
  */
 
-int SC_exec_commands(char *shell, char **cmnds, char **env, int to,
+int SC_exec_commands(const char *shell, char **cmnds, char **env, int to,
 		     char *lname, char *fname, int na, int show,
 		     int ignore, int dmp)
    {int i, n, st, sto;
