@@ -103,8 +103,8 @@ switch ($scsi[1])
         setenv SSH  ssh
         setenv SCP  scp
 
-        if ("$repo" =~ *:/*) then
-           set repohost = `echo $repo | sed 's|:/.*$||'`
+        if ("$repo" =~ *:*) then
+           set repohost = `echo $repo | sed 's|:.*$||'`
            set repodir  = `echo $repo | sed 's|^.*:||'`
         else
            set repohost = ""
@@ -142,47 +142,29 @@ switch ($scsi[1])
 
 # handle the REMOTE repository case
         else
-           set rlock = "$repodir/commit.lock"
-
            switch ($oper)
               case lock:
                    touch $lock
                    chmod 660 $lock
                    echo $lmsg >> $lock
-                   $SCP $lock ${repohost}:${repodir} >& /dev/null
                    breaksw
               case unlock:
                    rm -f $lock
-                   $SSH $repohost rm -f $rlock
                    breaksw
               case status:
-                   if ($?DoingConfig == 0) then
-                      set inf   = `$SSH $repohost ls $repodir |& cat`
-                      set elock = FALSE
-                      foreach i ($inf)
-                         set entry = $i:h
-                         if ("$entry" == "commit.lock") then
-                            set elock = TRUE
-                         endif
-                      end
-                      unset inf
-                      if ($elock == TRUE) then
-                         echo "locked"
-                      else
-                         echo "unlocked"
-                      endif
+                   if (-e $lock) then
+                      echo "locked"
+                   else
+                      echo "unlocked"
                    endif
                    breaksw
               case dir:
                    echo "$lstage"
                    breaksw
               case cat:
-                   $SSH $repohost cat $rlock
+                   cat $lock
                    breaksw
            endsw
-
-           unset rlock
-
         endif
         breaksw
 

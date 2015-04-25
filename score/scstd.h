@@ -59,10 +59,6 @@
 #define SC_DECLARE_VARU(_t, _n)       extern _t _n
 #endif
 
-/* the sole function of CONST in PACT is to make life easier
- * for C++ users in the API prototypes
- * it is NOT to be used internally
- */
 #undef CONST
 #ifdef __cplusplus
 # define CONST const

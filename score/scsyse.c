@@ -247,7 +247,7 @@ static void _SC_ex_trm_rej(int fd, int mask, void *a)
  *                 - return the number of occurences
  */
 
-static int _SC_squeeze_tag(char *s, int ns, char *tag)
+static int _SC_squeeze_tag(char *s, int ns, const char *tag)
    {int no, nt;
     char *ps, *p;
     static long nb = -1L;
@@ -432,7 +432,7 @@ static int _SC_do_session(PROCESS *pp,
  *             - passing signals from parent to child
  */
 
-int SC_exec_job(char **argv, char *mode, int flags,
+int SC_exec_job(char **argv, const char *mode, int flags,
 		PFFileCallback in, PFFileCallback irej,
 		PFFileCallback out, PFFileCallback orej)
    {int rv;

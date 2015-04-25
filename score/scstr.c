@@ -316,7 +316,7 @@ char *SC_strstr(const char *s1, const char *s2)
  *            - if not there returns NULL
  */
 
-char *SC_strstri(char *string1, char *string2)
+char *SC_strstri(const char *string1, const char *string2)
 
    {char *s1, *s2, *s3, *rv;
         

@@ -500,7 +500,7 @@ int SC_exec_async(const char *shell, char **cmnds, char **dirs,
 
 int SC_exec_async_s(const char *shell, char **env,
 		    char **sysl, char **cmnds, char **dirs,
-		    int to, char *fname, int na, int show, int ignore)
+		    int to, const char *fname, int na, int show, int ignore)
    {int ic, id, is, nc, nd, ns;
     int ok, st, jid, ioi;
     char hst[MAXLINE];
@@ -617,7 +617,7 @@ int SC_exec_async_s(const char *shell, char **env,
 
 int SC_exec_async_h(const char *shell, char **env,
 		    char **hstl, char **cmnds, char **dirs,
-		    int to, char *fname, int na, int show, int ignore)
+		    int to, const char *fname, int na, int show, int ignore)
    {int ic, id, ih, nc, nd, nh;
     int ok, st, jid, ioi, ln;
     char *ldir[1], *pc, *hst, *cm;
@@ -847,7 +847,7 @@ static int _SC_exec(int i, SC_array *out, execdes *ed)
  *         - return the exit status
  */
 
-int SC_exec(char ***out, char *cmnd, const char *shell, int to)
+int SC_exec(char ***out, const char *cmnd, const char *shell, int to)
    {int st;
     SC_array *str;
     SC_thread_proc *ps;
@@ -862,7 +862,7 @@ int SC_exec(char ***out, char *cmnd, const char *shell, int to)
     ps->ed.dmp    = dbg;
     ps->ed.ignore = FALSE;
     ps->ed.shell  = shell;
-    ps->ed.cmnds  = &cmnd;
+    ps->ed.cmnds  = (char **) &cmnd;
     ps->ed.env    = NULL;
     ps->ed.filter = NULL;
     ps->ed.res    = &st;
@@ -919,7 +919,8 @@ int SC_execa(char ***out, const char *shell, int to, const char *fmt, ...)
  *          - return the exit status or -1 on timeout
  */
 
-int SC_execs(char *out, int nc, const char *shell, int to, const char *fmt, ...)
+int SC_execs(char *out, int nc, const char *shell, int to,
+	     const char *fmt, ...)
    {int n, rv;
     char *s, *t, *p, *cmd, **res;
 
@@ -1054,7 +1055,7 @@ int _SC_exec_one(void **a, int *it)
  */
 
 int SC_exec_commands(const char *shell, char **cmnds, char **env, int to,
-		     char *lname, char *fname, int na, int show,
+		     const char *lname, const char *fname, int na, int show,
 		     int ignore, int dmp)
    {int i, n, st, sto;
     conpool *cpo;

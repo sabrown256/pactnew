@@ -444,7 +444,7 @@ int _SC_server_heartbeat(int *prv, void *a)
  *                - this is a server side routine
  */
 
-static int _SC_server_env(parstate *state, char *t)
+static int _SC_server_env(parstate *state, const char *t)
    {int rv, st;
     char *p, *var, *evl, *nvl, *ex;
     asyncstate *as;
@@ -489,7 +489,7 @@ static int _SC_server_env(parstate *state, char *t)
 
 static void _SC_server_command(parstate *state, char *t)
    {int i, n, jid;
-    char *p, *r;
+    char *p, *r, *s;
     taskdesc *job;
     jobinfo *inf;
     asyncstate *as;
@@ -502,8 +502,8 @@ static void _SC_server_command(parstate *state, char *t)
 
 /* handle a kill job request */
     if (SC_EXEC_MSG_MATCH(r, t, _SC_EXEC_KILL))
-       {t   = SC_strtok(r, " ", p);
-        jid = SC_stoi(t);
+       {s   = SC_strtok(r, " ", p);
+        jid = SC_stoi(s);
 
 	n = SC_array_get_n(state->tasks);
 	for (i = 0; i < n; i++)
@@ -703,8 +703,8 @@ static void _SC_server_in_reject(int fd, int mask, void *a)
 
 /* _SC_EXEC_SRV_CORE - do the core work of SC_exec_server */
 
-static int _SC_exec_srv_core(const char *shell, char *fname, int na,
-			     int show, int ignore, int debug,
+static int _SC_exec_srv_core(const char *shell, const char *fname,
+			     int na, int show, int ignore, int debug,
 			     parstate *state, fspec *filter)
    {int np, pi, dt, sig, st, sz, pid;
     SC_evlpdes *pe;
@@ -819,8 +819,8 @@ static int _SC_exec_srv_core(const char *shell, char *fname, int na,
  *                - return TRUE iff all commands succeed
  */
 
-int SC_exec_server(const char *shell, char *fname, int na, int show, int ignore,
-		   int debug)
+int SC_exec_server(const char *shell, const char *fname,
+		   int na, int show, int ignore, int debug)
    {int ia, st, sz, rst;
     fspec *filter;
     parstate state;
@@ -887,7 +887,7 @@ int SC_exec_server(const char *shell, char *fname, int na, int show, int ignore,
  *               - and to the AS log if it exists
  */
 
-static int _SC_exec_puts(asyncstate *as, char *msg)
+static int _SC_exec_puts(asyncstate *as, const char *msg)
    {int ns, rv;
 
 /* if we end up doing nothing the return value should be TRUE */

@@ -1133,7 +1133,7 @@ extern char
  *SC_strncpy(char *d, size_t nd, const char *s, size_t ns),
  *SC_dstrcpy(char *dest, const char *src),
  *SC_strstr(const char *string1, const char *string2),
- *SC_strstri(CONST char *string1, CONST char *string2),
+ *SC_strstri(const char *string1, const char *string2),
  *SC_strrev(char *s),
  *SC_squeeze_blanks(char *s),
  *SC_squeeze_chars(char *s, char *q),
@@ -1250,11 +1250,11 @@ extern void
 /* SCSYSA.C declarations */
 
 extern int
- SC_exec(char ***out, CONST char *cmnd, const char *shell, int to),
+ SC_exec(char ***out, const char *cmnd, const char *shell, int to),
  SC_execa(char ***out, const char *shell, int to, const char *fmt, ...),
  SC_execs(char *out, int nc, const char *shell, int to, const char *fmt, ...),
  SC_exec_commands(const char *shell, char **cmnds, char **env, int to,
-		  CONST char *lname, CONST char *fname, int na, int show,
+		  const char *lname, const char *fname, int na, int show,
 		  int ignore, int dmp),
  SC_signal_async(int sig),
  SC_exec_async(const char *shell, char **cmnds, char **dirs,
@@ -1262,17 +1262,22 @@ extern int
 	       const char *lname, const char *fname, int na, int show,
 	       int ignore, int log),
  SC_exec_async_h(const char *shell, char **env, char **hstl, char **cmnds,
-		 char **dirs, int to, CONST char *fname, int na,
+		 char **dirs, int to, const char *fname, int na,
 		 int show, int ignore),
  SC_exec_async_s(const char *shell, char **env, char **sysl, char **cmnds,
-		 char **dirs, int to, CONST char *fname, int na,
+		 char **dirs, int to, const char *fname, int na,
 		 int show, int ignore),
- SC_exec_server(const char *shell, CONST char *fname, int na, int show,
-		int ignore, int debug),
  SC_system(const char *cmd);
 
 extern char
  **SC_syscmnd(const char *fmt, ...);
+
+
+/* SCSYSB.C declarations */
+
+extern int
+ SC_exec_server(const char *shell, const char *fname, int na, int show,
+		int ignore, int debug);
 
 
 /* SCSYSC.C declarations */
@@ -1280,7 +1285,7 @@ extern char
 /* SCSYSE.C declarations */
 
 extern int
- SC_exec_job(char **argv, CONST char *mode, int flags,
+ SC_exec_job(char **argv, const char *mode, int flags,
 	     PFFileCallback in, PFFileCallback irej,
 	     PFFileCallback out, PFFileCallback orej);
 
