@@ -57,7 +57,8 @@
 
 /* PM_MK_CLINE - build and return a pointer to a curved line */
 
-PM_conic_curve *PM_mk_cline(char *type, double axx, double ayy, double axy,
+PM_conic_curve *PM_mk_cline(const char *type,
+			    double axx, double ayy, double axy,
 			    double ax, double ay, double ac)
    {PM_conic_curve *cp;
 
@@ -135,7 +136,7 @@ PM_side *PM_mk_side(PM_conic_curve *cur, int dir, double x, double y,
 
 /* PM_MK_PART - build and return a pointer to a new part */
 
-PM_part *PM_mk_part(char *name, int rg, int nsides,
+PM_part *PM_mk_part(const char *name, int rg, int nsides,
 		    PM_side *leg, PM_end_point *ends, void *comp,
 		    double kms, double kes, double kme, double kee,
 		    double krat, double lms, double les, double lme,

@@ -83,7 +83,7 @@ void PM_free_vectors(int nd, double **x)
 
 /* PM_MAKE_ARRAY - make a C_array of TYPE and SIZE */
 
-C_array *PM_make_array(char *type, long size, void *data)
+C_array *PM_make_array(const char *type, long size, void *data)
    {long bpi;
     char ltype[MAXLINE], ttype[MAXLINE];
     char *pt;
@@ -358,7 +358,7 @@ PM_set *PM_copy_set(PM_set *s)
  * #bind PM_make_set_alt fortran() scheme() python()
  */
 
-PM_set *PM_make_set_alt(char *name, char *type, int cp, int nd,
+PM_set *PM_make_set_alt(const char *name, const char *type, int cp, int nd,
 			int *diml, int nde, void **elml)
    {int i, d, ne, *maxes;
     void **elem;
@@ -388,7 +388,7 @@ PM_set *PM_make_set_alt(char *name, char *type, int cp, int nd,
  *             - build the set structure and fill it
  */
 
-PM_set *PM_make_set(char *name, char *type, int cp, int nd, ...)
+PM_set *PM_make_set(const char *name, const char *type, int cp, int nd, ...)
    {int i, d, ne, nde, *maxes;
     void **elem;
     PM_set *set;
@@ -422,7 +422,7 @@ PM_set *PM_make_set(char *name, char *type, int cp, int nd, ...)
  *                - build the set structure and fill it
  */
 
-PM_set *PM_make_ac_set(char *name, char *type, int cp,
+PM_set *PM_make_ac_set(const char *name, const char *type, int cp,
 		       PM_mesh_topology *mt, int nde, ...)
    {int i, nd, ne;
     void **elem;
@@ -456,12 +456,12 @@ PM_set *PM_make_ac_set(char *name, char *type, int cp,
  *           - return the set
  */
 
-PM_set *PM_mk_set(char *name, char *type, int cp, long ne,
+PM_set *PM_mk_set(const char *name, const char *type, int cp, long ne,
 		  int nd, int nde, int *maxes, void *elem,
 		  PM_field *opers, double *metric,
-		  char *symtype, void *sym,
-		  char *toptype, void *top,
-		  char *inftype, void *inf,
+		  const char *symtype, void *sym,
+		  const char *toptype, void *top,
+		  const char *inftype, void *inf,
 		  PM_set *next)
    {int i;
     void *ov, *nv, **el;
@@ -698,7 +698,7 @@ void PM_rel_topology(PM_mesh_topology *mt)
  *               - type double
  */
 
-double *PM_array_real(char *type, void *p, int n, double *x)
+double *PM_array_real(const char *type, void *p, int n, double *x)
    {int sid;
     char bf[MAXLINE];
 
@@ -771,7 +771,7 @@ void PM_rel_real_set_elements(double **r)
  *                       - also find the mesh scales
  */
 
-void PM_find_exist_extrema(PM_set *s, char *typ, void *em)
+void PM_find_exist_extrema(PM_set *s, const char *typ, void *em)
    {int i, nd, nde, ne, sid;
     int *maxes;
     void **elem;
@@ -970,7 +970,8 @@ double **PM_generate_lr_cp(int nd, int *maxes, double **x1)
  *                      - sets
  */
 
-PM_set *PM_make_lr_cp_domain(char *name, char *type, int nd, PM_set **sets)
+PM_set *PM_make_lr_cp_domain(const char *name, const char *type,
+			     int nd, PM_set **sets)
    {int id, mx, *maxes;
     long ne;
     double **x, **x1;
@@ -1098,7 +1099,8 @@ double **PM_generate_lr_index(int nd, int *maxes,
  *                         - the elements are the logical indeces of the points
  */
 
-PM_set *PM_make_lr_index_domain(char *name, char *type, int nd, int nde,
+PM_set *PM_make_lr_index_domain(const char *name, const char *type,
+				int nd, int nde,
 				int *maxes, double *extrema, double *ratio)
    {int i, did;
     long ne;
@@ -1168,7 +1170,7 @@ int PM_resolve_type(char *ltyp, int nc, const char *ntyp, const char *btyp)
  *                - free the original data if FLAG is TRUE
  */
 
-void PM_promote_set(PM_set *s, char *ntyp, int flag)
+void PM_promote_set(PM_set *s, const char *ntyp, int flag)
    {int id, nde, did, sid;
     long ne;
     char otyp[MAXLINE], ltyp[MAXLINE], nelt[MAXLINE], nest[MAXLINE];
@@ -1222,7 +1224,7 @@ void PM_promote_set(PM_set *s, char *ntyp, int flag)
  *                  - free the original data if FLAG is TRUE
  */
 
-void PM_promote_array(C_array *a, char *ntyp, int flag)
+void PM_promote_array(C_array *a, const char *ntyp, int flag)
    {int sid, did;
     long ne;
     char ltyp[MAXLINE];
@@ -1257,7 +1259,7 @@ void PM_promote_array(C_array *a, char *ntyp, int flag)
  * #bind PM_make_mapping fortran() scheme() python()
  */
 
-PM_mapping *PM_make_mapping(char *name, char *cat,
+PM_mapping *PM_make_mapping(const char *name, const char *cat,
 			    PM_set *domain, PM_set *range,
 			    PM_centering centering, PM_mapping *next)
    {int *pi;
@@ -1296,7 +1298,7 @@ PM_mapping *PM_make_mapping(char *name, char *cat,
  *                   - build and return a PM_mapping for it
  */
 
-PM_mapping *PM_build_grotrian(char *name, char *type,
+PM_mapping *PM_build_grotrian(const char *name, const char *type,
 			      int cp, void *xv, void *yv,
 			      char **labels, int n_s,
 			      void *tr, void *up, void *low,

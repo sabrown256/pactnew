@@ -13,7 +13,7 @@
 #define ORIENTATION(_rv, _x1, _x2, _x3)                                      \
    {double _cp;                                                              \
     _cp = PM_DELTA_CROSS_2D(_x1[0], _x1[1], _x2[0], _x2[1], _x3[0], _x3[1]); \
-    if (fabs(_cp) < TOLERANCE)                                                \
+    if (fabs(_cp) < TOLERANCE)                                               \
        _rv = 0;                                                              \
     else                                                                     \
        _rv = (_cp < 0) ? -1 : 1;}
@@ -1934,7 +1934,7 @@ double **PM_project_vectors(int nd, int n, double **x)
 
 /* PM_CONVERT_VECTORS - convert N ND vectors X to type double */
 
-double **PM_convert_vectors(int nd, int n, void *v, char *typ)
+double **PM_convert_vectors(int nd, int n, void *v, const char *typ)
    {int id;
     double **t, **x;
 
