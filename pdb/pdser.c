@@ -124,8 +124,9 @@ static int _PD_set_eod_s(PDBfile *file, int64_t addr, long nb)
  *                    - this a worker for _PD_get_next_address
  */
 
-static int64_t _PD_next_address_s(PDBfile *file, char *type, long number,
-				  void *vr, int seekf, int tellf, int colf)
+static int64_t _PD_next_address_s(PDBfile *file, const char *type,
+				  long number, const void *vr,
+				  int seekf, int tellf, int colf)
    {int64_t addr;
     FILE *fp;
 
@@ -542,8 +543,8 @@ int PD_init_threads_arg(int c, char **v, char *key, PFTid tid)
  *                     - this a worker for _PD_get_next_address
  */
 
-int64_t _PD_next_address_pf(PDBfile *file, char *type, long number,
-			    void *vr, int seekf, int tellf, int colf)
+int64_t _PD_next_address_pf(PDBfile *file, const char *type, long number,
+			    const void *vr, int seekf, int tellf, int colf)
    {int flag, ipt, sk;
     inti nb;
     intb bpi;

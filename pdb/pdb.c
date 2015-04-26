@@ -28,7 +28,7 @@
  * #bind PD_create fortran() scheme() python()
  */
 
-PDBfile *PD_create(char *name)
+PDBfile *PD_create(const char *name)
    {PDBfile *file;
 
     _PD_init_state(FALSE);
@@ -52,7 +52,7 @@ PDBfile *PD_create(char *name)
  * #bind PD_open scheme() python()
  */
 
-PDBfile *PD_open(char *name, char *mode)
+PDBfile *PD_open(const char *name, const char *mode)
    {PDBfile *file;
 
     _PD_init_state(FALSE);
@@ -75,7 +75,7 @@ PDBfile *PD_open(char *name, char *mode)
  * #bind PD_open_f fortran(pd_open_f)
  */
 
-PDBfile *PD_open_f(char *name, char *mode)
+PDBfile *PD_open_f(const char *name, const char *mode)
    {PDBfile *file;
 
     file = PD_open(name, mode);
@@ -158,7 +158,7 @@ PDBfile *PD_family(PDBfile *of ARG(,,cls), int flag)
  * #bind PD_open_vif fortran() scheme() python()
  */
 
-PDBfile *PD_open_vif(char *name)
+PDBfile *PD_open_vif(const char *name)
    {int reg;
     PDBfile *file;
     SC_udl *pu;
@@ -197,7 +197,7 @@ PDBfile *PD_open_vif(char *name)
  * #bind PD_copy_type fortran() scheme() python()
  */
 
-pboolean PD_copy_type(PDBfile *sf, PDBfile *df, char *type)
+pboolean PD_copy_type(PDBfile *sf, PDBfile *df, const char *type)
    {int rv;
     defstr *dp;
     memdes *lst;
@@ -345,10 +345,10 @@ int64_t PD_flush(PDBfile *file ARG(,,cls))
  *          - given by TYPE (PDBLib will allocated space if necessary)!
  */ 
  
-int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr, 
-             int nd, long *ind)
+int _PD_read(PDBfile *file, char *fullpath, const char *type,
+	     syment *ep, void *vr, int nd, long *ind)
    {int rv, nf;
-    char *typ;
+    const char *typ;
     defstr *dp;
 
     rv = 0;
@@ -398,7 +398,7 @@ int _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep, void *vr,
  * #bind PD_read fortran() scheme() python()
  */
 
-int PD_read(PDBfile *file ARG(,,cls), char *name, void *vr)
+int PD_read(PDBfile *file ARG(,,cls), const char *name, void *vr)
    {int rv;
 
     rv = PD_read_as(file, name, NULL, vr);
@@ -419,7 +419,8 @@ int PD_read(PDBfile *file ARG(,,cls), char *name, void *vr)
  * #bind PD_read_as fortran() scheme() python()
  */
 
-int PD_read_as(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
+int PD_read_as(PDBfile *file ARG(,,cls), const char *name,
+	       const char *type, void *vr)
    {int err;
     syment *ep;
     PD_smp_state *pa;
@@ -459,8 +460,10 @@ int PD_read_as(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
  *                 - if the variable is a direct type read it normally
  *                 - if it is indirect do a PD_read_as but copy what
  *                 - PDB returns into the space provided by the caller
- *                 - this frees the caller from having to worry about indirections
- *                 - provided the number of items to be read and hence the size
+ *                 - this frees the caller from having to worry about
+ *                 - indirections
+ *                 - provided the number of items to be read and
+ *                 - hence the size
  *                 - of SPACE is large enough to hold the data
  *                 - return the number of items successfully read
  *                 - if less than NIX otherwise read NIX items and
@@ -472,8 +475,8 @@ int PD_read_as(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
  * #bind PD_read_as_dwim fortran() scheme() python()
  */
 
-int PD_read_as_dwim(PDBfile *file ARG(,,cls), char *name,
-		    char *outtype, long nix, void *space)
+int PD_read_as_dwim(PDBfile *file ARG(,,cls), const char *name,
+		    const char *outtype, long nix, void *space)
    {int nir, nl;
     long ntr;
     char s[MAXLINE], fullpath[MAXLINE];
@@ -510,9 +513,9 @@ int PD_read_as_dwim(PDBfile *file ARG(,,cls), char *name,
 
     intype = PD_entry_type(ep);
     if (_PD_indirection(intype))
-       {void *vr;
+       {intb bpi;
 	char *ps, *pv;
-	intb bpi;
+	void *vr;
 	data_standard *std;
 	hasharr *chrt;
 
@@ -577,7 +580,8 @@ int PD_read_as_dwim(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_read_alt fortran() scheme() python()
  */
 
-int PD_read_alt(PDBfile *file ARG(,,cls), char *name, void *vr, long *ind)
+int PD_read_alt(PDBfile *file ARG(,,cls), const char *name,
+		void *vr, long *ind)
    {int rv;
 
     rv = PD_read_as_alt(file, name, NULL, vr, ind);
@@ -603,8 +607,8 @@ int PD_read_alt(PDBfile *file ARG(,,cls), char *name, void *vr, long *ind)
  * #bind PD_read_as_alt fortran() scheme() python()
  */
 
-int PD_read_as_alt(PDBfile *file ARG(,,cls), char *name, char *type,
-		   void *vr, long *ind)
+int PD_read_as_alt(PDBfile *file ARG(,,cls), const char *name,
+		   const char *type, void *vr, long *ind)
    {int nd, rv;
     char fullpath[MAXLINE];
     dimdes *pd, *dims;
@@ -644,7 +648,7 @@ int PD_read_as_alt(PDBfile *file ARG(,,cls), char *name, char *type,
  *            - return NULL otherwise
  */
 
-syment *_PD_defent(PDBfile *file, char *name, char *outtype,
+syment *_PD_defent(PDBfile *file, const char *name, const char *outtype,
 		   inti number, dimdes *dims)
    {intb bpi;
     int64_t addr;
@@ -709,7 +713,8 @@ syment *_PD_defent(PDBfile *file, char *name, char *outtype,
  * #bind PD_defent fortran() scheme() python()
  */
 
-syment *PD_defent(PDBfile *file ARG(,,cls), char *name, char *outtype)
+syment *PD_defent(PDBfile *file ARG(,,cls), const char *name,
+		  const char *outtype)
    {int ie;
     long number;
     dimdes *dims;
@@ -739,8 +744,8 @@ syment *PD_defent(PDBfile *file ARG(,,cls), char *name, char *outtype)
  * #bind PD_defent_alt fortran() scheme() python()
  */
 
-syment *PD_defent_alt(PDBfile *file ARG(,,cls), char *name, char *outtype,
-		      int nd, long *ind)
+syment *PD_defent_alt(PDBfile *file ARG(,,cls), const char *name,
+		      const char *outtype, int nd, long *ind)
    {int i;
     long number, maxi, mini, leng;
     dimdes *dims, *next, *prev;
@@ -787,13 +792,15 @@ syment *PD_defent_alt(PDBfile *file ARG(,,cls), char *name, char *outtype,
  *           - given by TYPE!!!!
  */
 
-syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
+syment *_PD_write(PDBfile *file, const char *name,
+		  const char *intype, const char *outtype,
 		  void *vr, dimdes *dims, int appnd, int *pnew)
    {int c, new, ok;
     long number; 
     int64_t addr;
     char bf[MAXLINE];
-    char *lname, *fullpath;
+    char *lname;
+    const char *fullpath;
     syment *ep;
     PD_smp_state *pa;
     SC_address ad;
@@ -898,7 +905,7 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 	   {addr = PD_entry_address(ep);
 	    new  = FALSE;};
 
-	lname = fullpath;}
+	lname = (char *) fullpath;}
 
 /* if the variable doesn't exist define it to the file */
     else
@@ -928,9 +935,9 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
 /* now write the data to the file */
        {if (file->virtual_internal)
 	   {if (new)
-	       {ad.memaddr = vr;
+	       {ad.memaddr = (void *) vr;
 		_PD_entry_set_address(ep, 0, ad.diskaddr);
-		SC_mark(vr, 1);}
+		SC_mark(ad.memaddr, 1);}
 
 	    else
 	       {if (!_PD_hyper_write(file, lname, ep, vr, intype))
@@ -977,7 +984,8 @@ syment *_PD_write(PDBfile *file, char *name, char *intype, char *outtype,
  * #bind PD_write fortran() scheme() python()
  */
 
-pboolean PD_write(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
+pboolean PD_write(PDBfile *file ARG(,,cls), const char *name,
+		  const char *type, void *vr)
    {pboolean rv;
 
     rv = PD_write_as(file, name, type, type, vr);
@@ -998,11 +1006,12 @@ pboolean PD_write(PDBfile *file ARG(,,cls), char *name, char *type, void *vr)
  * #bind PD_write_as fortran() scheme() python()
  */
 
-pboolean PD_write_as(PDBfile *file ARG(,,cls), char *name,
-		     char *intype, char *outtype, void *vr)
+pboolean PD_write_as(PDBfile *file ARG(,,cls), const char *name,
+		     const char *intype, const char *outtype, void *vr)
    {int appnd, new, ie;
     pboolean rv;
-    char *s, *t, *lname, fullpath[MAXLINE];
+    char *t, *lname, fullpath[MAXLINE];
+    const char *s;
     syment *ep;
     dimdes *dims;
     PD_smp_state *pa;
@@ -1057,8 +1066,8 @@ pboolean PD_write_as(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_write_alt fortran() scheme() python()
  */
 
-pboolean PD_write_alt(PDBfile *file ARG(,,cls), char *name, char *type,
-		      void *vr, int nd, long *ind)
+pboolean PD_write_alt(PDBfile *file ARG(,,cls), const char *name,
+		      const char *type, void *vr, int nd, long *ind)
    {pboolean rv;
 
     rv = PD_write_as_alt(file, name, type, type, vr, nd, ind);
@@ -1082,13 +1091,14 @@ pboolean PD_write_alt(PDBfile *file ARG(,,cls), char *name, char *type,
  * #bind PD_write_as_alt fortran() scheme() python()
  */
 
-pboolean PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
-			 char *intype, char *outtype,
+pboolean PD_write_as_alt(PDBfile *file ARG(,,cls), const char *name,
+			 const char *intype, const char *outtype,
 			 void *vr, int nd, long *ind)
    {int i, new, appnd, nc;
     pboolean rv;
     long start, stop, step, leng;
     char lndx[MAXLINE], hname[MAXLINE], fullpath[MAXLINE];
+    char inty[MAXLINE], outy[MAXLINE];
     dimdes *dims, *next, *prev;
     syment *ep;
     PD_smp_state *pa;
@@ -1126,9 +1136,13 @@ pboolean PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
        SC_strncpy(hname, MAXLINE, name, -1);
 
     if (intype != NULL)
-       SC_trim_right(intype, " \t");
+       {SC_strncpy(inty, MAXLINE, intype, -1);
+	SC_trim_right(inty, " \t");
+	intype = inty;};
     if (outtype != NULL)
-       SC_trim_right(outtype, " \t");
+       {SC_strncpy(outy, MAXLINE, outtype, -1);
+	SC_trim_right(outy, " \t");
+	outtype = outy;};
 
     appnd = pa->append_flag;
     SC_strncpy(fullpath, MAXLINE, _PD_fixname(file, hname), -1);
@@ -1156,7 +1170,7 @@ pboolean PD_write_as_alt(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_append fortran() scheme() python()
  */
 
-pboolean PD_append(PDBfile *file ARG(,,cls), char *name, void *vr)
+pboolean PD_append(PDBfile *file ARG(,,cls), const char *name, void *vr)
    {pboolean rv;
     PD_smp_state *pa;
 
@@ -1179,8 +1193,8 @@ pboolean PD_append(PDBfile *file ARG(,,cls), char *name, void *vr)
  * #bind PD_append_as fortran() scheme() python()
  */
 
-pboolean PD_append_as(PDBfile *file ARG(,,cls), char *name,
-		      char *intype, void *vr)
+pboolean PD_append_as(PDBfile *file ARG(,,cls), const char *name,
+		      const char *intype, void *vr)
    {pboolean rv;
     PD_smp_state *pa;
 
@@ -1202,7 +1216,7 @@ pboolean PD_append_as(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_append_alt fortran() scheme() python()
  */
 
-pboolean PD_append_alt(PDBfile *file ARG(,,cls), char *name,
+pboolean PD_append_alt(PDBfile *file ARG(,,cls), const char *name,
 		       void *vr, int nd, long *ind)
    {pboolean rv;
     PD_smp_state *pa;
@@ -1226,8 +1240,8 @@ pboolean PD_append_alt(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_append_as_alt fortran() scheme() python()
  */
 
-pboolean PD_append_as_alt(PDBfile *file ARG(,,cls), char *name, char *intype,
-			  void *vr, int nd, long *ind)
+pboolean PD_append_as_alt(PDBfile *file ARG(,,cls), const char *name,
+			  const char *intype, void *vr, int nd, long *ind)
    {pboolean rv;
     PD_smp_state *pa;
 
@@ -1268,7 +1282,7 @@ void PD_set_io_hooks(int which)
  * #bind PD_error fortran() scheme() python()
  */
 
-void PD_error(char *s, PD_major_op n)
+void PD_error(const char *s, PD_major_op n)
    {PD_smp_state *pa;
 
     pa = _PD_get_state(-1);
@@ -1311,7 +1325,7 @@ void PD_error(char *s, PD_major_op n)
  * #bind PD_free fortran() scheme() python()
  */
 
-pboolean PD_free(PDBfile *file ARG(,,cls), char *type, void *var) 
+pboolean PD_free(PDBfile *file ARG(,,cls), const char *type, void *var) 
    {pboolean rv;
     inti i, nb, nr, ni;
     intb bpi;
@@ -1392,7 +1406,7 @@ pboolean PD_free(PDBfile *file ARG(,,cls), char *type, void *var)
  * #bind PD_remove_entry fortran() scheme() python()
  */
 
-pboolean PD_remove_entry(PDBfile *file ARG(,,cls), char *name) 
+pboolean PD_remove_entry(PDBfile *file ARG(,,cls), const char *name) 
    {pboolean rv;
     hasharr *tab;
     syment *ep;
@@ -1463,7 +1477,8 @@ int PD_autofix_denorm(PDBfile *file ARG(,,cls), int flag)
  * #bind PD_fix_denorm fortran() scheme() python()
  */
 
-pboolean PD_fix_denorm(data_standard* std, char *type, int64_t ni, void *vr)
+pboolean PD_fix_denorm(data_standard* std, const char *type,
+		       int64_t ni, void *vr)
    {int id, ifp, reord, mask, rshift, nbits, nrem;
     int n_exp, n_mant, exp_sum, mant_sum, mant_bit, exp_bit;
     pboolean st;

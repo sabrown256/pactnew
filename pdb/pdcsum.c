@@ -178,7 +178,8 @@ int _PD_cksum_var_write(PDBfile *file, char *name, syment *ef)
  *                      - return the TRUE iff successful
  */ 
  
-int _PD_cksum_block_read(PDBfile *file, char *name, syment *ep, long n)
+int _PD_cksum_block_read(PDBfile *file, const char *name,
+			 syment *ep, long n)
    {int rv, st;
     inti i, mn, mx, ni, nb;
     intb bpi;

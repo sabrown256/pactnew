@@ -45,7 +45,7 @@ void PD_filt_switch(fltdat *inf, int i, int j)
  */ 
  
 int _PD_filt_block_out(PDBfile *file, unsigned char *bf,
-		       char *type, long bpi, int64_t ni)
+		       const char *type, long bpi, int64_t ni)
    {int ok;
     inti niw, nie;
     fltdes *fl, *flt;
@@ -103,7 +103,7 @@ int _PD_filt_block_out(PDBfile *file, unsigned char *bf,
  */ 
  
 int _PD_filt_block_in(PDBfile *file, unsigned char *bf,
-		      char *type, intb bpi, inti ni)
+		      const char *type, intb bpi, inti ni)
    {int ok;
     inti nir, nie, nbi;
     unsigned char *lbf;

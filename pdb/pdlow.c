@@ -221,8 +221,8 @@ void _PD_set_io_buffer(SC_udl *pu)
 
 /* _PD_PIO_OPEN - do an open in a parallel context */
 
-SC_udl *_PD_pio_open(char *name, char *mode)
-   {char *s, *md;
+SC_udl *_PD_pio_open(const char *name, const char *mode)
+   {const char *s, *md;
     FILE *fp;
     PFfopen opn;
     SC_udl *pu;
@@ -307,7 +307,7 @@ defstr *PD_inquire_type(PDBfile *file ARG(,,cls), const char *name)
  * #bind PD_inquire_host_type fortran() scheme() python()
  */
 
-defstr *PD_inquire_host_type(PDBfile *file ARG(,,cls), char *name)
+defstr *PD_inquire_host_type(PDBfile *file ARG(,,cls), const char *name)
    {defstr *dp;
 
     if (_PD_indirection(name) == TRUE)
@@ -377,8 +377,8 @@ void _PD_e_install(PDBfile *file, char *name, syment *ep, int lookup)
  *                  - (should be used in this file only)
  */
 
-static void _PD_d_install_in(char *name, defstr *def, hasharr *tab,
-			     PD_chart_kind chk, char *alias)
+static void _PD_d_install_in(const char *name, defstr *def, hasharr *tab,
+			     PD_chart_kind chk, const char *alias)
    {char *typ;
     defstr *dp;
     haelem *hp;
@@ -438,8 +438,8 @@ static void _PD_d_install_in(char *name, defstr *def, hasharr *tab,
 
 /* _PD_D_INSTALL - install a defstr pointer in the given chart of the file */
 
-void _PD_d_install(PDBfile *file, char *name, defstr *def,
-		   PD_chart_kind chk, char *alias)
+void _PD_d_install(PDBfile *file, const char *name, defstr *def,
+		   PD_chart_kind chk, const char *alias)
    {hasharr *ch;
 
     ch = (chk == PD_CHART_HOST) ? file->host_chart : file->chart;
@@ -455,7 +455,7 @@ void _PD_d_install(PDBfile *file, char *name, defstr *def,
  *               - in the specified chart (should be used in this file only)
  */
 
-static defstr *_PD_defstr_in(hasharr *chart, char *name, SC_kind kind,
+static defstr *_PD_defstr_in(hasharr *chart, const char *name, SC_kind kind,
 			     memdes *desc, multides *tuple,
                              long sz, int align,
 			     PD_byte_order ord, int conv,
@@ -482,7 +482,7 @@ static defstr *_PD_defstr_in(hasharr *chart, char *name, SC_kind kind,
  */
 
 defstr *_PD_defstr(PDBfile *file, PD_chart_kind chk,
-		   char *name, SC_kind kind,
+		   const char *name, SC_kind kind,
 		   memdes *desc, multides *tuple,
 		   long sz, int align, PD_byte_order ord,
 		   int conv, int *ordr, long *formt, int unsgned, int onescmp)
@@ -513,7 +513,7 @@ defstr *_PD_defstr(PDBfile *file, PD_chart_kind chk,
  *                 - if CHK is PD_CHART_HOST return the file host_chart defstr
  */
 
-defstr *_PD_defstr_inst(PDBfile *file, char *name, SC_kind kind,
+defstr *_PD_defstr_inst(PDBfile *file, const char *name, SC_kind kind,
 			memdes *desc, PD_byte_order ord,
 			int *ordr, long *formt, PD_chart_kind chk)
    {int algn, conv;
@@ -789,8 +789,8 @@ int _PD_set_current_address(PDBfile *file, int64_t addr, int wh,
  *                      - in MPI mode get collective space iff COLF is TRUE
  */
 
-int64_t _PD_get_next_address(PDBfile *file, char *type, inti ni,
-			     void *vr, int seekf, int tellf, int colf)
+int64_t _PD_get_next_address(PDBfile *file, const char *type, inti ni,
+			     const void *vr, int seekf, int tellf, int colf)
    {int64_t addr;
 
     if (ni == 0)

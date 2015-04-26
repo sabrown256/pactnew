@@ -670,7 +670,7 @@ char *PD_pwd(PDBfile *file ARG(,,cls))
  *                  - and the given pathname (absolute or relative)
  */
 
-char *_PD_fixname(PDBfile *file, char *inname)
+char *_PD_fixname(PDBfile *file, const char *inname)
    {char *node, *p, *s, *out;
     char tmpstr[MAXLINE];
     PD_smp_state *pa;

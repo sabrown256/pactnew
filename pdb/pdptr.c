@@ -68,7 +68,8 @@ static void _PD_ptr_init_null(void *a)
 
 /* _PD_MAKE_ADDR - make and return a PD_address */
 
-static PD_address *_PD_make_addr(long i, int64_t addr, char *ptr, syment *ep)
+static PD_address *_PD_make_addr(long i, int64_t addr,
+				 const char *ptr, syment *ep)
    {PD_address *ad;
 
     ad = CMAKE(PD_address);
@@ -77,7 +78,7 @@ static PD_address *_PD_make_addr(long i, int64_t addr, char *ptr, syment *ep)
     ad->addr    = addr;
     ad->reta    = -1;
     ad->entry   = ep;
-    ad->ptr     = ptr;
+    ad->ptr     = (char *) ptr;
     ad->written = -1;
 
     return(ad);}
@@ -489,7 +490,7 @@ static PD_address *_PD_ptr_get_ad(adloc *al, int n)
 
 /* _PD_PTR_LOOKUP - return the N address from the current address list */
 
-static long _PD_ptr_lookup(adloc *al, void *vr)
+static long _PD_ptr_lookup(adloc *al, const void *vr)
    {long i;
     long *pi;
     hasharr *ah;
@@ -602,7 +603,7 @@ static PD_address *_PD_ptr_find_addr(adloc *al, int64_t addr, int lck)
  *                  - return NULL if there is none found
  */
 
-static PD_address *_PD_ptr_find_ptr(adloc *al, void *vr, int lck)
+static PD_address *_PD_ptr_find_ptr(adloc *al, const void *vr, int lck)
    {long l;
     PD_address *ad, *lad;
 
@@ -631,7 +632,8 @@ static PD_address *_PD_ptr_find_ptr(adloc *al, void *vr, int lck)
  *                   - occuring after AD that has not be written
  */
 
-static PD_address *_PD_ptr_find_next(adloc *al, PD_address *ad, void *vr)
+static PD_address *_PD_ptr_find_next(adloc *al, PD_address *ad,
+				     const void *vr)
    {inti i, ni;
     SC_array *ap;
 
@@ -699,7 +701,7 @@ static PD_address *_PD_ptr_install_addr(adloc *al, int64_t addr, int lck)
  *                     - return the associated PD_address
  */
 
-static PD_address *_PD_ptr_install_ptr(adloc *al, char *vr,
+static PD_address *_PD_ptr_install_ptr(adloc *al, const char *vr,
 				       int wrt, int lck)
    {long i;
     void *key;
@@ -720,7 +722,7 @@ static PD_address *_PD_ptr_install_ptr(adloc *al, char *vr,
 	ad->written = wrt;
 
 /* hasharr */
-	key = (vr == NULL) ? NULL_ADDR : vr;
+	key = (vr == NULL) ? NULL_ADDR : (char *) vr;
 	_PD_ptr_install(al, i, key);
 
 /* array */
@@ -1161,7 +1163,7 @@ void _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck)
  *                   - location is LOC_HERE, LOC_OTHER, or LOC_BLOCK
  */
 
-PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr,
+PD_address *_PD_ptr_wr_lookup(PDBfile *file, const void *vr,
 			      PD_data_location *ploc, int wrt, int lck)
    {PD_data_location loc;
     PD_address *ad;
@@ -1211,8 +1213,8 @@ PD_address *_PD_ptr_wr_lookup(PDBfile *file, void *vr,
  *                   - fill in AD with the address info
  */
 
-void _PD_ptr_wr_syment(PDBfile *file, char *name,
-		       PD_address *ad, char *type,
+void _PD_ptr_wr_syment(PDBfile *file, const char *name,
+		       PD_address *ad, const char *type,
 		       inti ni, int64_t addr)
    {char pname[MAXLINE];
     syment *ep;
@@ -1246,8 +1248,8 @@ void _PD_ptr_wr_syment(PDBfile *file, char *name,
  *             -     block of data
  */
 
-int _PD_wr_itag(PDBfile *file, char *name,
-		PD_address *ad, inti ni, char *type,
+int _PD_wr_itag(PDBfile *file, const char *name,
+		PD_address *ad, inti ni, const char *type,
 		int64_t addr, PD_data_location loc)
    {char s[MAXLINE];
     FILE *fp;
@@ -1272,7 +1274,8 @@ int _PD_wr_itag(PDBfile *file, char *name,
  *                  - correctly
  */
 
-int _PD_ptr_wr_itags(PDBfile *file, char *name, void *vr, inti ni, char *type)
+int _PD_ptr_wr_itags(PDBfile *file, const char *name,
+		     const void *vr, inti ni, const char *type)
    {int rv;
     long n;
     int64_t addr;

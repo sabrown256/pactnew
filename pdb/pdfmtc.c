@@ -34,7 +34,7 @@
 
 /* _PD_WR_ITAG_III - format and write an itag to S */
 
-static int _PD_wr_itag_iii(char *s, int nc, char *type, int64_t ni,
+static int _PD_wr_itag_iii(char *s, int nc, const char *type, int64_t ni,
 			   int64_t addr, PD_data_location loc)
    {int rv;
     char t[2][MAXLINE];
@@ -52,7 +52,7 @@ static int _PD_wr_itag_iii(char *s, int nc, char *type, int64_t ni,
 
 /* _PD_RD_ITAG_III - fill an itag from the file */
 
-static char **_PD_rd_itag_iii(char *bf)
+static char **_PD_rd_itag_iii(const char *bf)
    {int i, na;
     char a[MAXLINE];
     char **ta;
@@ -1225,7 +1225,7 @@ static int _PD_wr_fmt_iii(PDBfile *file)
  *              - if successful else NULL
  */
 
-static int _PD_open_iii(PDBfile *file, char *mode)
+static int _PD_open_iii(PDBfile *file, const char *mode)
    {int nb, ns;
     char str[MAXLINE], key[MAXLINE];
     char *acc, *rej, *s, *ps;
@@ -1316,7 +1316,7 @@ static int _PD_open_iii(PDBfile *file, char *mode)
  *                - if successful else NULL
  */
 
-static int _PD_create_iii(PDBfile *file, char *mode, int mst)
+static int _PD_create_iii(PDBfile *file, const char *mode, int mst)
    {FILE *fp;
     PD_smp_state *pa;
 

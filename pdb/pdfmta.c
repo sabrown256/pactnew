@@ -47,7 +47,7 @@ extern int
  *            - if successful else NULL
  */
 
-static int _PD_open_i(PDBfile *file, char *mode)
+static int _PD_open_i(PDBfile *file, const char *mode)
    {char str[MAXLINE];
     char *token, *s;
     FILE *fp;
@@ -177,7 +177,7 @@ static int _PD_open_i(PDBfile *file, char *mode)
  *              - no new format I files will be created
  */
 
-static int _PD_create_i(PDBfile *file, char *mode, int mst)
+static int _PD_create_i(PDBfile *file, const char *mode, int mst)
    {
 
     return(FALSE);}

@@ -114,8 +114,8 @@ typedef enum e_PD_instr_rdwr PD_instr_rdwr;
  *                 - return -2 if the type is unknown
  */
 
-long _PD_number_refd(memdes *meml, void *svr, memdes *desc, void *vr,
-		     char *type, hasharr *tab)
+long _PD_number_refd(memdes *meml, void *svr, memdes *desc, const void *vr,
+		     const char *type, hasharr *tab)
    {intb bpi;
     inti ni;
 
@@ -147,7 +147,7 @@ long _PD_number_refd(memdes *meml, void *svr, memdes *desc, void *vr,
 
 int _PD_indirection(const char *s)
    {int rv;
-    char *t;
+    const char *t;
 
     rv = FALSE;
     for (t = s + strlen(s); t >= s; t--)
@@ -422,7 +422,7 @@ int64_t _PD_hyper_number(PDBfile *file, char *indxpr,
  * #bind PD_hyper_number fortran() scheme() python()
  */
 
-long PD_hyper_number(PDBfile *file ARG(,,cls), char *name, syment *ep)
+long PD_hyper_number(PDBfile *file ARG(,,cls), const char *name, syment *ep)
    {int c;
     long rv;
     char s[MAXLINE];
@@ -596,12 +596,12 @@ char *_PD_expand_hyper_name(PDBfile *file, char *name)
 
 /* _PD_WR_LEAF_MEMBERS - write the direct leaf data */
 
-static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype, 
-                                inti ni, void *vr)
+static void _PD_wr_leaf_members(PDBfile *file, const char *intype,
+				const char *outtype, inti ni, void *vr)
    {int cnv, ipt, ok;
     intb bpi;
     inti nb;
-    char *in, *out, *bf;
+    char *out, *in, *bf;
     defstr *dpf;
 
     if ((intype == NULL) || (outtype == NULL) || (vr == NULL))
@@ -641,7 +641,7 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
 	   memset(bf, 0, nb);
 
         out = bf;
-        in  = vr;
+        in  = (char *) vr;
         PD_convert(&out, &in, intype, outtype, ni,
                    file->host_std, file->std, file->host_std,
                    file->host_chart, file->chart, 0, PD_WRITE);
@@ -668,8 +668,8 @@ static void _PD_wr_leaf_members(PDBfile *file, char *intype, char *outtype,
  *                     - HBPI is the bytes per item in memory
  */
 
-static char *_PD_write_hyper_vif(PDBfile *file, char *name,
-				 char *in, char *intype, 
+static char *_PD_write_hyper_vif(PDBfile *file, const char *name,
+				 char *in, const char *intype, 
 				 syment *ep, intb hbpi, intb fbpi,
 				 int64_t addr, inti stop, inti step)
    {inti ni;
@@ -704,8 +704,8 @@ static char *_PD_write_hyper_vif(PDBfile *file, char *name,
  *                       - HBPI is the bytes per item in memory
  */
 
-static char *_PD_write_hyper_space(PDBfile *file, char *name,
-				   char *in, char *intype, 
+static char *_PD_write_hyper_space(PDBfile *file, const char *name,
+				   char *in, const char *intype, 
 				   syment *ep, intb hbpi, intb fbpi,
 				   int64_t addr, inti stop, inti step)
    {inti n, nb, niw, ni;
@@ -776,9 +776,9 @@ static char *_PD_write_hyper_space(PDBfile *file, char *name,
  *                    - HBPI is the bytes per item in memory
  */
 
-static char *_PD_wr_hyper_index(PDBfile *file, char *name,
+static char *_PD_wr_hyper_index(PDBfile *file, const char *name,
 				char *out, dimind *pi, 
-                                char *intype, int64_t addr,
+				const char *intype, int64_t addr,
 				syment *ep, intb hbpi, intb fbpi)
    {inti stride, step;
     inti offset, start, stop;
@@ -864,7 +864,7 @@ void _PD_fin_stacks(void)
 
 /* _PD_ANNOTATE_TEXT - for text files annotate the output */
 
-int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
+int64_t _PD_annotate_text(PDBfile *file, syment *ep, const char *name,
 			  int64_t addr)
    {long nc;
     inti ni;
@@ -907,8 +907,9 @@ int64_t _PD_annotate_text(PDBfile *file, syment *ep, char *name,
  *               - lists
  */
 
-int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
-		      char *intype, char *outtype)
+int64_t _PD_wr_syment(PDBfile *file, const char *name,
+		      char *vr, int64_t ni,
+		      const char *intype, const char *outtype)
    {int dst, indir, count, itags;
     inti i;
     intb size;
@@ -940,8 +941,8 @@ int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
 
     if (dst == LEAF)
        {indir  = FALSE;
-	litype = intype;
-	lotype = outtype;}
+	litype = (char *) intype;
+	lotype = (char *) outtype;}
     else
        {indir = TRUE;
 	SAVE_S(litype, intype);
@@ -972,7 +973,7 @@ int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
  * for an array of structs write the indirects for each array element
  */
          size = dp->size;
-         svr  = vr;
+         svr  = (char *) vr;
          i    = 0L;
 
     case LEAF_ITEM :
@@ -1119,8 +1120,8 @@ int64_t _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
  *                 - from the array provided
  */
 
-int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
-		    void *vr, char *intype)
+int _PD_hyper_write(PDBfile *file, const char *name, syment *ep,
+		    void *vr, const char *intype)
    {int nc, nd, c, rv;
     intb hbpi, fbpi;
     char s[MAXLINE];
@@ -1203,8 +1204,8 @@ int _PD_hyper_write(PDBfile *file, char *name, syment *ep,
  *                      - return the number of item successfully read
  */
 
-static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
-				char *out, syment *epo, char *outtype,
+static int _PD_read_hyper_space(PDBfile *file, const char *name, syment *ep,
+				char *out, syment *epo, const char *outtype,
 				intb hbpi, intb fbpi, 
                                 int64_t addr, inti stop, inti step)
    {int nrd, nr;
@@ -1320,9 +1321,9 @@ static int _PD_read_hyper_space(PDBfile *file, char *name, syment *ep,
  *                    - return the number of item successfully read
  */
 
-static int _PD_rd_hyper_index(PDBfile *file, char *name,
+static int _PD_rd_hyper_index(PDBfile *file, const char *name,
 			      syment *ep, char *out,
-			      dimind *pi, syment *epo, char *outtype,
+			      dimind *pi, syment *epo, const char *outtype,
 			      int64_t addr, intb hbpi, intb fbpi)
    {inti nrd, nir;
     inti stride, step;
@@ -1383,7 +1384,8 @@ static int _PD_rd_hyper_index(PDBfile *file, char *name,
  */
 
 static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni, 
-                                char *intype, char *outtype, int boffs)
+                                const char *intype, const char *outtype,
+				int boffs)
    {int ipt, cnv, ok;
     inti nia, nb;
     intb bpi, nbt;
@@ -1462,7 +1464,8 @@ static void _PD_rd_leaf_members(PDBfile *file, char *vr, inti ni,
  *                     - return the number of item successfully read
  */
 
-int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr, 
+int _PD_indexed_read_as(PDBfile *file, char *fullpath,
+			const char *type, void *vr, 
                         int nd, long *ind, syment *ep)
    {int i, j, err;
     inti indl[3];
@@ -1529,7 +1532,7 @@ int _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type, void *vr,
  *                - return the number of items successfully read
  */
 
-int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
+int _PD_hyper_read(PDBfile *file, const char *name, const char *outtype,
 		   syment *ep, void *vr)
    {int nc, nd, c, nrd;
     intb hbpi, fbpi;
@@ -1621,7 +1624,7 @@ int _PD_hyper_read(PDBfile *file, char *name, char *outtype,
  */
 
 int PD_read_bits(PDBfile *file ARG(,,cls),
-		 char *name, char *type, int64_t ni,
+		 const char *name, const char *type, int64_t ni,
 		 int sgned, int nbits, int padsz, int fpp,
 		 int64_t offs, long *pan, char **pdata)
    {int ret;
@@ -1649,7 +1652,7 @@ int PD_read_bits(PDBfile *file ARG(,,cls),
  *             -   PDATA   the data array returned
  */
 
-int _PD_rd_bits(PDBfile *file, char *name, char *type, inti ni,
+int _PD_rd_bits(PDBfile *file, const char *name, const char *type, inti ni,
 		int sgned, intb nbits, int padsz, int fpp,
 		inti offs, long *pan, char **pdata)
    {int i, ityp, out_flag, onescmp;
@@ -1742,7 +1745,8 @@ int _PD_rd_bits(PDBfile *file, char *name, char *type, inti ni,
  *               - lists
  */
 
-int64_t _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
+int64_t _PD_rd_syment(PDBfile *file, syment *ep,
+		      const char *outtype, void *vr)
    {int dst, vif, count, itags;
     inti i, n, ni, nrd, size;
     intb bpi, boffs;

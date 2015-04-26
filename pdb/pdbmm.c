@@ -116,7 +116,7 @@ static tr_layer
  *            - construct and return a pointer to a PDBFile
  */
 
-PDBfile *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
+PDBfile *_PD_mk_pdb(SC_udl *pu, const char *name, const char *md, int reg,
 		    sys_layer *sys, tr_layer *tr)
    {FILE *fp;
     PDBfile *file;
@@ -298,7 +298,7 @@ void *PD_alloc_entry(PDBfile *file ARG(,,cls), char *name)
 
 /* _PD_ALLOC_ENTRY - allocate memory for the variable type */
 
-void *_PD_alloc_entry(PDBfile *file, char *type, inti ni)
+void *_PD_alloc_entry(PDBfile *file, const char *type, inti ni)
    {int ipt;
     inti len;
     intb bpi;
@@ -309,7 +309,7 @@ void *_PD_alloc_entry(PDBfile *file, char *type, inti ni)
     pa = _PD_get_state(-1);
 
     if (_PD_indirection(type))
-       vr = (char *) CMAKE_N(char *, ni);
+       vr = CMAKE_N(char *, ni);
     else
        {dp = PD_inquire_host_type(file, type);
         if (dp == NULL)
@@ -644,7 +644,7 @@ void _PD_rl_syment(syment *ep)
 
 /* _PD_MK_DEFSTR - make a defstr entry for the structure chart */
 
-defstr *_PD_mk_defstr(hasharr *chrt, char *type, SC_kind kind,
+defstr *_PD_mk_defstr(hasharr *chrt, const char *type, SC_kind kind,
 		      memdes *lst, multides *tuple, long sz, int align,
 		      PD_byte_order ord, int conv,
 		      int *ordr, long *formt, int unsgned, int onescmp)
@@ -802,7 +802,7 @@ int _PD_ha_rl_defstr(haelem *hp, void *a)
 
 /* _PD_MAKE_TUPLE - instantiate a multides */
 
-multides *_PD_make_tuple(char *type, int ni, int *ord)
+multides *_PD_make_tuple(const char *type, int ni, int *ord)
    {multides *tuple;
 
     tuple = CMAKE(multides);

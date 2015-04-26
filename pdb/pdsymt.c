@@ -46,7 +46,8 @@ int _PD_is_var_in_dir(char *var, char *dir)
  *                  - if AD if FALSE decide whether to remove
  */
 
-int _PD_add_sym_ptrn(PDBfile *file, int ad, char *name, char *type,
+int _PD_add_sym_ptrn(PDBfile *file, int ad,
+		     const char *name, const char *type,
 		     char *acc, char *rej)
    {int ok;
 
@@ -71,7 +72,8 @@ int _PD_add_sym_ptrn(PDBfile *file, int ad, char *name, char *type,
  *                  - if AD if FALSE decide whether to remove
  */
 
-int _PD_add_sym_ptrp(PDBfile *file, int ad, char *name, char *type,
+int _PD_add_sym_ptrp(PDBfile *file, int ad,
+		     const char *name, const char *type,
 		     char *acc, char *rej)
    {int ok;
     char *p, *s;
@@ -108,7 +110,8 @@ int _PD_add_sym_ptrp(PDBfile *file, int ad, char *name, char *type,
  *                  - if AD if FALSE decide whether to remove
  */
 
-int _PD_add_sym_ancp(PDBfile *file, int ad, char *name, char *type,
+int _PD_add_sym_ancp(PDBfile *file, int ad,
+		     const char *name, const char *type,
 		     char *acc, char *rej)
    {int ok;
     char *p, *d, *s;
@@ -164,7 +167,8 @@ int _PD_add_sym_ancp(PDBfile *file, int ad, char *name, char *type,
  *                  - if AD if FALSE decide whether to remove
  */
 
-int _PD_add_sym_desp(PDBfile *file, int ad, char *name, char *type,
+int _PD_add_sym_desp(PDBfile *file, int ad,
+		     const char *name, const char *type,
 		     char *acc, char *rej)
    {int ok, nc, ex;
     char *s, *p;
@@ -211,7 +215,8 @@ int _PD_add_sym_desp(PDBfile *file, int ad, char *name, char *type,
  *                   - if AD if FALSE decide whether to remove
  */
 
-int _PD_add_sym_currp(PDBfile *file, int ad, char *name, char *type,
+int _PD_add_sym_currp(PDBfile *file, int ad,
+		      const char *name, const char *type,
 		      char *acc, char *rej)
    {int ok;
     char *s;
@@ -305,7 +310,7 @@ int _PD_symt_delay_rules(PDBfile *file, int when, char **pa, char **pr)
  *                         - return the old value
  */
 
-PD_delay_mode _PD_symt_set_delay_mode(PDBfile *file, char *mode)
+PD_delay_mode _PD_symt_set_delay_mode(PDBfile *file, const char *mode)
    {PD_delay_mode ov;
 
     ov = PD_DELAY_NONE;
@@ -375,7 +380,7 @@ PD_delay_mode _PD_symt_set_delay_mode(PDBfile *file, char *mode)
  *                           - return the old value
  */
 
-PFSymDelay _PD_symt_set_delay_method(PDBfile *file, char *mode,
+PFSymDelay _PD_symt_set_delay_method(PDBfile *file, const char *mode,
 				     PFSymDelay mth)
    {PFSymDelay rv;
 

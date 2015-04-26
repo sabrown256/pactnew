@@ -260,8 +260,8 @@ int PD_register_pdb(void)
 
 /* _PD_OPEN_BIN_AUX - open a PDB file */
 
-static PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
-				 tr_layer *tr, void *a)
+static PDBfile *_PD_open_bin_aux(SC_udl *pu, const char *name,
+				 const char *mode, tr_layer *tr, void *a)
    {PDBfile *file;
     PFBinOpen opn;
     PFBinCreate crt;
@@ -298,7 +298,7 @@ static PDBfile *_PD_open_bin_aux(SC_udl *pu, char *name, char *mode,
 
 /* _PD_OPEN_BIN - open up the specified UDL */
 
-PDBfile *_PD_open_bin(char *name, char *mode, void *a)
+PDBfile *_PD_open_bin(const char *name, const char *mode, void *a)
    {int i, n, ok;
     char *md, *type, *rfmt;
     const char *tfmt;

@@ -21,8 +21,9 @@
  *                 - and return a pointer to the string
  */
 
-char *_PD_member_type(char *s)
-   {char *t, *p, c, bf[MAXLINE], *pt;
+char *_PD_member_type(const char *s)
+   {char c, bf[MAXLINE];
+    char *t, *p, *pt, *rv;
 
     SC_strncpy(bf, MAXLINE, s, -1);
 
@@ -39,7 +40,9 @@ char *_PD_member_type(char *s)
     else
        SC_strtok(bf, " \t\n\r", pt);
 
-    return(CSTRSAVE(bf));}
+    rv = CSTRSAVE(bf);
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -48,7 +51,7 @@ char *_PD_member_type(char *s)
  *                      - given member and return a copy of it
  */
 
-char *_PD_member_base_type(char *s)
+char *_PD_member_base_type(const char *s)
    {char bf[MAXLINE];
     char *token, *p;
 
@@ -66,10 +69,12 @@ char *_PD_member_base_type(char *s)
 
 /* GOTCHA: This function is currently a no-op; it returns the original type */
 
-char *_PD_hyper_type(char *name, char *type)
-   {
+char *_PD_hyper_type(const char *name, const char *type)
+   {char *rv;
 
-    return(type);}
+    rv = (char *) type;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -79,7 +84,7 @@ char *_PD_hyper_type(char *name, char *type)
  *                 - new space is allocated for the name
  */
 
-char *_PD_member_name(char *s)
+char *_PD_member_name(const char *s)
    {char bf[MAXLINE], t[MAXLINE];
     char *pt, *token, *p;
 
@@ -112,7 +117,7 @@ char *_PD_member_name(char *s)
  *              - new space is allocated for the name
  */
 
-char *_PD_var_name(char *s)
+char *_PD_var_name(const char *s)
    {char bf[MAXLINE];
     char *token, *p;
 
@@ -130,7 +135,7 @@ char *_PD_var_name(char *s)
  *               - variable name and return a pointer to it
  */
 
-char *_PD_var_namef(PDBfile *file, char *name, char *bf, int nc)
+char *_PD_var_namef(PDBfile *file, const char *name, char *bf, int nc)
    {int n;
     char *p, *s;
 
@@ -166,7 +171,7 @@ char *_PD_var_namef(PDBfile *file, char *name, char *bf, int nc)
  *             - in PDE iff there is an index expression
  */
 
-dimdes *_PD_ex_dims(char *memb, int defoff, int *pde)
+dimdes *_PD_ex_dims(const char *memb, int defoff, int *pde)
    {int ne;
     long mini, leng;
     char bf[MAXLINE];
@@ -211,7 +216,7 @@ dimdes *_PD_ex_dims(char *memb, int defoff, int *pde)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_ADJ_DIMENSIONS - adjust dimension expressions in name for append.
+/* _PD_ADJ_DIMENSIONS - adjust dimension expressions in NAME for append.
  *                    - for now, indexes for all dimensions must include
  *                    - min and max (stride optional) and must match the
  *                    - post-append dimensions. All but the most slowly
@@ -295,7 +300,7 @@ int _PD_adj_dimensions(PDBfile *file, char *name, syment *ep)
  *                  - return -1 on error
  */
 
-long _PD_member_items(char *s)
+long _PD_member_items(const char *s)
    {char *token, bf[MAXLINE], *t;
     long acc;
 
@@ -404,7 +409,8 @@ long _PD_str_size(memdes *str, hasharr *tab)
  *           - on the proper byte boundary
  */
 
-int _PD_align(long n, char *type, int is_indirect, hasharr *tab, int *palign)
+int _PD_align(long n, const char *type, int is_indirect,
+	      hasharr *tab, int *palign)
    {long offset, align, nword;
     defstr *dp;
 
@@ -440,7 +446,7 @@ int _PD_align(long n, char *type, int is_indirect, hasharr *tab, int *palign)
  *                 - return the defstr
  */
 
-static defstr *_PD_lookup_type(char *s, hasharr *tab)
+static defstr *_PD_lookup_type(const char *s, hasharr *tab)
    {char bf[MAXLINE];
     char *token, *t;
     defstr *dp;
@@ -463,7 +469,7 @@ static defstr *_PD_lookup_type(char *s, hasharr *tab)
  *                 - return the defstr
  */
 
-defstr *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, char *s)
+defstr *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, const char *s)
    {defstr *dp;
 
     switch (ch)
@@ -553,7 +559,8 @@ long _PD_lookup_size(const char *s, hasharr *tab)
  *                     - don't get rid of this (some applications use it!)
  */
 
-int64_t _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
+int64_t _PD_member_location(const char *s, hasharr *tab,
+			    defstr *dp, memdes **pdesc)
    {int64_t addr;
     char name[MAXLINE];
     char *token;
@@ -587,7 +594,7 @@ int64_t _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc)
  */
 
 haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
-			  char *name, int flag,
+			  const char *name, int flag,
 			  char *fullname, hasharr *tab)
    {char s[MAXLINE], t[MAXLINE];
     haelem *hp;
@@ -630,7 +637,8 @@ haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
  * #bind PD_query_entry fortran() scheme() python()
  */
 
-syment *PD_query_entry(PDBfile *file ARG(,,cls), char *name, char *fullname)
+syment *PD_query_entry(PDBfile *file ARG(,,cls), const char *name,
+		       char *fullname)
    {haelem *hp;
     syment *ep;
 
@@ -647,7 +655,7 @@ syment *PD_query_entry(PDBfile *file ARG(,,cls), char *name, char *fullname)
  * #bind PD_inquire_entry fortran() scheme() python()
  */
 
-syment *PD_inquire_entry(PDBfile *file ARG(,,cls), char *name,
+syment *PD_inquire_entry(PDBfile *file ARG(,,cls), const char *name,
 			 int flag, char *fullname)
    {haelem *hp;
     syment *ep;
@@ -669,7 +677,7 @@ syment *PD_inquire_entry(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_effective_entry fortran() scheme() python()
  */
 
-syment *PD_effective_entry(PDBfile *file ARG(,,cls), char *name,
+syment *PD_effective_entry(PDBfile *file ARG(,,cls), const char *name,
 			   int flag, char *fullname)
    {syment *ep;
 

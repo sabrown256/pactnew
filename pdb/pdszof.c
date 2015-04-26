@@ -200,10 +200,11 @@ static int _PD_ptr_sz_itags(inti *pnb, PDBfile *file, void *vr,
  */
 
 long PD_sizeof(PDBfile *file ARG(,,cls),
-	       char *type, int64_t ni, void *vri)
+	       const char *type, int64_t ni, const void *vri)
    {int dst, size, indir, itags;
     inti i, nb;
-    char bf[MAXLINE], *ltype, *vr, *svr, *ttype;
+    char bf[MAXLINE];
+    char *ltype, *vr, *svr, *ttype;
     defstr *dp;
     memdes *desc, *mem_lst;
     PD_smp_state *pa;
@@ -247,7 +248,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
 
     if (dst == LEAF)
        {indir = FALSE;
-	ltype = type;}
+	ltype = (char *) type;}
     else
        {indir = TRUE;
 	SAVE_S(ltype, type);};
@@ -416,7 +417,7 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
  * #bind PN_relocate fortran() scheme() python()
  */
 
-int PN_relocate(PDBfile *file, char *type, long n)
+int PN_relocate(PDBfile *file, const char *type, long n)
    {int ret;
 
     ret = FALSE;

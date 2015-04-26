@@ -490,7 +490,7 @@ struct s_PROCESS
     int (*close)(PROCESS *pp);
     int (*flush)(PROCESS *pp);
     int (*read)(void *ptr, const char *type, size_t ni, PROCESS *pp);
-    int (*write)(const void *ptr, const char *type, size_t ni, PROCESS *pp);
+    int (*write)(void *ptr, const char *type, size_t ni, PROCESS *pp);
     int (*printf)(PROCESS *pp, const char *buffer);
     int (*gets)(char *bf, int len, PROCESS *pp);
     int (*in_ready)(PROCESS *pp);

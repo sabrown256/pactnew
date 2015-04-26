@@ -112,15 +112,15 @@ typedef int32_t intb;
 
 typedef int (*PFBinType)(char *type);
 typedef PDBfile *(*PFBinCreate)(tr_layer *tr, SC_udl *pu,
-				char *name, char *mode, void *a);
+				const char *name, const char *mode, void *a);
 typedef PDBfile *(*PFBinOpen)(tr_layer *tr, SC_udl *pu,
-			      char *name, char *mode, void *a);
+			      const char *name, const char *mode, void *a);
 typedef int64_t (*PFBinClose)(PDBfile *file);
-typedef syment *(*PFBinWrite)(PDBfile *file, char *path,
-			      char *inty, char *outty,
+typedef syment *(*PFBinWrite)(PDBfile *file, const char *path,
+			      const char *inty, const char *outty,
 			      void *vr, dimdes *dims,
 			      int appnd, int *pnew);
-typedef int (*PFBinRead)(PDBfile *file, char *path, char *ty,
+typedef int (*PFBinRead)(PDBfile *file, char *path, const char *ty,
 			 syment *ep, void *vr, int nd, long *ind);
 
 typedef struct s_PD_scope_private PD_scope_private;
@@ -250,15 +250,15 @@ extern PD_scope_private
 /* PDB.C declarations */
 
 extern PDBfile
- *PD_open_f(char *name, char *mode);
+ *PD_open_f(const char *name, const char *mode);
 
 extern syment
- *_PD_defent(PDBfile *file, char *name, char *outtype,
+ *_PD_defent(PDBfile *file, const char *name, const char *outtype,
 	     inti number, dimdes *dims);
 
 extern int
- _PD_read(PDBfile *file, char *fullpath, char *type, syment *ep,
-	  void *vr, int nd, long *ind);
+ _PD_read(PDBfile *file, char *fullpath, const char *type,
+	  syment *ep, void *vr, int nd, long *ind);
 
 
 /* PDBFC.C declarations */
@@ -311,7 +311,7 @@ extern int64_t
 /* PDBMM.C declarations */
 
 extern PDBfile
- *_PD_mk_pdb(SC_udl *pu, char *name, char *md, int reg,
+ *_PD_mk_pdb(SC_udl *pu, const char *name, const char *md, int reg,
 	     sys_layer *sys, tr_layer *tr);
 
 extern data_standard
@@ -329,13 +329,13 @@ extern syment
 
 extern defstr
  *_PD_defstr_copy(defstr *dp),
- *_PD_mk_defstr(hasharr *chrt, char *type, SC_kind kind,
+ *_PD_mk_defstr(hasharr *chrt, const char *type, SC_kind kind,
 		memdes *lst, multides *tuple,
 		long sz, int align, PD_byte_order ord, int conv,
 		int *ordr, long *formt, int unsgned, int onescmp);
 
 extern multides
- *_PD_make_tuple(char *type, int ni, int *ord),
+ *_PD_make_tuple(const char *type, int ni, int *ord),
  *_PD_copy_tuple(multides *tuple);
 
 extern memdes
@@ -345,7 +345,7 @@ extern dimdes
  *_PD_mk_dimensions(long mini, long leng);
 
 extern void
- *_PD_alloc_entry(PDBfile *file, char *type, inti ni),
+ *_PD_alloc_entry(PDBfile *file, const char *type, inti ni),
  _PD_clr_table(hasharr *tab, int (*rel)(haelem *p, void *a)),
  _PD_free_tuple(multides *tuple),
  _PD_rl_defstr(defstr *dp),
@@ -391,7 +391,7 @@ extern int
  _PD_prim_typep(char *memb, hasharr *chrt, PD_major_op error),
  _PD_require_conv(defstr *dpf, defstr *dph),
  _PD_requires_conversion(PDBfile *file, defstr *dpf,
-			 char *outtype, char *intype);
+			 const char *outtype, const char *intype);
 
 extern long
  _PD_convert_ptr_rd(char *bfi, intb fbpi, PD_byte_order ford,
@@ -425,7 +425,7 @@ extern int
  _PD_cksum_var_read(PDBfile *file, char *fullpath, char *type,
 		   syment *ep, void *vr),
  _PD_cksum_var_write(PDBfile *file, char *name, syment *ef),
- _PD_cksum_block_read(PDBfile *file, char *name, syment *ep, long n),
+ _PD_cksum_block_read(PDBfile *file, const char *name, syment *ep, long n),
  _PD_cksum_block_write(PDBfile *file, syment *ep, long n),
  _PD_cksum_reserve(PDBfile *file),
  _PD_cksum_file_write(PDBfile *file);
@@ -439,7 +439,7 @@ extern int64_t
 extern char
  **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
 	       int *num, int all, char *flags),
- *_PD_fixname(PDBfile *file, char *inname);
+ *_PD_fixname(PDBfile *file, const char *inname);
 
 
 /* PDBX.C declarations */
@@ -464,9 +464,9 @@ extern FIXNUM
 
 extern int
  _PD_filt_block_out(PDBfile *file, unsigned char *bf,
-		    char *type, long bpi, int64_t ni),
+		    const char *type, long bpi, int64_t ni),
  _PD_filt_block_in(PDBfile *file, unsigned char *bf,
-		   char *type, intb bpi, inti ni);
+		   const char *type, intb bpi, inti ni);
 
 extern int
  _PD_filt_file_out(PDBfile *file),
@@ -514,7 +514,7 @@ extern int
 /* PDLOW.C declarations */
 
 extern SC_udl
- *_PD_pio_open(char *name, char *mode);
+ *_PD_pio_open(const char *name, const char *mode);
 
 extern void
  _PD_set_io_buffer(SC_udl *pu),
@@ -530,8 +530,8 @@ extern void
 		    int *ordr, long *formt,
 		    int unsgned, int onescmp, int conv),
  _PD_def_real(char *type, PDBfile *file),
- _PD_d_install(PDBfile *file, char *name, defstr *def,
-	       PD_chart_kind chk, char *alias),
+ _PD_d_install(PDBfile *file, const char *name, defstr *def,
+	       PD_chart_kind chk, const char *alias),
  _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup),
  _PD_request_unset(PDBfile *file),
  _PD_replace_file(PDBfile *file, char *name, int64_t addr);
@@ -549,17 +549,17 @@ extern int
 extern int64_t
  _PD_close(PDBfile *file),
  _PD_eod(PDBfile *file),
- _PD_get_next_address(PDBfile *file, char *type, inti ni, void *vr,
-		      int seekf, int tellf, int colf),
+ _PD_get_next_address(PDBfile *file, const char *type, inti ni,
+		      const void *vr, int seekf, int tellf, int colf),
  _PD_get_current_address(PDBfile *file, PD_major_op tag);
 
 extern defstr
  *_PD_defstr(PDBfile *file, PD_chart_kind host,
-	     char *name, SC_kind kind,
+	     const char *name, SC_kind kind,
 	     memdes *desc, multides *tuple,
 	     long sz, int align, PD_byte_order ord,
 	     int conv, int *ordr, long *formt, int unsgned, int onescmp),
- *_PD_defstr_inst(PDBfile *file, char *name, SC_kind kind,
+ *_PD_defstr_inst(PDBfile *file, const char *name, SC_kind kind,
 		  memdes *desc, PD_byte_order ord,
 		  int *ordr, long *formt, PD_chart_kind chk),
  *_PD_type_container(PDBfile *file, defstr *dp);
@@ -578,32 +578,34 @@ extern char
 /* PDMEMB.C declarations */
 
 extern dimdes
- *_PD_ex_dims(char *memb, int defoff, int *pde);
+ *_PD_ex_dims(const char *memb, int defoff, int *pde);
 
 extern defstr
- *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, char *s);
+ *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, const char *ty);
 
 extern long
- _PD_member_items(char *s),
+ _PD_member_items(const char *s),
  _PD_comp_num(dimdes *dims),
  _PD_comp_nind(int nd, long *ind, int str),
  _PD_str_size(memdes *str, hasharr *tab),
  _PD_lookup_size(const char *s, hasharr *tab);
 
 extern int64_t
- _PD_member_location(char *s, hasharr *tab, defstr *dp, memdes **pdesc);
+ _PD_member_location(const char *s, hasharr *tab,
+		     defstr *dp, memdes **pdesc);
 
 extern int
- _PD_align(long n, char *type, int is_indirect, hasharr *tab, int *palign),
+ _PD_align(long n, const char *type, int is_indirect,
+	   hasharr *tab, int *palign),
  _PD_adj_dimensions(PDBfile *file, char *name, syment *ep);
 
 extern char
- *_PD_member_type(char *s),
- *_PD_member_base_type(char *s),
- *_PD_member_name(char *s),
- *_PD_var_name(char *s),
- *_PD_hyper_type(char *name, char *type),
- *_PD_var_namef(PDBfile *file, char *name, char *bf, int nc);
+ *_PD_member_type(const char *s),
+ *_PD_member_base_type(const char *s),
+ *_PD_member_name(const char *s),
+ *_PD_var_name(const char *s),
+ *_PD_hyper_type(const char *name, const char *type),
+ *_PD_var_namef(PDBfile *file, const char *name, char *bf, int nc);
 
 
 /* PDPAR.C declarations */
@@ -630,7 +632,7 @@ extern void
  _PD_conv_in(PDBfile *file, void *out, void *in, char *type, inti ni);
 
 extern PDBfile
- *_PD_open_bin(char *name, char *mode, void *a);
+ *_PD_open_bin(const char *name, const char *mode, void *a);
 
 extern inti
  _PD_write_bin(PDBfile *file),
@@ -683,10 +685,11 @@ extern void
 extern int
  _PD_ptr_reset(PDBfile *file, char *vr),
  _PD_ptr_entry_itag(PDBfile *file, PD_itag *pi, char *p),
- _PD_wr_itag(PDBfile *file, char *name,
-	     PD_address *ad, inti ni, char *type,
+ _PD_wr_itag(PDBfile *file, const char *name,
+	     PD_address *ad, inti ni, const char *type,
 	     int64_t addr, PD_data_location loc),
- _PD_ptr_wr_itags(PDBfile *file, char *name, void *vr, inti ni, char *type),
+ _PD_ptr_wr_itags(PDBfile *file, const char *name, const void *vr,
+		  inti ni, const char *type),
  _PD_rd_itag(PDBfile *file, char *p, PD_itag *pi),
  _PD_ptr_rd_itags(PDBfile *file, char **vr, PD_itag *pi),
  _PD_ptr_register_entry(PDBfile *fp, char *name, syment *ep);
@@ -701,7 +704,8 @@ extern void
  _PD_ptr_free_apl(PDBfile *file),
  _PD_ptr_rd_install_addr(PDBfile *file, int64_t addr, PD_data_location loc),
  _PD_ptr_remove_entry(PDBfile *file, syment *ep, int lck),
- _PD_ptr_wr_syment(PDBfile *file, char *name, PD_address *ad, char *type,
+ _PD_ptr_wr_syment(PDBfile *file, const char *name,
+		   PD_address *ad, const char *type,
 		   inti ni, int64_t addr),
  _PD_ptr_open_setup(PDBfile *file);
 
@@ -709,8 +713,8 @@ extern syment
  *_PD_ptr_read(PDBfile *file, int64_t addr, int force);
 
 extern PD_address
- *_PD_ptr_wr_lookup(PDBfile *file, void *vr, PD_data_location *ploc,
-		    int write, int lck);
+ *_PD_ptr_wr_lookup(PDBfile *file, const void *vr,
+		    PD_data_location *ploc, int write, int lck);
 
 
 /* PDRDWR.C declarations */
@@ -722,29 +726,29 @@ extern void
  _PD_fin_stacks(void);
 
 extern int
- _PD_hyper_write(PDBfile *file, char *name, syment *ep, void *vr,
-		 char *intype),
- _PD_hyper_read(PDBfile *file, char *name, char *type,
+ _PD_hyper_write(PDBfile *file, const char *name, syment *ep, void *vr,
+		 const char *intype),
+ _PD_hyper_read(PDBfile *file, const char *name, const char *type,
 		syment *ep, void *vr),
- _PD_indexed_read_as(PDBfile *file, char *fullpath, char *type,
+ _PD_indexed_read_as(PDBfile *file, char *fullpath, const char *type,
 		     void *vr, int nd, long *ind, syment *ep),
- _PD_rd_bits(PDBfile *file, char *name, char *type,
+ _PD_rd_bits(PDBfile *file, const char *name, const char *type,
 	     inti ni, int sgned, intb nbits, int padsz, int fpp, inti offs,
 	     long *pan, char **pdata),
  _PD_valid_dims(dimdes *dimscheck, dimdes *vardims);
 
 extern long
- _PD_number_refd(memdes *meml, void *svr, memdes *desc, void *vr,
-		 char *type, hasharr *tab),
+ _PD_number_refd(memdes *meml, void *svr, memdes *desc, const void *vr,
+		 const char *type, hasharr *tab),
  _PD_rd_pointer(PDBfile *file, int64_t addr);
 
 extern int64_t
- _PD_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr),
- _PD_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni, char *intype,
-	       char *outtype);
+ _PD_rd_syment(PDBfile *file, syment *ep, const char *outtype, void *vr),
+ _PD_wr_syment(PDBfile *file, const char *name, char *vr,
+	       int64_t ni, const char *intype, const char *outtype);
 
 extern int64_t
- _PD_annotate_text(PDBfile *file, syment *ep, char *name,
+ _PD_annotate_text(PDBfile *file, syment *ep, const char *name,
 		   int64_t addr);
 
 extern dimdes
@@ -763,8 +767,8 @@ extern PD_smp_state
  *_PD_get_state(int id);
 
 extern int64_t
- _PD_next_address_pf(PDBfile *file, char *type, long number,
-		     void *vr, int seekf, int tellf, int colf);
+ _PD_next_address_pf(PDBfile *file, const char *type, long number,
+		     const void *vr, int seekf, int tellf, int colf);
 
 
 /* PDSPOKE.C declarations */
@@ -781,10 +785,10 @@ extern int
  _PD_rd_symt(PDBfile *file, char *acc, char *rej);
 
 extern PD_delay_mode
- _PD_symt_set_delay_mode(PDBfile *file, char *mode);
+ _PD_symt_set_delay_mode(PDBfile *file, const char *mode);
 
 extern PFSymDelay
- _PD_symt_set_delay_method(PDBfile *file, char *mode, PFSymDelay mth);
+ _PD_symt_set_delay_method(PDBfile *file, const char *mode, PFSymDelay mth);
 
 
 #ifdef __cplusplus

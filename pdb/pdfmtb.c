@@ -56,7 +56,7 @@ static void _PD_regen_std(PDBfile *file, char *type,
 
 /* _PD_WR_ITAG_II - format and write an itag int S */
 
-static int _PD_wr_itag_ii(char *s, int nc, char *type, int64_t ni,
+static int _PD_wr_itag_ii(char *s, int nc, const char *type, int64_t ni,
 			  int64_t addr, PD_data_location loc)
    {int rv;
     char t[2][MAXLINE];
@@ -74,7 +74,7 @@ static int _PD_wr_itag_ii(char *s, int nc, char *type, int64_t ni,
 
 /* _PD_RD_ITAG_II - fill an itag from the file */
 
-static char **_PD_rd_itag_ii(char *bf)
+static char **_PD_rd_itag_ii(const char *bf)
    {char **ta;
 
     ta = PS_tokenize(bf, "\001\n", 0);
@@ -1329,7 +1329,7 @@ static int _PD_wr_fmt_ii(PDBfile *file)
  *             - if successful else NULL
  */
 
-static int _PD_open_ii(PDBfile *file, char *mode)
+static int _PD_open_ii(PDBfile *file, const char *mode)
    {char str[MAXLINE];
     char *acc, *rej, *token, *s;
     FILE *fp;
@@ -1420,7 +1420,7 @@ static int _PD_open_ii(PDBfile *file, char *mode)
  *               - return TRUE iff successful
  */
 
-static int _PD_create_ii(PDBfile *file, char *mode, int mst)
+static int _PD_create_ii(PDBfile *file, const char *mode, int mst)
    {u_int64_t nstr;
     char str[MAXLINE];
     char *nht;

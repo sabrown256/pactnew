@@ -468,7 +468,7 @@ int _PD_require_conv(defstr *dpf, defstr *dph)
  */
 
 int _PD_requires_conversion(PDBfile *file, defstr *dpf,
-			    char *outtype, char *intype)
+			    const char *outtype, const char *intype)
    {int cnv;
     defstr *dph;
 
@@ -2276,7 +2276,7 @@ static int _PD_convert(char **out, char **in, inti ni, int boffs,
  * #bind PD_convert fortran() scheme() python()
  */
 
-int PD_convert(char **out, char **in, char *typi, char *typo,
+int PD_convert(char **out, char **in, const char *typi, const char *typo,
 	       int64_t ni, data_standard *stdi, data_standard *stdo,
 	       data_standard *hstd, hasharr *chi, hasharr *cho,
 	       int boffs, PD_major_op error)

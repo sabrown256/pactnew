@@ -2092,7 +2092,8 @@ static void _PD_parse(PD_smp_state *pa)
  *
  */
 
-syment *_PD_effective_ep(PDBfile *file, char *name, int flag, char *fullname)
+syment *_PD_effective_ep(PDBfile *file, const char *name,
+			 int flag, char *fullname)
    {int alloc_frames;
     dimdes *dims;
     char *s, *type, *lname, bf[MAXLINE];

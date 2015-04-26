@@ -124,7 +124,7 @@ int _PN_bin_read(void *ptr, const char *type, size_t ni, PROCESS *pp)
 
 /* _PN_BIN_WRITE - do binary write to a PROCESS */
 
-int _PN_bin_write(const void *ptr, const char *type, size_t ni, PROCESS *pp)
+int _PN_bin_write(void *ptr, const char *type, size_t ni, PROCESS *pp)
    {int niw;
     char *name;
     PDBfile *file;
