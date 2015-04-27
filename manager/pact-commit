@@ -1,4 +1,4 @@
-#!/bin/csh -fvx
+#!/bin/csh -f
 #
 # PACT-COMMIT - commit to the PACT repository
 #
