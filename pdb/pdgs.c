@@ -55,12 +55,13 @@ inti _PD_n_spec_elements(int n, long *ind)
  *                  - return the number of contiguous items
  */
 
-static inti _PD_hyper_gather(char *dst, char *src,
+static inti _PD_hyper_gather(char *dst, const char *src,
 			     int is, int ns, long *sind, intb bpi, int mo)
    {int mn, mx;
     inti i, j, ng;
     inti offset, stride, start, stop, step;
-    char *pd, *ps;
+    char *pd;
+    const char *ps;
 
     if (mo == COLUMN_MAJOR_ORDER)
        {mn = 0;
@@ -102,12 +103,13 @@ static inti _PD_hyper_gather(char *dst, char *src,
  *                   - return the number of items moved
  */
 
-static inti _PD_hyper_scatter(char *dst, int id, int nd, long *dind, char *src,
-			      intb bpi, int mo)
+static inti _PD_hyper_scatter(char *dst, int id, int nd, long *dind,
+			      const char *src, intb bpi, int mo)
    {int mn, mx;
     inti i, j, ng;
     inti offset, stride, start, stop, step;
-    char *pd, *ps;
+    char *pd;
+    const char *ps;
 
     if (mo == COLUMN_MAJOR_ORDER)
        {mn = 0;
@@ -163,8 +165,9 @@ static inti _PD_hyper_scatter(char *dst, int id, int nd, long *dind, char *src,
  * #bind PD_gather_as fortran() scheme() python()
  */
 
-int64_t PD_gather_as(PDBfile *file ARG(,,cls), char *name, char *type,
-		     void *vr, long *sind, int ndst, long *dind)
+int64_t PD_gather_as(PDBfile *file ARG(,,cls), const char *name,
+		     const char *type, void *vr, long *sind,
+		     int ndst, long *dind)
    {inti nr, ng, ni, mo;
     intb bpi;
     char *tv;
@@ -206,7 +209,8 @@ int64_t PD_gather_as(PDBfile *file ARG(,,cls), char *name, char *type,
  * #bind PD_gather fortran() scheme() python()
  */
 
-int64_t PD_gather(PDBfile *file ARG(,,cls), char *name, void *vr, long *sind,
+int64_t PD_gather(PDBfile *file ARG(,,cls), const char *name,
+		  void *vr, long *sind,
 		  int ndst, long *dind)
    {int64_t rv;
 
@@ -234,7 +238,7 @@ int64_t PD_gather(PDBfile *file ARG(,,cls), char *name, void *vr, long *sind,
  */
 
 int PD_scatter_as(PDBfile *file ARG(,,cls),
-		  char *name, char *intype, char *outtype,
+		  const char *name, const char *intype, const char *outtype,
 		  void *vr, int nsrc, long *sind, int ndst, long *dind)
    {int ret, mo;
     inti ni, ng;
@@ -273,7 +277,8 @@ int PD_scatter_as(PDBfile *file ARG(,,cls),
  * #bind PD_scatter fortran() scheme() python()
  */
 
-int PD_scatter(PDBfile *file ARG(,,cls), char *name, char *type, void *vr,
+int PD_scatter(PDBfile *file ARG(,,cls), const char *name,
+	       const char *type, void *vr,
 	       int nsrc, long *sind, int ndst, long *dind)
    {int rv;
 

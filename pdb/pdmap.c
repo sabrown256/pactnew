@@ -18,7 +18,7 @@
  * #bind PD_wrt_curve_alt fortran() python()
  */
 
-int PD_wrt_curve_alt(PDBfile *file ARG(,,cls), char *labl,
+int PD_wrt_curve_alt(PDBfile *file ARG(,,cls), const char *labl,
 		     int n, double *x, double *y, int *sic)
    {int rv;
 
@@ -38,7 +38,7 @@ int PD_wrt_curve_alt(PDBfile *file ARG(,,cls), char *labl,
  * #bind PD_wrt_curve_y_alt fortran() python()
  */
 
-int PD_wrt_curve_y_alt(PDBfile *file ARG(,,cls), char *labl,
+int PD_wrt_curve_y_alt(PDBfile *file ARG(,,cls), const char *labl,
 		       int n, int ix, double *y, int *sic)
    {int rv;
 
@@ -55,7 +55,7 @@ int PD_wrt_curve_y_alt(PDBfile *file ARG(,,cls), char *labl,
 
 /* _PD_BUILD_SET - build and return a set from FORTRAN type information */
 
-static PM_set *_PD_build_set(int *ai, double *ad, char *sname)
+static PM_set *_PD_build_set(int *ai, double *ad, const char *sname)
    {int i, j, nd, nde, ne;
     int *maxes;
     void **elem;
@@ -115,7 +115,7 @@ static PM_set *_PD_build_set(int *ai, double *ad, char *sname)
  */
 
 int PD_wrt_set(PDBfile *file ARG(,,cls),
-	       char *dname, int *adp, double *adm)
+	       const char *dname, int *adp, double *adm)
    {int rv;
     PM_set *set;
 
@@ -167,8 +167,8 @@ int PD_wrt_set(PDBfile *file ARG(,,cls),
  */
 
 int PD_wrt_map(PDBfile *file ARG(,,cls),
-	       char *dname, int *adp, double *adm,
-	       char *rname, int *arp, double *arm,
+	       const char *dname, int *adp, double *adm,
+	       const char *rname, int *arp, double *arm,
 	       int *sim)
    {int rv;
     char s[MAXLINE];
@@ -234,8 +234,8 @@ int PD_wrt_map(PDBfile *file ARG(,,cls),
  * #bind PD_wrt_map_ran fortran() python()
  */
 
-int PD_wrt_map_ran(PDBfile *file ARG(,,cls), char *dname,
-		   char *rname, int *arp, double *arm,
+int PD_wrt_map_ran(PDBfile *file ARG(,,cls), const char *dname,
+		   const char *rname, int *arp, double *arm,
 		   pcons *info, int *sim)
    {int i;
     int rv;

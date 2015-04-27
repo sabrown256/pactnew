@@ -2441,7 +2441,7 @@ int PD_n_bit_char_std(PD_character_standard cstd)
  */
 
 char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
-		       char *in, int64_t nb)
+		       const char *in, int64_t nb)
    {int n, ret;
     inti ni;
 
@@ -2488,7 +2488,7 @@ char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
  */
 
 char *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
-			 char *in, int64_t nb)
+			 const char *in, int64_t nb)
    {inti n, nn, nx;
     char *t;
 

@@ -26,7 +26,7 @@ char
  * #bind PD_mk_attribute fortran() scheme() python()
  */
 
-attribute *PD_mk_attribute(char *at, char *type)
+attribute *PD_mk_attribute(const char *at, const char *type)
    {int i;
     attribute *attr;
 
@@ -119,7 +119,7 @@ static void _PD_rl_attribute_value(attribute_value *avl)
  */
 
 attribute *PD_inquire_attribute(PDBfile *file ARG(,,cls),
-				char *name, char *path)
+				const char *name, char *path)
    {haelem *hp;
     attribute *at;
 
@@ -139,7 +139,7 @@ attribute *PD_inquire_attribute(PDBfile *file ARG(,,cls),
  */
 
 attribute_value *PD_inquire_attribute_value(PDBfile *file ARG(,,cls),
-					    char *name, char *path)
+					    const char *name, char *path)
    {haelem *hp;
     attribute_value *avl;
 
@@ -199,7 +199,8 @@ void PD_rel_attr_table(PDBfile *file ARG(,,cls))
  * #bind PD_def_attribute fortran() scheme() python()
  */
 
-int PD_def_attribute(PDBfile *file ARG(,,cls), char *at, char *type)
+int PD_def_attribute(PDBfile *file ARG(,,cls),
+		     const char *at, const char *type)
    {char atype[MAXLINE], path[MAXLINE];
     attribute *attr;
 
@@ -241,7 +242,7 @@ int PD_def_attribute(PDBfile *file ARG(,,cls), char *at, char *type)
  * #bind PD_rem_attribute fortran() scheme() python()
  */
 
-int PD_rem_attribute(PDBfile *file ARG(,,cls), char *at)
+int PD_rem_attribute(PDBfile *file ARG(,,cls), const char *at)
    {attribute *attr;
 
     attr = PD_inquire_attribute(file, at, NULL);
@@ -266,7 +267,8 @@ int PD_rem_attribute(PDBfile *file ARG(,,cls), char *at)
  * #bind PD_set_attribute fortran() scheme(pd-set-attribute!) python()
  */
 
-int PD_set_attribute(PDBfile *file ARG(,,cls), char *vr, char *at, void *vl)
+int PD_set_attribute(PDBfile *file ARG(,,cls),
+		     const char *vr, const char *at, void *vl)
    {int i;
     long indx;
     attribute *attr;
@@ -331,7 +333,8 @@ int PD_set_attribute(PDBfile *file ARG(,,cls), char *vr, char *at, void *vl)
  * #bind PD_get_attribute fortran() scheme() python()
  */
 
-void *PD_get_attribute(PDBfile *file ARG(,,cls), char *vr, char *at)
+void *PD_get_attribute(PDBfile *file ARG(,,cls),
+		       const char *vr, const char *at)
    {char fat[MAXLINE], favl[MAXLINE];
     char *vt;
     void *vl, **data;
@@ -672,7 +675,7 @@ int _PD_contains_indirections(hasharr *tab, char *type)
  */
 
 int PD_read_pdb_curve(PDBfile *fp ARG(,,cls),
-		      char *name, double **pxp, double **pyp,
+		      const char *name, double **pxp, double **pyp,
 		      int *pn, char *label,
 		      double *pxmn, double *pxmx, double *pymn, double *pymx,
 		      PD_curve_io flag)
@@ -807,7 +810,7 @@ int PD_read_pdb_curve(PDBfile *fp ARG(,,cls),
  * #bind PD_wrt_pdb_curve fortran() scheme() python()
  */
 
-int PD_wrt_pdb_curve(PDBfile *fp ARG(,,cls), char *labl, int n,
+int PD_wrt_pdb_curve(PDBfile *fp ARG(,,cls), const char *labl, int n,
 		     double *px, double *py, int icurve)
    {int i, *np;
     char name[MAXLINE], desc[MAXLINE], *dp, *lp;
@@ -905,7 +908,7 @@ int PD_wrt_pdb_curve(PDBfile *fp ARG(,,cls), char *labl, int n,
  */
 
 int PD_wrt_pdb_curve_y(PDBfile *fp ARG(,,cls),
-		       char *labl, int n, int ix,
+		       const char *labl, int n, int ix,
 		       double *py, int icurve)
    {int i, len;
     char name[MAXLINE], desc[MAXLINE];
@@ -940,7 +943,7 @@ int PD_wrt_pdb_curve_y(PDBfile *fp ARG(,,cls),
 
 /* save the curve label */
     snprintf(name, MAXLINE, "labl%d(%d)", icurve, i);
-    if (!PD_write(fp, name, G_CHAR_S, labl))
+    if (!PD_write(fp, name, G_CHAR_S, (char *) labl))
        return(FALSE);
 
 /* save the number of points */
@@ -1115,7 +1118,7 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
  * #bind PD_make_image fortran() scheme() python()
  */
 
-PD_image *PD_make_image(char *name, char *type, void *data,
+PD_image *PD_make_image(const char *name, const char *type, void *data,
 		        int kmax, int lmax, int bpp,
 		        double xmin, double xmax, double ymin, double ymax,
 			double zmin, double zmax)

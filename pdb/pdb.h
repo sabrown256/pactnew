@@ -1083,22 +1083,22 @@ extern defstr
 /* PDBX.C declarations */
 
 extern void
- *PD_get_attribute(PDBfile *file, CONST char *vr, CONST char *at);
+ *PD_get_attribute(PDBfile *file, const char *vr, const char *at);
 
 extern int
  PD_def_pdb_types(PDBfile *file),
  PD_def_attr_str(PDBfile *file),
- PD_def_attribute(PDBfile *file, CONST char *at, CONST char *type),
- PD_set_attribute(PDBfile *file, CONST char *vr, CONST char *at, void *vl),
- PD_rem_attribute(PDBfile *file, CONST char *at),
+ PD_def_attribute(PDBfile *file, const char *at, const char *type),
+ PD_set_attribute(PDBfile *file, const char *vr, const char *at, void *vl),
+ PD_rem_attribute(PDBfile *file, const char *at),
  PD_def_hash_types(PDBfile *file, int flag),
- PD_read_pdb_curve(PDBfile *fp, CONST char *name, double **pxp, double **pyp,
-                   int *pn, CONST char *label,
+ PD_read_pdb_curve(PDBfile *fp, const char *name, double **pxp, double **pyp,
+                   int *pn, char *label,
                    double *pxmn, double *pxmx, double *pymn, double *pymx,
                    PD_curve_io flag),
- PD_wrt_pdb_curve(PDBfile *fp, CONST char *labl, int n,
+ PD_wrt_pdb_curve(PDBfile *fp, const char *labl, int n,
                   double *px, double *py, int icurve),
- PD_wrt_pdb_curve_y(PDBfile *fp, CONST char *labl, int n, int ix,
+ PD_wrt_pdb_curve_y(PDBfile *fp, const char *labl, int n, int ix,
                     double *py, int icurve),
  PD_put_mapping(PDBfile *file, PM_mapping *f, int mapping),
  PD_put_image(PDBfile *file, void *f, int image),
@@ -1108,21 +1108,22 @@ extern int
  _PD_disk_addr_sort(haelem **v, int n);
 
 extern attribute
- *PD_mk_attribute(char *at, CONST char *type),
- *PD_inquire_attribute(PDBfile *file, CONST char *name, char *path);
+ *PD_mk_attribute(const char *at, const char *type),
+ *PD_inquire_attribute(PDBfile *file, const char *name, char *path);
 
 extern attribute_value
- *PD_inquire_attribute_value(PDBfile *file, CONST char *name, char *path);
+ *PD_inquire_attribute_value(PDBfile *file, const char *name, char *path);
 
 extern void
  PD_rel_image(PD_image *im),
  PD_rel_attr_table(PDBfile *file);
 
 extern char
- *PD_process_set_name(CONST char *dname);
+ *PD_process_set_name(char *dname);
 
 extern PD_image
- *PD_make_image(CONST char *name, char *type, void *data, int kmax, int lmax,
+ *PD_make_image(const char *name, const char *type,
+		void *data, int kmax, int lmax,
                 int bpp, double xmin, double xmax, double ymin, double ymax,
                 double zmin, double zmax);
 
@@ -1141,24 +1142,24 @@ extern int
 
 extern char
  *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
-                   CONST char *in, int64_t nb),
+                   const char *in, int64_t nb),
  *PD_conv_from_ascii(char *out, int nc, PD_character_standard cstd,
-                     CONST char *in, int64_t nb);
+                     const char *in, int64_t nb);
 
 
 /* PDGS.C declarations */
 
 extern int64_t
- PD_gather_as(PDBfile *file, CONST char *name, CONST char *type,
+ PD_gather_as(PDBfile *file, const char *name, const char *type,
               void *vr, long *sind, int ndst, long *dind),
- PD_gather(PDBfile *file, CONST char *name, void *vr, long *sind,
+ PD_gather(PDBfile *file, const char *name, void *vr, long *sind,
            int ndst, long *dind);
 
 extern int
- PD_scatter_as(PDBfile *file, CONST char *name,
-	       CONST char *intype, CONST char *outtype,
+ PD_scatter_as(PDBfile *file, const char *name,
+	       const char *intype, const char *outtype,
                void *vr, int nsrc, long *sind, int ndst, long *dind),
- PD_scatter(PDBfile *file, CONST char *name, CONST char *type, void *vr,
+ PD_scatter(PDBfile *file, const char *name, const char *type, void *vr,
             int nsrc, long *sind, int ndst, long *dind);
 
 
@@ -1248,17 +1249,17 @@ extern void
 /* PDMAP.C declarations */
 
 extern int
- PD_wrt_curve_alt(PDBfile *file, CONST char *labl,
+ PD_wrt_curve_alt(PDBfile *file, const char *labl,
                   int n, double *x, double *y, int *sic),
- PD_wrt_curve_y_alt(PDBfile *file, CONST char *labl,
+ PD_wrt_curve_y_alt(PDBfile *file, const char *labl,
                     int n, int ix, double *y, int *sic),
- PD_wrt_set(PDBfile *file, CONST char *dname, int *adp, double *adm),
+ PD_wrt_set(PDBfile *file, const char *dname, int *adp, double *adm),
  PD_wrt_map(PDBfile *file,
-            CONST char *dname, int *adp, double *adm,
-            CONST char *rname, int *arp, double *arm,
+            const char *dname, int *adp, double *adm,
+            const char *rname, int *arp, double *arm,
             int *sim),
- PD_wrt_map_ran(PDBfile *file, CONST char *dname,
-                CONST char *rname, int *arp, double *arm,
+ PD_wrt_map_ran(PDBfile *file, const char *dname,
+                const char *rname, int *arp, double *arm,
                 pcons *info, int *sim);
 
 
