@@ -60,7 +60,7 @@ int PD_mp_set_collective(int flag)
  * #bind PD_mp_create fortran() scheme() python()
  */
 
-PDBfile *PD_mp_create(char *name, SC_communicator *comm)
+PDBfile *PD_mp_create(const char *name, SC_communicator *comm)
    {PDBfile *file;
 
     if (!_PD_IS_DP_INIT)
@@ -85,7 +85,8 @@ PDBfile *PD_mp_create(char *name, SC_communicator *comm)
  * #bind PD_mp_open fortran() scheme() python()
  */
 
-PDBfile *PD_mp_open(char *name, char *mode, SC_communicator comm)
+PDBfile *PD_mp_open(const char *name, const char *mode,
+		    SC_communicator comm)
    {PDBfile *file;
 
     if (!_PD_IS_DP_INIT)

@@ -356,7 +356,7 @@ FILE *_PD_open_container_file(const char *name, const char *mode)
  *                   - in the address range (SAD, EAD)
  */
 
-PDBfile *PD_open_contained(char *name, int64_t sad, int64_t ead)
+PDBfile *PD_open_contained(const char *name, int64_t sad, int64_t ead)
    {char t[3][MAXLINE];
     PDBfile *fp;
 

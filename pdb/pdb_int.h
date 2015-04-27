@@ -437,8 +437,8 @@ extern int64_t
 /* PDBDIR.C declarations */
 
 extern char
- **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
-	       int *num, int all, char *flags),
+ **_PD_ls_extr(PDBfile *file, const char *path, const char *type,
+	       long size, int *num, int all, const char *flags),
  *_PD_fixname(PDBfile *file, const char *inname);
 
 
@@ -672,8 +672,9 @@ extern char
 /* PDPRNT.C declarations */
 
 extern int
- _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
-		char *type, int irecursion, int n, long *ind);
+ _PD_print_leaf(PD_printdes *prnt, PDBfile *file,
+		const char *vr, inti ni,
+		const char *type, int irecursion, int n, long *ind);
 
 extern void
  _PD_set_digits(PDBfile *file),

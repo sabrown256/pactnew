@@ -420,7 +420,7 @@ static int _PN_sizeof(const char *s)
  * #bind PN_conv_in fortran() scheme() python()
  */
 
-void PN_conv_in(void *out, void *in, char *type, int64_t ni,
+void PN_conv_in(void *out, void *in, const char *type, int64_t ni,
 		hasharr *in_chart)
    {data_standard *istd;
     PD_smp_state *pa;
@@ -455,7 +455,7 @@ void PN_conv_in(void *out, void *in, char *type, int64_t ni,
  * #bind PN_conv_out fortran() scheme() python()
  */
 
-void PN_conv_out(void *out, void *in, char *type, int64_t ni,
+void PN_conv_out(void *out, void *in, const char *type, int64_t ni,
 		 hasharr *out_chart)
    {data_standard *ostd;
     PD_smp_state *pa;
@@ -552,7 +552,7 @@ hasharr *PN_target(data_standard *std, data_alignment *align)
  * #bind PN_defstr fortran() scheme() python()
  */
 
-defstr *PN_defstr(hasharr *chart, char *name, data_alignment *align,
+defstr *PN_defstr(hasharr *chart, const char *name, data_alignment *align,
                   int defoff, ...)
    {char *nxt, *ptype, *type;
     defstr *dp;
@@ -734,7 +734,7 @@ int PN_close(PDBfile *file)
  * #bind PN_write fortran() scheme() python()
  */
 
-int PN_write(PDBfile *file, char *type, int64_t ni, void *vr)
+int PN_write(PDBfile *file, const char *type, int64_t ni, void *vr)
    {int ret;
     char bf[MAXLINE];
 
@@ -754,7 +754,7 @@ int PN_write(PDBfile *file, char *type, int64_t ni, void *vr)
  * #bind PN_read fortran() scheme() python()
  */
 
-int PN_read(PDBfile *file, char *type, int64_t ni, void *vr)
+int PN_read(PDBfile *file, const char *type, int64_t ni, void *vr)
    {int ret;
     int64_t addr;
     char bf[MAXLINE];

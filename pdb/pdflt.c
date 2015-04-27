@@ -334,7 +334,7 @@ int _PD_filt_close(PDBfile *file)
 
 /* PD_FILT_MAKE_CHAIN - make a filter chain */
 
-fltdes *PD_filt_make_chain(fltdes *flp, char *name,
+fltdes *PD_filt_make_chain(fltdes *flp, const char *name,
 			   PFifltdes fi, PFifltdes fo, void *data)
    {fltdes *fl;
 

@@ -15,7 +15,7 @@
 
 /* _PD_INQUIRE_MEMBER - return the member of DP S */
 
-static memdes *_PD_inquire_member(defstr *dp, char *s)
+static memdes *_PD_inquire_member(defstr *dp, const char *s)
    {memdes *desc, *rv;
 
     rv = NULL;
@@ -33,7 +33,7 @@ static memdes *_PD_inquire_member(defstr *dp, char *s)
 
 /* _PD_GET_MEMBER_NAME - return the member of LST named S */
 
-static memdes *_PD_get_member_name(memdes *lst, char *s)
+static memdes *_PD_get_member_name(memdes *lst, const char *s)
    {memdes *desc, *rv;
 
     rv = NULL;
@@ -51,7 +51,7 @@ static memdes *_PD_get_member_name(memdes *lst, char *s)
 
 /* _PD_INQUIRE_MEMBER_NAME - return the member of DP named S */
 
-static memdes *_PD_inquire_member_name(defstr *dp, char *s)
+static memdes *_PD_inquire_member_name(defstr *dp, const char *s)
    {memdes *rv;
 
     rv = NULL;
@@ -66,7 +66,8 @@ static memdes *_PD_inquire_member_name(defstr *dp, char *s)
 
 /* _PD_CAST_INJECT - setup the cast specs from S into DESC */
 
-static int _PD_cast_inject(hasharr *tab, defstr *dp, memdes *desc, char *s)
+static int _PD_cast_inject(hasharr *tab, defstr *dp, memdes *desc,
+			   const char *s)
    {int rv;
     memdes *lst;
 
@@ -124,7 +125,7 @@ static int _PD_size_from_inject(hasharr *tab, defstr *dp,
 /* _PD_CAST_PROCESS_SPEC - process a cast or size_from specification S */
 
 static int _PD_cast_process_spec(hasharr *chrt, defstr *dp,
-				 memdes *desc, char *s)
+				 memdes *desc, const char *s)
    {int it, nt, rv;
     char **sa, **ta;
 
@@ -269,7 +270,8 @@ inti _PD_cast_size(memdes *meml, void *svr, memdes *desc)
  * #bind PD_cast fortran() scheme() python()
  */
 
-int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
+int PD_cast(PDBfile *file ARG(,,cls), const char *type,
+	    const char *memb, const char *contr)
    {int rv;
     defstr *dp;
     hasharr *tab;
@@ -315,8 +317,8 @@ int PD_cast(PDBfile *file ARG(,,cls), char *type, char *memb, char *contr)
  * #bind PD_size_from fortran() scheme() python()
  */
 
-int PD_size_from(PDBfile *file ARG(,,cls), char *type,
-		 char *memb, char *contr)
+int PD_size_from(PDBfile *file ARG(,,cls), const char *type,
+		 const char *memb, const char *contr)
    {int rv;
     long is, ns;
     char **sa;

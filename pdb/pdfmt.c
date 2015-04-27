@@ -476,7 +476,7 @@ int _PD_format_version(PDBfile *file, int vers)
  * #bind PD_isfile fortran() scheme(pd-isfile?) python()
  */
 
-int PD_isfile(char *fname)
+int PD_isfile(const char *fname)
    {int vers, ok;
     FILE *fp;
 

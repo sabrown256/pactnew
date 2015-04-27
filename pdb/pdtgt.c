@@ -58,7 +58,7 @@ int PD_target_n_platforms(void)
  * #bind PD_target_platform fortran() scheme() python()
  */
 
-int PD_target_platform(char *tgt)
+int PD_target_platform(const char *tgt)
    {int i, n, rv;
     target *pt;
 

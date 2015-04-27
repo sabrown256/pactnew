@@ -31,7 +31,7 @@ int
  * #bind PD_cd fortran() scheme() python()
  */
 
-int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
+int PD_cd(PDBfile *file ARG(,,cls), const char *dirname)
    {int rv, ok;
     char name[MAXLINE];
     char *acc, *rej;
@@ -102,7 +102,7 @@ int PD_cd(PDBfile *file ARG(,,cls), char *dirname)
  * #bind PD_ln fortran() scheme() python()
  */
 
-int PD_ln(PDBfile *file ARG(,,cls), char *oldname, char *newname)
+int PD_ln(PDBfile *file ARG(,,cls), const char *oldname, const char *newname)
    {syment *oldep;
     char newpath[MAXLINE], oldpath[MAXLINE], dirname[MAXLINE];
     char *nname, *s, **avl;
@@ -173,7 +173,7 @@ int PD_ln(PDBfile *file ARG(,,cls), char *oldname, char *newname)
  *
  */
 
-static int _PD_setup_flags(char *flags)
+static int _PD_setup_flags(const char *flags)
    {int i, nc, iflags;
     char csave[MAXLINE], *token, *t;
 
@@ -205,7 +205,7 @@ static int _PD_setup_flags(char *flags)
  *               - which signifies that it should be hidden
  */
 
-static int _PD_is_hidden(char *pattern, char *entry)
+static int _PD_is_hidden(const char *pattern, const char *entry)
    {int n, match, rv;
     char *amp;
 
@@ -241,13 +241,13 @@ static int _PD_is_hidden(char *pattern, char *entry)
 
 /* _PD_LS_EXTR - return a list of all variables and directories of
  *             - the specified type in the specified directory.
- *             - If type is null, all types are returned. If path
- *             - is null, the root directory is searched. Directories
+ *             - If TYPE is null, all types are returned. If PATH
+ *             - is NULL, the root directory is searched. Directories
  *             - are terminated with a slash.
  */
 
-char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
-		   int *num, int all, char *flags)
+char **_PD_ls_extr(PDBfile *file, const char *path, const char *type,
+		   long size, int *num, int all, const char *flags)
    {int nc, ne, nvars, i, has_dirs, head, pass; 
     int iflags, psx;
     char **varlist, **outlist;
@@ -429,7 +429,8 @@ char **_PD_ls_extr(PDBfile *file, char *path, char *type, long size,
  * #bind PD_ls fortran() scheme() python()
  */
 
-char **PD_ls(PDBfile *file ARG(,,cls), char *path, char *type, int *num)
+char **PD_ls(PDBfile *file ARG(,,cls), const char *path, const char *type,
+	     int *num)
    {char **rv;
 
     rv = _PD_ls_extr(file, path, type, -1L, num, FALSE, NULL);
@@ -450,8 +451,8 @@ char **PD_ls(PDBfile *file ARG(,,cls), char *path, char *type, int *num)
  * #bind PD_ls_alt fortran() scheme() python()
  */
 
-char **PD_ls_alt(PDBfile *file ARG(,,cls), char *path,
-		 char *type, int *num, char *flags)
+char **PD_ls_alt(PDBfile *file ARG(,,cls), const char *path,
+		 const char *type, int *num, const char *flags)
    {char **rv;
 
     rv = _PD_ls_extr(file, path, type, -1L, num, FALSE, flags);
@@ -463,7 +464,7 @@ char **PD_ls_alt(PDBfile *file ARG(,,cls), char *path,
 
 /* _PD_WR_DIR - actually write the directory entry */
 
-static int _PD_wr_dir(PDBfile *file, char *name)
+static int _PD_wr_dir(PDBfile *file, const char *name)
    {int ret;
     int *dir;
 
@@ -515,7 +516,7 @@ int PD_def_dir(PDBfile *file ARG(,,cls))
  *                - exists
  */
 
-static int _PD_exist_path(PDBfile *file, char *path)
+static int _PD_exist_path(PDBfile *file, const char *path)
    {int ret;
     char head[MAXLINE];
     char *s;
@@ -548,7 +549,7 @@ static int _PD_exist_path(PDBfile *file, char *path)
  * #bind PD_isdir fortran() scheme() python()
  */
 
-int PD_isdir(PDBfile *file ARG(,,cls), char *dir)
+int PD_isdir(PDBfile *file ARG(,,cls), const char *dir)
    {int ret;
     char name[MAXLINE];
     syment *ep;
@@ -587,7 +588,7 @@ int PD_isdir(PDBfile *file ARG(,,cls), char *dir)
  * #bind PD_mkdir fortran() scheme() python()
  */
 
-int PD_mkdir(PDBfile *file ARG(,,cls), char *dir)
+int PD_mkdir(PDBfile *file ARG(,,cls), const char *dir)
    {int ret;
     char name[MAXLINE];
     PD_smp_state *pa;

@@ -68,7 +68,8 @@ void PD_contents(PDBfile *file ARG(,,cls), FILE *out, int fh, int vers)
  * #bind PD_typedef fortran() scheme() python()
  */
 
-defstr *PD_typedef(PDBfile *file ARG(,,cls), char *oname, char *tname)
+defstr *PD_typedef(PDBfile *file ARG(,,cls),
+		   const char *oname, const char *tname)
    {defstr *dp;
     PD_smp_state *pa;
 
@@ -102,7 +103,7 @@ defstr *PD_typedef(PDBfile *file ARG(,,cls), char *oname, char *tname)
  * #bind PD_defenum fortran() scheme() python()
  */
 
-defstr *PD_defenum(PDBfile *file ARG(,,cls), char *name)
+defstr *PD_defenum(PDBfile *file ARG(,,cls), const char *name)
    {char *ity;
     defstr *dp;
     enum {A, B, C} t = A;
@@ -129,7 +130,8 @@ defstr *PD_defenum(PDBfile *file ARG(,,cls), char *name)
  * #bind PD_defncv fortran() scheme() python()
  */
 
-defstr *PD_defncv(PDBfile *file ARG(,,cls), char *name, long bpi, int align)
+defstr *PD_defncv(PDBfile *file ARG(,,cls), const char *name,
+		  long bpi, int align)
    {defstr *dp;
 
 /* install in the file chart */
@@ -154,7 +156,7 @@ defstr *PD_defncv(PDBfile *file ARG(,,cls), char *name, long bpi, int align)
  * #bind PD_defchr fortran() scheme() python()
  */
 
-defstr *PD_defchr(PDBfile *file ARG(,,cls), char *name,
+defstr *PD_defchr(PDBfile *file ARG(,,cls), const char *name,
 		  long bpi, int align,
 		  PD_byte_order ord, int unsgned)
    {defstr *dp;
@@ -179,7 +181,7 @@ defstr *PD_defchr(PDBfile *file ARG(,,cls), char *name,
  * #bind PD_defixnum fortran() scheme() python()
  */
 
-defstr *PD_defixnum(PDBfile *file ARG(,,cls), char *name, long bpi,
+defstr *PD_defixnum(PDBfile *file ARG(,,cls), const char *name, long bpi,
 		    int align, PD_byte_order ord, int unsgned, int onescmp)
    {defstr *dp;
 
@@ -203,7 +205,7 @@ defstr *PD_defixnum(PDBfile *file ARG(,,cls), char *name, long bpi,
  * #bind PD_defix fortran() scheme() python()
  */
 
-defstr *PD_defix(PDBfile *file ARG(,,cls), char *name, long bpi,
+defstr *PD_defix(PDBfile *file ARG(,,cls), const char *name, long bpi,
 		 int align, PD_byte_order ord)
    {defstr *dp;
 
@@ -219,7 +221,7 @@ defstr *PD_defix(PDBfile *file ARG(,,cls), char *name, long bpi,
  * #bind PD_defloat fortran() scheme() python()
  */
 
-defstr *PD_defloat(PDBfile *file ARG(,,cls), char *name, long bpi,
+defstr *PD_defloat(PDBfile *file ARG(,,cls), const char *name, long bpi,
 		   int align, int *ordr,
 		   long expb, long mantb, long sbs, long sbe,
 		   long sbm, long hmb, long bias)
@@ -267,8 +269,8 @@ defstr *PD_defloat(PDBfile *file ARG(,,cls), char *name, long bpi,
  * #bind PD_defstr_alt fortran() scheme() python()
  */
 
-defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
-		      char **members)
+defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), const char *name,
+		      int nmemb, char **members)
    {int i, doffs;
     char *mbr, *ptype;
     hasharr *fchrt;
@@ -357,7 +359,7 @@ defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), char *name, int nmemb,
  * #bind PD_defstr python()
  */
 
-defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
+defstr *PD_defstr(PDBfile *file ARG(,,cls), const char *name, ...)
    {int n;
     char **members, *mbr;
     defstr *dp;
@@ -388,7 +390,7 @@ defstr *PD_defstr(PDBfile *file ARG(,,cls), char *name, ...)
  *             - return a status of the operation
  */
 
-int PD_defstr_i(PDBfile *file ARG(,,cls), char *name, ...)
+int PD_defstr_i(PDBfile *file ARG(,,cls), const char *name, ...)
    {int rv, n;
     char **members, *mbr;
     defstr *dp;
@@ -428,7 +430,8 @@ int PD_defstr_i(PDBfile *file ARG(,,cls), char *name, ...)
  * #bind PD_defstr_s fortran() scheme() python()
  */
 
-defstr *PD_defstr_s(PDBfile *file ARG(,,cls), char *name, char *members)
+defstr *PD_defstr_s(PDBfile *file ARG(,,cls),
+		    const char *name, const char *members)
    {int nm;
     char **mbr;
     defstr *dp;

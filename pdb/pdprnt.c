@@ -17,23 +17,17 @@ typedef int (*PFPrnt)(FILE *fp, void *p, int i, int mode);
 static int
  _PD_print_data(FILE *f0,
 		char *prefix, char *before, char *after,
-		char *nodename, PDBfile *file, void *vr,
+		char *nodename, PDBfile *file, const void *vr,
 		inti ni, char *type, dimdes *dims,
 		int mjr, int def_off, int irecursion,
-		int n, long *ind),
- _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
-		       inti ni, char *type, int irecursion,
-		       int n, long *ind);
-
-static int
- _PD_test_recursion(char *type, char *mtype);
+		int n, long *ind);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_DISP_MODE_I - print a single item from array X */
 
-static void _PD_disp_mode_i(PD_printdes *prnt, void *x, int tid,
+static void _PD_disp_mode_i(PD_printdes *prnt, const void *x, int tid,
 			    long n, long *ind)
    {long i, j;
     char bf[MAXLINE];
@@ -60,9 +54,11 @@ static void _PD_disp_mode_i(PD_printdes *prnt, void *x, int tid,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_DISP_MODE_1 - print a single item from scalar X according to formats1 */
+/* _PD_DISP_MODE_1 - print a single item from scalar X
+ *                 - according to formats1
+ */
 
-static void _PD_disp_mode_1(PD_printdes *prnt, void *x, int tid)
+static void _PD_disp_mode_1(PD_printdes *prnt, const void *x, int tid)
    {char bf[MAXLINE];
     FILE *fp;
 
@@ -88,7 +84,8 @@ static void _PD_disp_mode_1(PD_printdes *prnt, void *x, int tid)
  *                 - where NI is less than the number of items per line
  */
 
-static void _PD_disp_mode_2(PD_printdes *prnt, void *x, inti ni, int tid)
+static void _PD_disp_mode_2(PD_printdes *prnt, const void *x,
+			    inti ni, int tid)
    {inti i, j;
     char bf[MAXLINE];
     FILE *fp;
@@ -137,7 +134,8 @@ static void _PD_disp_mode_2(PD_printdes *prnt, void *x, inti ni, int tid)
  *                 - the number of items per line
  */
 
-static void _PD_disp_mode_3(PD_printdes *prnt, void *x, inti ni, int tid)
+static void _PD_disp_mode_3(PD_printdes *prnt, const void *x,
+			    inti ni, int tid)
    {int nn;
     inti i, j, k;
     char bf[MAXLINE], s[MAXLINE];
@@ -181,7 +179,7 @@ static void _PD_disp_mode_3(PD_printdes *prnt, void *x, inti ni, int tid)
 
 /* _PD_DISP_DATA - print NI values from X of type indexed by TID */
 
-static void _PD_disp_data(PD_printdes *prnt, void *x,
+static void _PD_disp_data(PD_printdes *prnt, const void *x,
 			  inti ni, int tid, long n, long *ind)
    {
 
@@ -390,7 +388,7 @@ void PD_print_defstr(defstr *dp)
 
 /* _PD_TEST_RECURSION - test if this is a recursive definition */
 
-static int _PD_test_recursion(char *type, char *mtype)
+static int _PD_test_recursion(const char *type, const char *mtype)
    {int irec;
     char *dtype;
 
@@ -412,8 +410,8 @@ static int _PD_test_recursion(char *type, char *mtype)
 
 /* _PD_PRKIND_INT_CHAR - print an entry of KIND_CHAR */
 
-static void _PD_print_char_kind(PD_printdes *prnt, char *vr, inti ni,
-				char *type, int quo, int idx,
+static void _PD_print_char_kind(PD_printdes *prnt, const char *vr, inti ni,
+				const char *type, int quo, int idx,
 				int n, long *ind)
    {int max1, max2;
     inti i, offset;
@@ -505,8 +503,8 @@ static void _PD_print_char_kind(PD_printdes *prnt, char *vr, inti ni,
  *              - indices
  */
 
-static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
-			inti ni, char *type, int n, long *ind)
+static int _PD_io_print(PD_printdes *prnt, PDBfile *file, const char *vr,
+			inti ni, const char *type, int n, long *ind)
    {int k, m, idx, nn, isz, status, quo;
     int id, ifx, ifp, icx;
     inti i, j, offset;
@@ -611,7 +609,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, char *vr,
  */
 
 int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
-		   char *name, void *vr,
+		   const char *name, const void *vr,
 		   syment *ep, int n, long *ind)
    {int status;
     char prefix[80], pathname[MAXLINE];
@@ -661,47 +659,12 @@ int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
  */
 
 int PD_print_entry(PDBfile *file ARG(,,cls),
-		   char *name, void *vr, syment *ep)
+		   const char *name, const void *vr, syment *ep)
    {int rv;
 
     rv = PD_write_entry(stdout, file, name, vr, ep, 0, NULL);
 
     return(rv);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-/* _PD_PRINT_DATA - print out variables in a nicely formatted way  */
-
-static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after, 
-                          char *nodename, PDBfile *file, void *vr, inti ni,
-                          char *type, dimdes *dims, int mjr, int def_off, 
-                          int irecursion, int n, long *ind)
-   {int status;
-    PD_printdes prnt;
-
-    prnt.mjr      = mjr;
-    prnt.def_off  = def_off;
-    prnt.prefix   = prefix;
-    prnt.before   = before;
-    prnt.after    = after;
-    prnt.nodename = nodename;
-    prnt.dims     = dims;
-    prnt.fp       = f0;
-    prnt.nn       = 0;
-    prnt.offset   = 0;
-
-    status = 0;
-
-/* if the type is an indirection, follow the pointer */
-    if (_PD_indirection(type))
-       status = _PD_print_indirection(&prnt, file, (char **) vr, ni, type, 
-				      irecursion, n, ind);
-    else
-       status = _PD_print_leaf(&prnt, file, vr, ni, type,
-			       irecursion, n, ind);
-
-    return(status);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -786,17 +749,54 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _PD_PRINT_DATA - print out variables in a nicely formatted way  */
+
+static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after, 
+                          char *nodename, PDBfile *file,
+			  const void *vr, inti ni,
+                          char *type, dimdes *dims, int mjr, int def_off, 
+                          int irecursion, int n, long *ind)
+   {int status;
+    PD_printdes prnt;
+
+    prnt.mjr      = mjr;
+    prnt.def_off  = def_off;
+    prnt.prefix   = prefix;
+    prnt.before   = before;
+    prnt.after    = after;
+    prnt.nodename = nodename;
+    prnt.dims     = dims;
+    prnt.fp       = f0;
+    prnt.nn       = 0;
+    prnt.offset   = 0;
+
+    status = 0;
+
+/* if the type is an indirection, follow the pointer */
+    if (_PD_indirection(type))
+       status = _PD_print_indirection(&prnt, file, (char **) vr, ni, type, 
+				      irecursion, n, ind);
+    else
+       status = _PD_print_leaf(&prnt, file, vr, ni, type,
+			       irecursion, n, ind);
+
+    return(status);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _PD_PRINT_MEMBER - print the specified member of a struct */
 
 static int _PD_print_member(FILE *f0, char *prefix,
-			    char *mbefore, char *mafter,  
-			    PDBfile *file, char *svr, char *type,
+			    char *mbefore, char *mafter, PDBfile *file,
+			    const char *svr, const char *type,
 			    memdes *desc, char *mfield, long nb,
 			    int mjr, int def_off, 
 			    int *pirec, int n, long *ind)
    {int irecursion, status;
     long mitems, nc, nr;
-    char *mvr, *mtype, *s1;
+    char *mtype, *s1;
+    const char *mvr;
     defstr *ldp;
     dimdes *mdims;
     static char blank[2] = "";
@@ -851,16 +851,16 @@ static int _PD_print_member(FILE *f0, char *prefix,
  *                - otherwise, lookup the type, and display each member.
  */
 
-int _PD_print_leaf(PD_printdes *prnt, PDBfile *file, char *vr, inti ni,
-		   char *type, int irecursion, int n, long *ind)
+int _PD_print_leaf(PD_printdes *prnt, PDBfile *file,
+		   const char *vr, inti ni,
+		   const char *type, int irecursion, int n, long *ind)
    {int mjr, def_off;
     int size, min_index, nchars, status;
     inti ii;
     char field[80], mfield[80];
     char *prefix, *before, *after, *nodename;
-    char *s, *s2, *svr;
-    char *mbefore, *mafter;
-    char *sm;
+    char *s, *s2, *sm, *mbefore, *mafter;
+    const char *svr;
     defstr *defp;
     dimdes *dims;
     memdes *desc, *mem_lst, *next;
