@@ -597,7 +597,7 @@ haelem *PG_ptr_attr_entry(char *name)
 
 /* PG_PTR_ATTR_GLB - return a pointer to a global PGS attribute */
 
-void *PG_ptr_attr_glb(char *name)
+void *PG_ptr_attr_glb(const char *name)
    {void *rv;
     haelem *hp;
 

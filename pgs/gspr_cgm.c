@@ -20,7 +20,8 @@
  *                      - of the given string
  */
 
-void _PG_CGM_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p)
+void _PG_CGM_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs,
+			  const char *s, double *p)
    {
 
     p[0] = strlen(s)*(dev->char_width_s + dev->char_space_s) -
@@ -145,7 +146,8 @@ void _PG_CGM_set_fill_color(PG_device *dev, int color, int mapped)
 
 /* _PG_CGM_SET_FONT - set the character font */
 
-int _PG_CGM_set_font(PG_device *dev, char *face, char *style, int size)
+int _PG_CGM_set_font(PG_device *dev, const char *face,
+		     const char *style, int size)
    {int nfont, nstyle, ih, nc;
     int dx[PG_SPACEDM];
     char *font_name;

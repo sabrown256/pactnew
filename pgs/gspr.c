@@ -19,7 +19,8 @@
  */
 
 void PG_get_text_ext_n(PG_device *dev ARG(,,cls), int nd,
-		       PG_coord_sys cs ARG(NORMC), char *s, double *p)
+		       PG_coord_sys cs ARG(NORMC),
+		       const char *s, double *p)
    {
 
     p[0] = 0.0;
@@ -126,7 +127,8 @@ PG_dev_attributes *PG_get_attributes(PG_device *dev)
  *               - return B_T iff successful
  */
 
-pboolean PG_setup_font(PG_device *dev, char *face, char *style, int size, 
+pboolean PG_setup_font(PG_device *dev,
+		       const char *face, const char *style, int size, 
 		       char **pfn, int *pnf, int *pns)
    {int l, fn, nfont;
     pboolean rv;

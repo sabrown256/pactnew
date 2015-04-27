@@ -1337,7 +1337,8 @@ void PG_draw_surface_n(PG_device *dev ARG(,,cls),
 		       double *a1, double *a2, double *extr,
 		       double **r, int nn, double *va, double width,
 		       int color, int style, PG_rendering pty,
-		       char *name, char *mesh_type, void *cnnct, pcons *alist)
+		       const char *name, const char *mesh_type,
+		       void *cnnct, pcons *alist)
    {int imx, jmx;
     int nrd;
     int *maxes;

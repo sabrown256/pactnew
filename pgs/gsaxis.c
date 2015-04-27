@@ -1045,7 +1045,7 @@ static void _PG_write_label(PG_device *dev, char *format,
 
 /* _PG_DRAW_LABEL - draw the axis numerics */
 
-static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
+static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, const char *fmt)
    {int i, id, l, lt, n, inc, sz;
     int ovlp, ok;
     double Dr, rmx, idm;
@@ -1292,7 +1292,7 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, char *fmt)
 PG_axis_def *PG_draw_axis_n(PG_device *dev ARG(,,cls),
 			    double *xl, double *xr,
 			    double *tn, double *vw, double sc,
-			    char *format, int tick_type, int label_type,
+			    const char *format, int tick_type, int label_type,
 			    int flag, ...)
    {int tickdef, fx[PG_SPACEDM];
     double vo[2], minorsz, majorsz;

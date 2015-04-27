@@ -99,8 +99,9 @@ void PG_rl_all(void)
  * #bind PG_make_graph_1d fortran() scheme() python()
  */
 
-PG_graph *PG_make_graph_1d(int id, char *label, int cp, int n,
-			   double *x, double *y, char *xname, char *yname)
+PG_graph *PG_make_graph_1d(int id, const char *label, int cp, int n,
+			   double *x, double *y,
+			   const char *xname, const char *yname)
    {PG_graph *g;
     pcons *info;
     PM_set *domain, *range;
@@ -130,10 +131,10 @@ PG_graph *PG_make_graph_1d(int id, char *label, int cp, int n,
  * #bind PG_make_graph_r2_r1 fortran() scheme() python()
  */
 
-PG_graph *PG_make_graph_r2_r1(int id, char *label, int cp,
+PG_graph *PG_make_graph_r2_r1(int id, const char *label, int cp,
 			      int imx, int jmx, PM_centering centering,
 			      double *x, double *y, double *r,
-			      char *dname, char *rname)
+			      const char *dname, const char *rname)
    {PG_graph *g;
     PM_set *domain, *range;
 
@@ -156,10 +157,11 @@ PG_graph *PG_make_graph_r2_r1(int id, char *label, int cp,
  *                     - and return a pointer to it
  */
 
-PG_graph *PG_make_graph_r3_r1(int id, char *label, int cp,
-			      int imx, int jmx, int kmx, PM_centering centering,
+PG_graph *PG_make_graph_r3_r1(int id, const char *label, int cp,
+			      int imx, int jmx, int kmx,
+			      PM_centering centering,
 			      double *x, double *y, double *z, double *r,
-			      char *dname, char *rname)
+			      const char *dname, const char *rname)
    {PG_graph *g;
     PM_set *domain, *range;
 
@@ -257,9 +259,11 @@ pcons *PG_set_tdv_info(pcons *info, PG_rendering pty, int axis_type,
  *                         - and return a pointer to it
  */
 
-PG_graph *PG_make_graph_from_sets(char *name, PM_set *domain, PM_set *range,
-				  PM_centering centering, char *info_type,
-				  void *info, int id, PG_graph *next)
+PG_graph *PG_make_graph_from_sets(const char *name,
+				  PM_set *domain, PM_set *range,
+				  PM_centering centering,
+				  const char *info_type, void *info,
+				  int id, PG_graph *next)
    {PM_mapping *f;
     PG_graph *g;
 
@@ -282,8 +286,9 @@ PG_graph *PG_make_graph_from_sets(char *name, PM_set *domain, PM_set *range,
  *                            - and return a pointer to it
  */
 
-PG_graph *PG_make_graph_from_mapping(PM_mapping *f, char *info_type,
-				     void *info, int id, PG_graph *next)
+PG_graph *PG_make_graph_from_mapping(PM_mapping *f,
+				     const char *info_type, void *info,
+				     int id, PG_graph *next)
    {PG_graph *g;
 
 /* build the graph */
@@ -330,7 +335,7 @@ void PG_rl_graph(PG_graph *g, int rld, int rlr)
  * #bind PG_register_device fortran() scheme() python()
  */
 
-void PG_register_device(char *name, PFRDev fnc)
+void PG_register_device(const char *name, PFRDev fnc)
    {void *f;
     static char *type = NULL;
 
@@ -436,11 +441,12 @@ static void PG_init_device_geometry(PG_dev_geometry *g)
 
 /* PG_MAKE_RAW_DEVICE - initialize a graphical device to lowest order */
 
-static PG_device *PG_make_raw_device(char *name, char *type, char *title,
+static PG_device *PG_make_raw_device(const char *name, const char *type,
+				     const char *title,
 				     PG_device *dd, int dp)
    {int id, ok, lnclr, lnsty, txclr;
     double lnwid;
-    char bf[MAXLINE], *pttl, *pname;
+    char bf[MAXLINE], *pname;
     PG_device *d;
     PFRDev fnc;
 
@@ -460,8 +466,6 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
 		     "line-width", &lnwid,
 		     "text-color", &txclr,
 		     NULL);
-
-    pttl = title;
 
 /* parallel graphics info */
     d->pri = _PG_init_dev_parallel(dd, dp);
@@ -536,7 +540,7 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
     d->scatter                 = 0;
     d->supress_setup           = FALSE;
     d->text_color              = txclr;
-    d->title                   = CSTRSAVE(pttl);
+    d->title                   = CSTRSAVE(title);
     d->use_pixmap              = PG_fget_use_pixmap();
 
     d->txt_ratio               = 1.0;
@@ -645,9 +649,10 @@ static PG_device *PG_make_raw_device(char *name, char *type, char *title,
  * #bind PG_make_device fortran() scheme() python()
  */
 
-PG_device *PG_make_device(char *name, char *type, char *title)
+PG_device *PG_make_device(const char *name, const char *type,
+			  const char *title)
    {int ip, np;
-    char *fname;
+    const char *fname;
     PG_device *d, *dd;
 
     dd    = NULL;
@@ -730,7 +735,7 @@ void PG_rl_device(PG_device *dev)
  *                     - text fonts
  */
 
-PG_font_family *PG_make_font_family(PG_device *dev, char *name,
+PG_font_family *PG_make_font_family(PG_device *dev, const char *name,
                                     PG_font_family *next, int n, ...)
    {int i;
     char *ft, **fs;

@@ -69,7 +69,7 @@ static INLINE int _PG_install_color(RGB_color_map *true_cm, int j,
 
 /* PG_MK_PALETTE - allocate and initialize a new palette */
 
-PG_palette *PG_mk_palette(PG_device *dev, char *name, int nclr)
+PG_palette *PG_mk_palette(PG_device *dev, const char *name, int nclr)
    {int npc, ndc, nclim, i;
     unsigned long *pv;
     double mxr, mxg, mxb;
@@ -1557,7 +1557,7 @@ int PG_select_color(PG_device *dev, int n, double *a, double *extr)
  * #bind PG_fget_palette fortran() scheme() python()
  */
 
-PG_palette *PG_fget_palette(PG_device *dev ARG(,,cls), char *name)
+PG_palette *PG_fget_palette(PG_device *dev ARG(,,cls), const char *name)
    {PG_palette *pal;
 
     if (name == NULL)
@@ -1586,7 +1586,7 @@ PG_palette *PG_fget_palette(PG_device *dev ARG(,,cls), char *name)
  * #bind PG_fset_palette fortran() scheme() python()
  */
 
-PG_palette *PG_fset_palette(PG_device *dev ARG(,,cls), char *name)
+PG_palette *PG_fset_palette(PG_device *dev ARG(,,cls), const char *name)
    {PG_palette *pal;
 
     pal = dev->palettes;
@@ -1737,7 +1737,7 @@ static void PG_hsv_rgb(RGB_color_map *cm, int nc, int flg)
 
 /* PG_SHOW_COLORMAP - display the colormap for the given device */
 
-void PG_show_colormap(char *type, int wbck)
+void PG_show_colormap(const char *type, int wbck)
    {int k, l, n_pal_colors, color, ns, mapped;
     double dx, dy;
     double wc[PG_BOXSZ], x[5], y[5];
@@ -1822,7 +1822,7 @@ void PG_show_colormap(char *type, int wbck)
 
 /* PG_DUMP_COLORMAP - dump the colormap for the given device */
 
-void PG_dump_colormap(char *type, char *file)
+void PG_dump_colormap(const char *type, const char *file)
    {int k, ntc, nc, nbw, nsp;
     double r, g, b;
     PG_palette *root_pal;
@@ -1929,7 +1929,7 @@ static void _PG_pal_mouse_ev_hand(PG_device *dev, PG_event *ev)
  * #bind PG_show_palettes fortran() scheme(pg-show-palettes) python()
  */
 
-void PG_show_palettes(PG_device *sdev ARG(,,cls), char *type, int wbck)
+void PG_show_palettes(PG_device *sdev ARG(,,cls), const char *type, int wbck)
    {int i, j, k, np, page;
     double y, dy, z, old, wd;
     double obx[PG_BOXSZ], rbx[PG_BOXSZ], p[PG_SPACEDM];
@@ -2086,7 +2086,7 @@ void PG_show_palettes(PG_device *sdev ARG(,,cls), char *type, int wbck)
  *               - specified device
  */
 
-PG_palette *PG_rd_palette(PG_device *dev, char *fname)
+PG_palette *PG_rd_palette(PG_device *dev, const char *fname)
    {int i, ns, nc, ncx, ndims, dims[2];
     double mxr, mxg, mxb, r, g, b;
     char bf[MAXLINE], *name, *s, *nd;
@@ -2148,7 +2148,7 @@ PG_palette *PG_rd_palette(PG_device *dev, char *fname)
 
 /* PG_WR_PALETTE - write a palette to an ASCII file */
 
-int PG_wr_palette(PG_device *dev, PG_palette *pal, char *fname)
+int PG_wr_palette(PG_device *dev, PG_palette *pal, const char *fname)
    {int i, ns, nc, ndims, *dims;
     double mxr, mxg, mxb, r, g, b;
     RGB_color_map *true_cm;
@@ -2195,7 +2195,8 @@ int PG_wr_palette(PG_device *dev, PG_palette *pal, char *fname)
  *                   device graphically
  */
 
-PG_palette *PG_make_palette(PG_device *tdev, char *name, int nclr, int wbck)
+PG_palette *PG_make_palette(PG_device *tdev, const char *name,
+			    int nclr, int wbck)
    {PG_palette *pal;
 
     pal = PG_make_ndim_palette(tdev, name, 1, &nclr, wbck);
@@ -2340,7 +2341,7 @@ static void _PG_select_colors(PG_device *dev, PG_palette *npal,
  *                        device graphically 
  */
 
-PG_palette *PG_make_ndim_palette(PG_device *tdev, char *name,
+PG_palette *PG_make_ndim_palette(PG_device *tdev, const char *name,
                                  int ndims, int *dims, int wbck)
    {int i, k, l, nc, color, nclr;
     int ncl[PG_SPACEDM];

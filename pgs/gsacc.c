@@ -443,8 +443,8 @@ void PG_fget_font(PG_device *dev ARG(,in,cls),
  */
 
 void PG_fset_font(PG_device *dev ARG(,in,cls),
-		  char *face ARG("helvetica",in),
-		  char *style ARG("medium",in),
+		  const char *face ARG("helvetica",in),
+		  const char *style ARG("medium",in),
 		  int sz ARG(12,in))
    {
 
@@ -1901,7 +1901,7 @@ void PG_clear_page(PG_device *dev ARG(,in,cls), int i)
  * #bind PG_write_text fortran() scheme() python()
  */
 
-void PG_write_text(PG_device *dev ARG(,in,cls), FILE *fp, char *s)
+void PG_write_text(PG_device *dev ARG(,in,cls), FILE *fp, const char *s)
    {
 
     if ((dev != NULL) && (dev->write_text != NULL))

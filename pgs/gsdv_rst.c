@@ -20,13 +20,14 @@ HIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 /* from the GSTX_X.C */
 
 extern int
- _PG_rst_draw_text(PG_device *dev, char *s);
+ _PG_rst_draw_text(PG_device *dev, const char *s);
 
 
 /* from the corresponding PR file */
 
 extern int
- _PG_rst_set_font(PG_device *dev, char *face, char *style, int size);
+ _PG_rst_set_font(PG_device *dev, const char *face,
+		  const char *style, int size);
 
 extern void
  _PG_rst_draw_disjoint_polyline_2(PG_device *dev, double **r,
@@ -34,7 +35,8 @@ extern void
  _PG_rst_draw_curve(PG_device *dev, PG_curve *crv, int clip),
  _PG_rst_draw_to_abs(PG_device *dev, double x, double y),
  _PG_rst_draw_to_rel(PG_device *dev, double x, double y),
- _PG_rst_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p),
+ _PG_rst_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs,
+		      const char *s, double *p),
  _PG_rst_get_image(PG_device *dev, unsigned char *bf,
 		   int ix, int iy, int nx, int ny),
  _PG_rst_set_clipping(PG_device *dev, bool flag),
@@ -553,7 +555,7 @@ static void _PG_rst_release_current_device(PG_device *dev)
  
 /* _PG_RST_IMAGE_TEXT - write out text to the appropriate device */
  
-static int _PG_rst_image_text(PG_device *dev, FILE *fp, char *s)
+static int _PG_rst_image_text(PG_device *dev, FILE *fp, const char *s)
    {int ok;
 
     ok = _PG_rst_draw_text(dev, s);
@@ -565,7 +567,7 @@ static int _PG_rst_image_text(PG_device *dev, FILE *fp, char *s)
  
 /* _PG_RST_STROKE_TEXT - write out text to the appropriate device */
  
-static int _PG_rst_stroke_text(PG_device *dev, FILE *fp, char *s)
+static int _PG_rst_stroke_text(PG_device *dev, FILE *fp, const char *s)
    {int i, ind, savlinclr, ncharin;
     double savlwd, lwd, dx;
     double x[PG_SPACEDM];
@@ -617,7 +619,7 @@ static int _PG_rst_stroke_text(PG_device *dev, FILE *fp, char *s)
  
 /* _PG_RST_WRITE_TEXT - write out text to the appropriate device */
  
-static void _PG_rst_write_text(PG_device *dev, FILE *fp, char *s)
+static void _PG_rst_write_text(PG_device *dev, FILE *fp, const char *s)
    {int ok;
 
     if (_PG_gattrs.stroke_raster_text == TRUE)

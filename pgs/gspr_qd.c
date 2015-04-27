@@ -26,7 +26,8 @@ void
  *                     - of the given string
  */
 
-void _PG_qd_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p)
+void _PG_qd_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs,
+			 const char *s, double *p)
    {double x, y;
     int ix, iy;
     FontInfo info;
@@ -186,7 +187,8 @@ void _PG_qd_set_fill_color(PG_device *dev, int color, int mapped)
 
 /* _PG_QD_SET_FONT - set the character font */
 
-int _PG_qd_set_font(PG_device *dev, char *face, char *style, int size)
+int _PG_qd_set_font(PG_device *dev, const char *face,
+		    const char *style, int size)
    {int nfont, nstyle;
     char *font_name;
     short f;

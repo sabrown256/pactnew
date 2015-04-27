@@ -352,7 +352,7 @@ extern void
 /* GSDV.C declarations */
 
 extern FILE
- *_PG_fopen(char *name, char *mode);
+ *_PG_fopen(const char *name, const char *mode);
 
 extern void
  _PG_default_viewspace(PG_device *dev, int asp),
@@ -402,7 +402,8 @@ extern PG_triangle
 extern void
  _PG_intp_byte(unsigned char *op, unsigned char *np, int ox, int nx,
 	       int os, int ns),
- _PG_draw_image_nc_lr(PG_device *dev, char *name, char *type,
+ _PG_draw_image_nc_lr(PG_device *dev,
+		      const char *name, const char *type,
 		      void *f, double *frm,
 		      void *cnnct, pcons *alist);
 

@@ -238,7 +238,7 @@ static int _PG_X_txt_set_font(PG_device *dev, char *face,
  
 /* _PG_X_TXT_WRITE_TEXT - write out text to the appropriate device */
  
-static void _PG_X_txt_write_text(PG_device *dev, char *s,
+static void _PG_X_txt_write_text(PG_device *dev, const char *s,
 				 int color, int xpad, int *dx)
    {int ypad, st;
     int len, dir, asc, dsc;
@@ -436,7 +436,7 @@ int _PG_X_txt_place_text(PG_device *src, int *dx,
  *                 - image
  */
 
-int _PG_X_draw_text(PG_device *dev, char *s, double *x)
+int _PG_X_draw_text(PG_device *dev, const char *s, double *x)
    {int id, nd;
     int ok, bc, fc, sz, pad;
     int ir[PG_SPACEDM], dx[PG_SPACEDM];
@@ -495,7 +495,7 @@ int _PG_X_draw_text(PG_device *dev, char *s, double *x)
  *                   -   FC    - foreground or text color
  */
 
-int _PG_rst_draw_text(PG_device *dev, char *s)
+int _PG_rst_draw_text(PG_device *dev, const char *s)
    {int id, nd, bc, fc, sz;
     int ok, pad;
     int io[PG_SPACEDM], dx[PG_SPACEDM];

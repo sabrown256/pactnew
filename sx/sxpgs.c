@@ -2545,7 +2545,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
 static object *_SX_graph_info(SS_psides *si, object *obj,
 			      char *name, object *val)
    {long v;
-    char *t;
+    const char *t;
     PG_graph *g, *h;
     PM_mapping *f;
     object *ret;

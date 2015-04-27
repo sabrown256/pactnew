@@ -37,7 +37,8 @@ static CursHandle
 /* from or for corresponding PR file */
 
 int
- _PG_qd_set_font(PG_device *dev, char *face, char *style, int size);
+ _PG_qd_set_font(PG_device *dev, const char *face,
+		 const char *style, int size);
 
 void
  _PG_qd_draw_disjoint_polyline_2(PG_device *dev, double **r,
@@ -45,7 +46,8 @@ void
  _PG_qd_draw_curve(PG_device *dev, PG_curve *crv, int clip),
  _PG_qd_draw_to_abs(PG_device *dev, double x, double y),
  _PG_qd_draw_to_rel(PG_device *dev, double x, double y),
- _PG_qd_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p),
+ _PG_qd_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs,
+		     const char *s, double *p),
  _PG_qd_set_clipping(PG_device *dev, bool flag),
  _PG_qd_set_char_line(PG_device *dev, int n),
  _PG_qd_set_char_path(PG_device *dev, double x, double y),
@@ -250,7 +252,8 @@ static void _PG_qd_match_rgb_colors(PG_device *dev, PG_palette *pal)
  *                     - devices
  */
  
-static int _PG_qd_open_console(char *title, char *type, int bckgr,
+static int _PG_qd_open_console(const char *title, const char *type,
+			       int bckgr,
 			       double xf, double yf, double dxf, double dyf)
    {int rv;
 
@@ -592,7 +595,7 @@ void _PG_qd_release_current_device(PG_device *dev)
  
 /* _PG_QD_WRITE_TEXT - write out text to the appropriate device */
  
-void _PG_qd_write_text(PG_device *dev, FILE *fp, char *s)
+void _PG_qd_write_text(PG_device *dev, FILE *fp, const char *s)
    {
 
     SetPort(dev->window);
@@ -1049,7 +1052,7 @@ static void _PG_qd_key_event_info(PG_device *dev, PG_event *ev,
 
 /* _PG_QD_PUTS - put a string to the console window */
 
-static void _PG_qd_puts(char *bf)
+static void _PG_qd_puts(const char *bf)
    {
 
     if (PG_gs.console != NULL)

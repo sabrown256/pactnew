@@ -14,7 +14,7 @@
 SC_THREAD_LOCK(PG_iob_lock);
 
 extern PG_interface_object
- *PG_find_object(PG_device *dev, char *s,
+ *PG_find_object(PG_device *dev, const char *s,
 		 PG_interface_object *parent);
 
 static void
@@ -315,7 +315,7 @@ static void _PG_find_registered(PG_interface_object *iob, haelem **php,
  * #bind PG_register_callback fortran() scheme() python()
  */
 
-void PG_register_callback(char *name, ...)
+void PG_register_callback(const char *name, ...)
    {long *ip;
     SC_address addr;
 
@@ -340,7 +340,7 @@ void PG_register_callback(char *name, ...)
  *                    - under name
  */
 
-PFVoid PG_lookup_callback(char *name)
+PFVoid PG_lookup_callback(const char *name)
    {long *ip;
     SC_address addr;
 
@@ -362,7 +362,7 @@ PFVoid PG_lookup_callback(char *name)
  * #bind PG_register_variable fortran() scheme() python()
  */
 
-void PG_register_variable(char *name, char *type,
+void PG_register_variable(const char *name, const char *type,
                           void *var, void *vn, void *vx)
    {char **s;
 
@@ -383,7 +383,7 @@ void PG_register_variable(char *name, char *type,
 
 /* PG_LOOKUP_VARIABLE - lookup the named VARIABLE object */
 
-haelem *PG_lookup_variable(char *name)
+haelem *PG_lookup_variable(const char *name)
    {haelem *hp;
     char **sp;
 
@@ -1627,12 +1627,14 @@ PG_interface_object *PG_get_object_event(PG_device *dev, PG_event *ev)
  */
 
 PG_interface_object *PG_make_interface_object_n(PG_device *dev,
-						char *name, char *type,
+						const char *name,
+						const char *type,
 						void *obj, PG_curve *crv,
 						int *flags, int fc, int bc,
 						PG_textdes *ptd,
-						char *slct, char *draw,
-						char *action,
+						const char *slct,
+						const char *draw,
+						const char *action,
 						PG_interface_object *parent)
    {PG_interface_object *iob;
     PFVoid fnc;
@@ -1825,7 +1827,7 @@ void _PG_rl_interface_object(PG_interface_object *iob, int flag)
 
 /* PG_ADD_TEXT_OBJ - register a TEXT interface object with the device */
 
-void PG_add_text_obj(PG_device *dev, double *obx, char *s)
+void PG_add_text_obj(PG_device *dev, double *obx, const char *s)
    {int flags[3];
     double dx[PG_SPACEDM], co[PG_SPACEDM], tbx[PG_BOXSZ];
     PG_curve *tcrv;
@@ -1866,7 +1868,8 @@ void PG_add_text_obj(PG_device *dev, double *obx, char *s)
 
 /* PG_ADD_BUTTON - register a BUTTON interface object with the device */
 
-void PG_add_button(PG_device *dev, double *obx, char *s, PFEvCallback fnc)
+void PG_add_button(PG_device *dev, double *obx,
+		   const char *s, PFEvCallback fnc)
    {int flags[3];
     double dx[PG_SPACEDM], co[PG_SPACEDM], tbx[PG_BOXSZ];
     PG_textdes td;
@@ -1898,7 +1901,8 @@ void PG_add_button(PG_device *dev, double *obx, char *s, PFEvCallback fnc)
     flags[2] = FALSE;
 
     tcrv = PG_make_box_curve(dev, NORMC, co, tbx);
-    biob = PG_make_interface_object_n(dev, "BUTTON", PG_BUTTON_OBJECT_S, s,
+    biob = PG_make_interface_object_n(dev, "BUTTON", PG_BUTTON_OBJECT_S,
+				      (char *) s,
 				      bcrv, flags, dev->BLACK, dev->GRAY,
 				      NULL, NULL, "draw-button", s, NULL);
 

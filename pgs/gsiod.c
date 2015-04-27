@@ -57,7 +57,7 @@ static PG_curve *_PG_make_iob_box(PG_device *dev, double *cbx)
 
 /* PG_IOB_MAKE_CONTAINER - make a container interface object */
 
-PG_interface_object *PG_iob_make_container(PG_device *dev, char *name,
+PG_interface_object *PG_iob_make_container(PG_device *dev, const char *name,
 					   double *bx)
    {int fc, bc;
     int flags[N_IOB_FLAGS];
@@ -143,7 +143,7 @@ static void _PG_scale_rect_to_container(PG_device *dev,
 PG_interface_object *PG_add_iob(PG_device *dev,
 				PG_interface_object *cnt,
 				double *bx,
-				char *type, ...)
+				const char *type, ...)
    {int fc, bc, ok, tag, ifl;
     int flags[N_IOB_FLAGS];
     void *obj;
@@ -245,7 +245,7 @@ static void _PG_iob_toggle_var(PG_interface_object *iob, PG_event *ev)
  */
 
 void PG_iob_register_toggle(PG_device *dev, PG_interface_object *cnt,
-			    char *name, char *abbrv, int *pv,
+			    const char *name, const char *abbrv, int *pv,
 			    double *bx, int on_clr, int off_clr)
    {int bc, btxtc;
     double abx[PG_BOXSZ];
@@ -306,7 +306,7 @@ void PG_iob_register_toggle(PG_device *dev, PG_interface_object *cnt,
  */
 
 void PG_iob_register_slider(PG_device *dev, PG_interface_object *cnt,
-			    char *name, char *abbrv, int *pv,
+			    const char *name, const char *abbrv, int *pv,
 			    double *bx, double dx, double dy)
    {PG_interface_object *var, *btn, *c1, *c2;
     double abx[PG_BOXSZ];

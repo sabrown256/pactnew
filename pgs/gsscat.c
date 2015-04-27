@@ -386,7 +386,7 @@ void PG_scatter_plot(PG_device *dev, PG_graph *data, ...)
 void PG_draw_scatter(PG_device *dev, double *a1, double *a2,
 		     int nn, int ne, double **x,
 		     double theta, double phi, double chi, double width,
-		     int color, int style, int type, char *name,
+		     int color, int style, int type, const char *name,
 		     pcons *alist)
    {int diml[1];
     PM_set *domain, *range;

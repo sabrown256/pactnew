@@ -23,7 +23,8 @@ extern SC_array
  *                    - of the given string
  */
 
-void _PG_X_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p)
+void _PG_X_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs,
+			const char *s, double *p)
    {int len, dir, asc, dsc;
     XCharStruct overall;
     XFontStruct *fnt;

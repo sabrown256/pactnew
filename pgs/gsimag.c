@@ -12,10 +12,12 @@
 
 #include "gsimag.h"
 
-typedef void (*PFImgZC)(PG_device *dev, char *name, char *type, void *f,
+typedef void (*PFImgZC)(PG_device *dev,
+			const char *name, const char *type, void *f,
                         double *frm, void *cnnct, pcons *alist);
 
-typedef void (*PFImgNC)(PG_device *dev, char *name, char *type, void *f,
+typedef void (*PFImgNC)(PG_device *dev,
+			const char *name, const char *type, void *f,
                         double *frm, void *cnnct, pcons *alist);
 
 /*--------------------------------------------------------------------------*/
@@ -25,7 +27,8 @@ typedef void (*PFImgNC)(PG_device *dev, char *name, char *type, void *f,
  *                    - TYPE in Z to UNSIGNED CHAR in BF
  */
 
-static void _PG_map_type_image(PG_device *dev, char *type, unsigned char *bf,
+static void _PG_map_type_image(PG_device *dev, const char *type,
+			       unsigned char *bf,
 			       int kmax, int lmax, int n, int nc,
 			       void *z, double zmin, double zmax)
    {int id, nd;
@@ -336,7 +339,8 @@ static void _PG_image_core(PG_device *dev, PG_graph *data,
  *                      - on a Logical-Rectangular mesh
  */
 
-void _PG_draw_image_nc_lr(PG_device *dev, char *name, char *type,
+void _PG_draw_image_nc_lr(PG_device *dev,
+			  const char *name, const char *type,
 			  void *f, double *frm,
 			  void *cnnct, pcons *alist)
    {int *maxes, w, h, bpp;
@@ -363,7 +367,8 @@ void _PG_draw_image_nc_lr(PG_device *dev, char *name, char *type,
  *                      - on a Logical-Rectangular mesh
  */
 
-static void _PG_draw_image_zc_lr(PG_device *dev, char *name, char *type,
+static void _PG_draw_image_zc_lr(PG_device *dev,
+				 const char *name, const char *type,
 				 void *f, double *frm,
 				 void *cnnct, pcons *alist)
    {double *fp;
@@ -379,7 +384,7 @@ static void _PG_draw_image_zc_lr(PG_device *dev, char *name, char *type,
 
 /* PG_DRAW_IMAGE_PIXELS - draw an image assuming colocated data */
 
-void PG_draw_image_pixels(PG_device *dev, char *name, char *type,
+void PG_draw_image_pixels(PG_device *dev, const char *name, const char *type,
 			  void *f, double *dbx, double *ext,
 			  void *cnnct, pcons *alist)
    {double frm[PG_BOXSZ];
@@ -532,7 +537,8 @@ static void PG_crop_image(PG_device *dev, PG_image *im)
 
 /* PG_BUILD_IMAGE - map arrays to an image and return it */
 
-PG_image *PG_build_image(PG_device *dev, char *name, char *type, void *z,
+PG_image *PG_build_image(PG_device *dev, const char *name,
+			 const char *type, void *z,
 			 int w, int h, int nd, PG_coord_sys cs,
 			 double *dbx, double *rbx)
    {int n, nc, bpp;
@@ -675,7 +681,8 @@ static PG_image *PG_prep_image(PG_device *dev, PG_image *im,
  *               - screen
  */
 
-void PG_draw_image(PG_device *dev, PG_image *im, char *label, pcons *alist)
+void PG_draw_image(PG_device *dev, PG_image *im, 
+		   const char *label, pcons *alist)
    {int nx, ny, do_par_set;
     double pc[PG_BOXSZ];
     PG_image *nim;
@@ -1262,7 +1269,7 @@ int _PG_byte_bit_map(unsigned char *bf, int nx, int ny, int complmnt)
  * #bind PG_make_image_n fortran() scheme() python()
  */
 
-PG_image *PG_make_image_n(char *label, char *type, void *z,
+PG_image *PG_make_image_n(const char *label, const char *type, void *z,
 			  int nd, PG_coord_sys cs, double *dbx, double *rbx,
 			  int w, int h, int bpp,
 			  PG_palette *palette)

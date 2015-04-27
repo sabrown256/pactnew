@@ -63,7 +63,7 @@
 #endif
 
 extern FILE
- *_PG_fopen(char *name, char *mode);
+ *_PG_fopen(const char *name, const char *mode);
 
 
 /* pnmrw.h - header file for PBM/PGM/PPM read/write library

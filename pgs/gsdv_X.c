@@ -60,7 +60,7 @@ char *X_event_name[] =
 /* from the corresponding TX file */
 
 extern int
- _PG_X_draw_text(PG_device *dev, char *s, double *x);
+ _PG_X_draw_text(PG_device *dev, const char *s, double *x);
 
 
 /* from the corresponding PR file */
@@ -71,7 +71,8 @@ extern void
  _PG_X_draw_curve(PG_device *dev, PG_curve *crv, int clip),
  _PG_X_draw_to_abs(PG_device *dev, double x, double y),
  _PG_X_draw_to_rel(PG_device *dev, double x, double y),
- _PG_X_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p),
+ _PG_X_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs,
+		    const char *s, double *p),
  _PG_X_set_clipping(PG_device *dev, bool flag),
  _PG_X_set_char_line(PG_device *dev, int n),
  _PG_X_set_char_path(PG_device *dev, double x, double y),
@@ -95,10 +96,6 @@ extern void
  _PG_X_put_image(PG_device *dev, unsigned char *bf, int ix, int iy,
 		 int nx, int ny);
 
-
-static int
- _PG_X_open_console(char *title, char *type, int bckgr,
-		    double xf, double yf, double dxf, double dyf);
 
 static PG_device
  *_PG_X_get_event_device(PG_event *ev);
@@ -377,7 +374,7 @@ static char *_PG_X_find_scalable_font(PG_device *dev,
  */
 
 static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
-			     char *face, char *style, int size)
+			     const char *face, const char *style, int size)
    {int i, nf;
     int fsz, lsz;
     char **names, *lfn;
@@ -434,7 +431,8 @@ static char *_PG_X_find_font(PG_device *dev, char *fn, int nc,
  *                  - return TRUE iff successful
  */
 
-static int _PG_X_setup_font(PG_device *dev, char *face, char *style, int size)
+static int _PG_X_setup_font(PG_device *dev, const char *face,
+			    const char *style, int size)
    {int ret;
     char *p;
     char fn[MAXLINE];
@@ -1120,14 +1118,17 @@ static void _PG_X_match_rgb_colors(PG_device *dev, PG_palette *pal)
  *                - return TRUE iff successful
  */
 
-int _PG_X_set_font(PG_device *dev, char *face, char *style, int size)
+int _PG_X_set_font(PG_device *dev, const char *face,
+		   const char *style, int size)
    {int nfont, nstyle, rv, ok;
     char *font_name;
 
     rv = FALSE;
     ok = PG_setup_font(dev, face, style, size, &font_name, &nfont, &nstyle);
     if (ok == TRUE)
-       rv = _PG_X_setup_font(dev, font_name, style, size);
+       {const char *fn;
+	fn = (const char *) font_name;
+	rv = _PG_X_setup_font(dev, fn, style, size);};
 
     return(rv);}
 
@@ -1140,7 +1141,8 @@ int _PG_X_set_font(PG_device *dev, char *face, char *style, int size)
  *                    - devices
  */
  
-static int _PG_X_open_console(char *title, char *type, int bckgr,
+static int _PG_X_open_console(const char *title, const char *type,
+			      int bckgr,
 			      double xf, double yf, double dxf, double dyf)
    {int nc;
     int dx[PG_SPACEDM];
@@ -1587,7 +1589,7 @@ static void _PG_X_release_current_device(PG_device *dev)
  
 /* _PG_X_WRITE_TEXT - write out text to the appropriate device */
  
-static void _PG_X_write_text(PG_device *dev, FILE *fp, char *s)
+static void _PG_X_write_text(PG_device *dev, FILE *fp, const char *s)
    {int id, nd;
     double x[PG_SPACEDM];
     Display *disp;
@@ -1951,7 +1953,7 @@ static void _PG_X_key_event_info(PG_device *dev, PG_event *ev,
 
 /* _PG_X_PUTS - put a string to the console window */
 
-static void _PG_X_puts(char *bf)
+static void _PG_X_puts(const char *bf)
    {
 
     puts(bf);

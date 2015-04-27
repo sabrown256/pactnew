@@ -256,7 +256,7 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
  * #bind PG_write_interface fortran() scheme() python()
  */
 
-int PG_write_interface(PG_device *dev ARG(,,cls), char *name)
+int PG_write_interface(PG_device *dev ARG(,,cls), const char *name)
    {int i, niobs, ret;
     char indent[MAXLINE];
     PG_interface_object *iob;
@@ -416,7 +416,7 @@ static void _PG_fix_flags(PG_device *dev, int *flags, char *ps)
  *                - the named object
  */
 
-PG_interface_object *PG_find_object(PG_device *dev, char *s,
+PG_interface_object *PG_find_object(PG_device *dev, const char *s,
                                     PG_interface_object *parent)
    {int i, niobs;
     PG_interface_object *rv, *iob;
@@ -636,7 +636,7 @@ static PG_interface_object *_PG_read_interface_object(PG_device *dev, FILE *fp,
  * #bind PG_read_interface fortran() scheme() python()
  */
 
-int PG_read_interface(PG_device *dev ARG(,,cls), char *name)
+int PG_read_interface(PG_device *dev ARG(,,cls), const char *name)
    {int ns;
     PG_interface_object *iob, *piob, *parent;
     FILE *fp;

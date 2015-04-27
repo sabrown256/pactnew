@@ -53,7 +53,7 @@ static INLINE void _PG_place_text(PG_device *dev, char *p)
  *                  - display text
  */
  
-PG_text_box *PG_open_text_box(PG_device *dev, char *name, int type,
+PG_text_box *PG_open_text_box(PG_device *dev, const char *name, int type,
 			      PFKeymap *keymap,
 			      double xf, double yf, double dxf, double dyf)
    {double cbx[PG_BOXSZ], co[PG_SPACEDM];
@@ -1023,7 +1023,7 @@ static void _PG_delete_previous(PG_text_box *b)
  *                   - display text
  */
  
-PG_text_box *PG_open_text_rect(PG_device *dev, char *name, int type,
+PG_text_box *PG_open_text_rect(PG_device *dev, const char *name, int type,
 			       PFKeymap *keymap, PG_curve *crv,
 			       double brd, int ndrw)
    {int i, ni, n_linep, n_lines, n_chars;

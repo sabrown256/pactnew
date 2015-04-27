@@ -22,7 +22,7 @@
  */
 
 void PG_center_label(PG_device *dev ARG(,,cls),
-		     double sy, char *label)
+		     double sy, const char *label)
    {double p[PG_SPACEDM];
     PG_dev_geometry *g;
 
@@ -62,7 +62,7 @@ void PG_center_label(PG_device *dev ARG(,,cls),
 void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
 			char **labels, char **files,
 			int *dataid, int *modified, int *clr,
-			double *extr, char *ctg,
+			double *extr, const char *ctg,
 		        unsigned int llf, int lcf, int slf, int lts)
    {int i, color, size, id, md, clp;
     int ne, tc, hcd;

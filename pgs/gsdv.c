@@ -39,9 +39,6 @@
 gcontdes
  _PG_gcont;
 
-int
- _PG_display_page(PG_device *dev, FILE *fp, char *s);
-
 /*--------------------------------------------------------------------------*/
  
 /*                          HIGH LEVEL ROUTINES                             */
@@ -101,7 +98,8 @@ PG_device *PG_open_device(PG_device *dev ARG(,,cls),
 
 /* PG_DEVICE_FILENAME - make a good file name for a device */
 
-void PG_device_filename(char *fname, long nc, char *raw, char *ext)
+void PG_device_filename(char *fname, long nc,
+			const char *raw, const char *ext)
    {char *s, *pf;
 
     if (fname != NULL)
@@ -308,8 +306,9 @@ int PG_write_n(PG_device *dev ARG(,,cls), int nd ARG(2),
  *                  - device
  */
  
-int _PG_display_page(PG_device *dev, FILE *fp, char *s)
-   {char *p, *ps, *s1, *bf;
+int _PG_display_page(PG_device *dev, FILE *fp, const char *s)
+   {char *p, *s1, *bf;
+    const char *ps;
 
     ps = s;
     bf = NULL;
@@ -373,7 +372,7 @@ int PG_fprintf(FILE *fp, const char *fmt, ...)
 
 /* PG_FPUTS - fputs function which is safe for large strings */
 
-int PG_fputs(char *s, FILE *fp)
+int PG_fputs(const char *s, FILE *fp)
    {int ret;
 
     ret = 0;
@@ -502,7 +501,7 @@ int PG_wind_fprintf(FILE *fp, const char *fmt, ...)
 
 /* PG_WIND_FPUTS - handle printing in the window environment */
 
-int PG_wind_fputs(char *s, FILE *fp)
+int PG_wind_fputs(const char *s, FILE *fp)
    {int ret;
     
     ret = 0;
@@ -522,7 +521,7 @@ int PG_wind_fputs(char *s, FILE *fp)
 
 /* PG_OPEN_CONSOLE - open a console window */
 
-int PG_open_console(char *title, char *type, int bckgr,
+int PG_open_console(const char *title, const char *type, int bckgr,
 		    double xf, double yf, double dxf, double dyf)
    {int rv;
 
@@ -598,7 +597,7 @@ void PG_setup_ctrls_glb(char *s)
 
 /* _PG_FOPEN - open file with attention to buffering issues */
 
-FILE *_PG_fopen(char *name, char *mode)
+FILE *_PG_fopen(const char *name, const char *mode)
    {FILE *fp;
 
     fp = io_open(name, mode);

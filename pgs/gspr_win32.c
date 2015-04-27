@@ -29,7 +29,8 @@ void
  *                        - of the given string
  */
 
-void _PG_win32_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p)
+void _PG_win32_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs,
+			    const char *s, double *p)
    {HDC hdc;
     TEXTMETRIC tm;
     double x, y;
@@ -237,7 +238,8 @@ void _PG_win32_set_fill_color(PG_device *dev, int color, int mapped)
 
 /* _PG_WIN32_SET_FONT - set the character font */
 
-int _PG_win32_set_font(PG_device *dev, char *face, char *style, int size)
+int _PG_win32_set_font(PG_device *dev, const char *face,
+		       const char *style, int size)
    {int rv;
 
     rv = TRUE;

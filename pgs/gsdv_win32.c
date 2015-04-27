@@ -29,7 +29,8 @@ MSG
 /* from or for corresponding PR file */
 
 int
- _PG_win32_set_font(PG_device *dev, char *face, char *style, int size);
+ _PG_win32_set_font(PG_device *dev, const char *face,
+		    const char *style, int size);
 
 void
  _PG_win32_draw_disjoint_polyline_2(PG_device *dev, double **r,
@@ -37,7 +38,8 @@ void
  _PG_win32_draw_curve(PG_device *dev, PG_curve *crv, int clip),
  _PG_win32_draw_to_abs(PG_device *dev, double x, double y),
  _PG_win32_draw_to_rel(PG_device *dev, double x, double y),
- _PG_win32_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs, char *s, double *p),
+ _PG_win32_get_text_ext(PG_device *dev, int nd, PG_coord_sys cs,
+			const char *s, double *p),
  _PG_win32_set_clipping(PG_device *dev, bool flag),
  _PG_win32_set_char_line(PG_device *dev, int n),
  _PG_win32_set_char_path(PG_device *dev, double x, double y),
@@ -498,7 +500,7 @@ static void _PG_win32_release_current_device(PG_device *dev)
  
 /* _PG_WIN32_WRITE_TEXT - write out text to the appropriate device */
  
-static void _PG_win32_write_text(PG_device *dev, FILE *fp, char *s)
+static void _PG_win32_write_text(PG_device *dev, FILE *fp, const char *s)
    {
 
     _PG_textdraw(dev, s);
@@ -652,7 +654,7 @@ static void _PG_win32_key_event_info(PG_device *dev, PG_event *ev,
 
 /* _PG_WIN32_PUTS - put a string to the console window */
 
-static void _PG_win32_puts(char *bf)
+static void _PG_win32_puts(const char *bf)
    {
 
 /* should we process pending messages before putting the string? */
@@ -907,7 +909,8 @@ Set the background color????
  *                     - devices
  */
  
-static int _PG_win32_open_cons(char *title, char *type, int bckgr, int vis,
+static int _PG_win32_open_cons(const char *title, const char *type,
+			       int bckgr, int vis,
 			       double xf, double yf, double dxf, double dyf)
    {
 
@@ -931,7 +934,8 @@ static int _PG_win32_open_cons(char *title, char *type, int bckgr, int vis,
  *                        - devices
  */
  
-static int _PG_win32_open_console(char *title, char *type, int bckgr,
+static int _PG_win32_open_console(const char *title, const char *type,
+				  int bckgr,
 				  double xf, double yf,
 				  double dxf, double dyf)
    {int rv;

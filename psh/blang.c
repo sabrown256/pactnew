@@ -54,6 +54,7 @@ typedef struct s_farg farg;
 
 struct s_mbrdes
    {int is_fnc_ptr;               /* TRUE iff a function pointer */
+    int is_const;
     cast_kind cast;               /* what kind of cast is it */
     char type[BFSML];             /* member type */
     char name[BFSML];             /* member name */
@@ -257,7 +258,7 @@ static void type_name_list(char *typ, tn_list *na)
 int parse_member(mbrdes *md, char *mbr)
    {int im, ns, hd;
     char s[BFLRG], ind[BFSML];
-    char **sa, *pn, *pt;
+    char **sa, *pn, *pt, *ps;
 
     memset(md, 0, sizeof(mbrdes));
 
@@ -267,26 +268,32 @@ int parse_member(mbrdes *md, char *mbr)
     nstrncpy(s, BFLRG, mbr, -1);
     md->text = STRSAVE(s);
 
-    if (strstr(s, "(*") != NULL)
+    md->is_const = (strstr(s, "const ") != NULL);
+    if (md->is_const == TRUE)
+       ps = subst(s, "const ", "", -1);
+    else
+       ps = s;
+
+    if (strstr(ps, "(*") != NULL)
        {md->is_fnc_ptr = TRUE;
-	sa = tokenize(s, "()[]", 0);
+	sa = tokenize(ps, "()[]", 0);
 	ns = 0;
 	pt = sa[im++];
 	pn = sa[im++] + 1;}
-    else if (strncmp(s, "PF", 2) == 0)
+    else if (strncmp(ps, "PF", 2) == 0)
        {md->is_fnc_ptr = TRUE;
-	sa = tokenize(s, " \t", 0);
+	sa = tokenize(ps, " \t", 0);
 	ns = 0;
 	pt = sa[im++];
 	pn = sa[im++];}
-    else if (strchr(s, '*') != NULL)
-       {sa = tokenize(s, " \t[]", 0);
+    else if (strchr(ps, '*') != NULL)
+       {sa = tokenize(ps, " \t[]", 0);
 	pt = sa[im++];
 	pn = sa[im++];
 	ns = strspn(pn, "*");
 	pn += ns;}
     else
-       {sa = tokenize(s, " \t[]", 0);
+       {sa = tokenize(ps, " \t[]", 0);
 	ns = 0;
 	pt = sa[im++];
 	pn = sa[im++];};
