@@ -898,7 +898,10 @@ void *SC_convert_id(int did, void *d, long od, long ds,
     rv = (nc == n);
 
     if (flag && (rv == TRUE))
-       CFREE(s);
+       {void *t;
+
+	t = (void *) s;
+	CFREE(t);};
 
     return(d);}
 

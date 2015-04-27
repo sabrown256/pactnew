@@ -72,6 +72,7 @@ struct s_idecl
 struct s_farg
    {int nv;                 /* number of default values specified */
     int arr;                /* TRUE for array default values */
+    int is_const;
     pboolean cls;           /* TRUE for class */
     fparam knd;
     fdir dir;               /* data flow direction */
@@ -249,6 +250,27 @@ static void type_name_list(char *typ, tn_list *na)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* WORKING_TYPE - copy the type specification TS into
+ *              - the working copy TD
+ *              - set PIC if the type is const
+ *              - and remove const from the working copy
+ */
+
+char *working_type(char *td, int nd, const char *ts, int *pic)
+   {char *rv;
+
+    nstrncpy(td, nd, ts, -1);
+    *pic = (strstr(td, "const ") != NULL);
+    if (*pic == TRUE)
+       rv = subst(td, "const ", "", -1);
+    else
+       rv = td;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* PARSE_MEMBER - parse a member description, MBR, into type, TY,
  *              - name, NM, and dimensions, DM
  *              - each of these is NC long if non-NULL
@@ -265,14 +287,8 @@ int parse_member(mbrdes *md, char *mbr)
     hd = (strchr(mbr, '[') != NULL);
     im = 0;
 
-    nstrncpy(s, BFLRG, mbr, -1);
+    ps = working_type(s, BFLRG, mbr, &md->is_const);
     md->text = STRSAVE(s);
-
-    md->is_const = (strstr(s, "const ") != NULL);
-    if (md->is_const == TRUE)
-       ps = subst(s, "const ", "", -1);
-    else
-       ps = s;
 
     if (strstr(ps, "(*") != NULL)
        {md->is_fnc_ptr = TRUE;
@@ -1051,23 +1067,23 @@ static int process_qualifiers(farg *al, char *qual)
 static int split_decl(farg *al, char *s, int isarg)
    {int nc, rv;
     char t[BFLRG];
-    char *p, *pn, *qual;
+    char *p, *pn, *pt, *qual;
 
-    nstrncpy(t, BFLRG, s, -1);
+    pt = working_type(t, BFLRG, s, &al->is_const);
 
 /* look for ARG qualifiers */
-    qual = strstr(t, "ARG(");
+    qual = strstr(pt, "ARG(");
     if (qual != NULL)
        qual[-1] = '\0';
 
-    al->arg       = STRSAVE(t);
+    al->arg       = STRSAVE(pt);
     al->qualifier = (qual == NULL) ? qual : STRSAVE(qual);
     al->nv        = 0;
     al->knd       = FP_ANY;
     al->dir       = FD_NONE;
     al->val       = NULL;
 
-    p = trim(strtok(t, "),"), BOTH, " \t");
+    p = trim(strtok(pt, "),"), BOTH, " \t");
 
     if (strcmp(p, "void") == 0)
        pn = p + 4;

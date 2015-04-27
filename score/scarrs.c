@@ -459,7 +459,8 @@ void *SC_array_set(SC_array *a, long n, const void *v)
 
 	 _SC_array_err(a, "set array %s %ld", a->name, n);
 
-	 rv = a->access(SET, a->array, a->bpi, n, v);};
+	 rv = (void *) v;
+	 rv = a->access(SET, a->array, a->bpi, n, rv);};
 
      return(rv);}
 

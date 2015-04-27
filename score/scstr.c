@@ -316,24 +316,22 @@ char *SC_strstr(const char *s1, const char *s2)
  *            - if not there returns NULL
  */
 
-char *SC_strstri(const char *string1, const char *string2)
+char *SC_strstri(const char *s1, const char *s2)
 
-   {char *s1, *s2, *s3, *rv;
+   {char *t1, *t2, *rv;
         
-    rv = NULL;
-    s1 = string1;
-    while (*s1 != '\0')
-       {for (s2 = string2, s3 = s1;
-             (toupper((int) *s2) == toupper((int) *s3)) &&
-	     (*s3 != '\0') && (*s2 != '\0');
-             s3++, s2++);
+    t1 = CSTRSAVE(s1);
+    t2 = CSTRSAVE(s2);
 
-/* if s2 makes it to the end the string is found */
-        if (*s2 == '\0')
-	   {rv = s1;
-	    break;}
-        else
-           s1++;};
+    PS_downcase(t1);
+    PS_downcase(t2);
+
+    rv = strstr(t1, t2);
+    if (rv != NULL)
+       rv = ((char *) s1) + (rv - t1);
+
+    CFREE(t1);
+    CFREE(t2);
 
     return(rv);}
 

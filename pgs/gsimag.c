@@ -179,7 +179,7 @@ static void PG_image_hand(PG_device *dev, PG_graph *g,
  */
 
 pboolean PG_render_data_type(PG_graph *data)
-   {char *s;
+   {const char *s;
     pboolean rv;
 
     s = data->use;

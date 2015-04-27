@@ -242,7 +242,10 @@ static connectdes *_SC_make_connectdes(int na, char *sys,
 /* _SC_FREE_CONNECTDES - release a connectdes instance */
 
 static void _SC_free_connectdes(connectdes *pc)
-   {
+   {char *t;
+
+    t = (char *) pc->shell;
+    pc->shell = NULL;
 
 /* set these as a marginal precaution in case another pointer exists
  * for this space - it can infer that the space has been freed
@@ -255,7 +258,7 @@ static void _SC_free_connectdes(connectdes *pc)
 
     CFREE(pc->system);
     CFREE(pc->host);
-    CFREE(pc->shell);
+    CFREE(t);
 
 /* free the tasks */
     SC_free_array(pc->taska, _SC_free_contask);

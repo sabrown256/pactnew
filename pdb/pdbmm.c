@@ -812,7 +812,6 @@ multides *_PD_make_tuple(const char *type, int ni, int *ord)
     tuple->order = ord;
 
     SC_mark(ord, 1);
-    SC_mark(type, 1);
 
     return(tuple);}
 
