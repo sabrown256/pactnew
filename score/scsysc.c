@@ -108,10 +108,11 @@ int _SC_chg_dir(char *dir, char **pndir)
 char *SC_get_shell(const char *shell)
    {char *rv;
 
-    if (shell == NULL)
+    rv = (char *) shell;
+    if (rv == NULL)
        rv = getenv("SHELL");
 
-    if (shell == NULL)
+    if (rv == NULL)
        rv = SHELL_Default;
 
     return(rv);}
