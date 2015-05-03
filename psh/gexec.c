@@ -49,8 +49,8 @@ static int do_test(FILE **fio, char *tag)
 
 /* STR_TEST - function to test */
 
-static int str_test(char *db, io_mode md, FILE **fio,
-		    char *name, int c, char **v)
+static int str_test(const char *db, io_mode md, FILE **fio,
+		    const char *name, int c, char **v)
    {int rv;
     char *tag;
 
@@ -71,8 +71,8 @@ static int str_test(char *db, io_mode md, FILE **fio,
  *            - to test both functions and processes for GEXEC
  */
 
-int gexec_conv(char *db, io_mode md, FILE **fio,
-	       char *name, int c, char **v)
+int gexec_conv(const char *db, io_mode md, FILE **fio,
+	       const char *name, int c, char **v)
    {int rv, nx;
     char s[BFLRG];
     char *p, *side;
@@ -124,7 +124,7 @@ int gexec_conv(char *db, io_mode md, FILE **fio,
 
 /* MAPS - map function name to procedure for strong function execution */
 
-static PFPCAL maps(char *s)
+static PFPCAL maps(const char *s)
    {PFPCAL f;
 
     f = NULL;

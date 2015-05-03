@@ -18,7 +18,7 @@
 
 /* SS_INPUT_SYNT - get the next character from the stream for the lexer */
 
-int SS_input_synt(SS_psides *si, char *ltxt)
+int SS_input_synt(SS_psides *si, const char *ltxt)
    {int c;
     
     si->lex_text = ltxt;
@@ -146,7 +146,7 @@ object *SS_mk_string_synt(SS_psides *si, char *s)
  *                  - this can be used for many but not all languages
  */
 
-void SS_name_map_synt(SS_psides *si, char *d, int nd, char *s)
+void SS_name_map_synt(SS_psides *si, char *d, int nd, const char *s)
    {char *pd;
 
     SC_strncpy(d, nd, s, -1);
@@ -163,7 +163,7 @@ void SS_name_map_synt(SS_psides *si, char *d, int nd, char *s)
 
 /* SS_LOOKUP_VARIABLE - lookup a variable for LEX */
 
-object *SS_lookup_variable(SS_psides *si, char *txt, int verbose)
+object *SS_lookup_variable(SS_psides *si, const char *txt, int verbose)
    {object *o;
 
     o = SS_add_variable(si, txt);
@@ -175,7 +175,7 @@ object *SS_lookup_variable(SS_psides *si, char *txt, int verbose)
 
 /* SS_ADD_TYPE_SYNT - add a new data type */
 
-object *SS_add_type_synt(SS_psides *si, char *name)
+object *SS_add_type_synt(SS_psides *si, const char *name)
    {object *typ;
 
     if (name == NULL)
@@ -197,7 +197,8 @@ object *SS_add_type_synt(SS_psides *si, char *name)
  *                     - parser
  */
 
-void _SS_diagnostic_synt(SS_psides *si, object *expr, char *msg, int diag)
+void _SS_diagnostic_synt(SS_psides *si, object *expr,
+			 const char *msg, int diag)
    {char s[MAXLINE];
 
     if (diag)
@@ -211,7 +212,8 @@ void _SS_diagnostic_synt(SS_psides *si, object *expr, char *msg, int diag)
 
 /* _SS_DIAGNOSE_RETURN_SYNT - print diagnostics for returns */
 
-int _SS_diagnose_return_synt(SS_psides *si, int x, char *y, PFPInt fnc)
+int _SS_diagnose_return_synt(SS_psides *si, int x,
+			     const char *y, PFPInt fnc)
    {int dbg, *pdbg;
 
     pdbg = (*fnc)();
@@ -227,7 +229,7 @@ int _SS_diagnose_return_synt(SS_psides *si, int x, char *y, PFPInt fnc)
 
 /* _SS_UNSUPPORTED_SYNTAX - barf on unsupported syntax */
 
-void _SS_unsupported_syntax(SS_psides *si, char *msg)
+void _SS_unsupported_syntax(SS_psides *si, const char *msg)
    {
 
     SS_error(si, "UNSUPPORTED SYNTAX", SS_mk_string(si, msg));
@@ -239,7 +241,7 @@ void _SS_unsupported_syntax(SS_psides *si, char *msg)
 
 /* SS_PARSE_ERROR_SYNT - error handler for parser */
 
-int SS_parse_error_synt(SS_psides *si, char *s, PFPObject fnc)
+int SS_parse_error_synt(SS_psides *si, const char *s, PFPObject fnc)
    {object *tok, *obj;
     char msg[MAXLINE];
 

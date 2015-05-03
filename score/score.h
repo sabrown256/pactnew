@@ -1049,8 +1049,8 @@ extern int
 extern long
  SC_mem_monitor(int old, int lev, const char *id, char *msg),
  SC_mem_object_trace(long nb, int type,
-		     void (*f)(char *name, char *addr, long length,
-			       int count, int type));
+		     void (*f)(const char *name, const char *addr,
+			       long length, int count, int type));
 
 extern double
  SC_mem_frag(int tid, int nde);

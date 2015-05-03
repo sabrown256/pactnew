@@ -157,7 +157,8 @@ static object *_SS_set_var(SS_psides *si, void *vr, long nb,
  *               -   (foo)    - evaluates to value of foo
  */
 
-object *SS_install_cf(SS_psides *si, char *name, char *doc, ...)
+object *SS_install_cf(SS_psides *si, const char *name,
+		      const char *doc, ...)
    {long nb;
     object *op, *vp;
     PFPHand handler;
@@ -197,7 +198,7 @@ object *SS_install_cf(SS_psides *si, char *name, char *doc, ...)
  *               -   foo           - evaluates to value of foo
  */
 
-object *SS_install_cv(SS_psides *si, char *name, void *pval, int ityp)
+object *SS_install_cv(SS_psides *si, const char *name, void *pval, int ityp)
    {char *typ;
     object *var;
 

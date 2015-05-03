@@ -13,8 +13,8 @@
 #define ENTRY_SIZE          128
 #define MAP_ENTRY(_a, _i)   ((_a) + ENTRY_SIZE*(_i))
 
-typedef void (*PFOTrace)(char *name, char *addr, long length,
-			 int count, int type);
+typedef void (*PFOTrace)(const char *name, const char *addr,
+			 long length, int count, int type);
 typedef struct s_mapdes mapdes;
 
 struct s_mapdes
@@ -836,8 +836,8 @@ static int _SC_mem_obj_trace(SC_heap_des *ph, mem_descriptor *desc,
 /* SC_MEM_OBJECT_TRACE - report all objects matching size and type */
 
 long SC_mem_object_trace(long nb, int type,
-			 void (*f)(char *name, char *addr, long length,
-				   int count, int type))
+			 void (*f)(const char *name, const char *addr,
+				   long length, int count, int type))
    {long nm;
     otrdes st;
 	

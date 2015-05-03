@@ -200,14 +200,14 @@ extern void
 /* SHENVR.C declarations */
 
 extern object
- *_SS_make_ext_boolean(SS_psides *si, char *name, int val),
- *_SS_make_ext_int(SS_psides *si, char *name, long val),
+ *_SS_make_ext_boolean(SS_psides *si, const char *name, int val),
+ *_SS_make_ext_int(SS_psides *si, const char *name, long val),
  *_SSI_defp(SS_psides *si, object *vr),
- *_SS_bind_envc(SS_psides *si, char *name, object *penv),
- *_SS_lk_var_valc(SS_psides *si, char *name, object *penv);
+ *_SS_bind_envc(SS_psides *si, const char *name, object *penv),
+ *_SS_lk_var_valc(SS_psides *si, const char *name, object *penv);
 
 extern void
- _SS_rem_varc(SS_psides *si, char *name, object *penv);
+ _SS_rem_varc(SS_psides *si, const char *name, object *penv);
 
 extern char
  *_SS_get_print_name(SS_psides *si, object *o);
@@ -264,26 +264,27 @@ extern SS_C_procedure
  *_SS_mk_C_proc_va(PFPHand phand, int n, ...);
 
 extern SS_procedure
- *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
-                     SS_C_procedure *cp);
+ *_SS_mk_scheme_proc(const char *pname, const char *pdoc,
+		     SS_form ptype, SS_C_procedure *cp);
 
 extern int
  _SS_object_map(SS_psides *si, FILE *fp, int flag),
  _SS_get_object_length(SS_psides *si, object *obj),
  _SS_object_to_numtype_id(int vid, void *p, long n, object *val),
- _SS_object_to_numtype(char *type, void *p, long n, object *val),
+ _SS_object_to_numtype(const char *type, void *p, long n, object *val),
  _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o),
- _SS_list_to_numtype(SS_psides *si, char *type, void *p, long n, object *o),
+ _SS_list_to_numtype(SS_psides *si, const char *type,
+		     void *p, long n, object *o),
  _SS_max_numeric_type(SS_psides *si, object *argl, long *pn);
 
 extern void
  _SS_rl_C_proc(SS_C_procedure *cp),
- _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
-             int n, PFVoid *pr, SS_form ptype);
+ _SS_install(SS_psides *si, const char *pname, const char *pdoc,
+	     PFPHand phand, int n, PFVoid *pr, SS_form ptype);
 
 extern object
- *_SS_numtype_to_object(SS_psides *si, char *type, void *p, long n),
- *_SS_numtype_to_list(SS_psides *si, char *type, void *p, long n);
+ *_SS_numtype_to_object(SS_psides *si, const char *type, void *p, long n),
+ *_SS_numtype_to_list(SS_psides *si, const char *type, void *p, long n);
 
 
 /* SHPRM1.C declarations */
@@ -352,13 +353,13 @@ extern object
  *_SSI_scheme_mode(SS_psides *si);
 
 extern PFPOprs
- _SS_lookup_parser(SS_psides *si, char *sfx);
+ _SS_lookup_parser(SS_psides *si, const char *sfx);
 
 
 /* SHSTRG.C declarations */
 
 extern object
- *_SS_string_list(SS_psides *si, char *s);
+ *_SS_string_list(SS_psides *si, const char *s);
 
 extern void
  _SS_inst_str(SS_psides *si);
@@ -367,12 +368,14 @@ extern void
 /* SHSYNT.C declarations */
 
 extern int
- _SS_diagnose_return_synt(SS_psides *si, int x, char *y, PFPInt fnc);
+ _SS_diagnose_return_synt(SS_psides *si, int x,
+			  const char *y, PFPInt fnc);
 
 extern void
  _SS_push_token(SS_psides *si, char *s),
- _SS_unsupported_syntax(SS_psides *si, char *msg),
- _SS_diagnostic_synt(SS_psides *si, object *expr, char *msg, int diag);
+ _SS_unsupported_syntax(SS_psides *si, const char *msg),
+ _SS_diagnostic_synt(SS_psides *si, object *expr,
+		     const char *msg, int diag);
 
 
 /* SHTLEV.C declarations */

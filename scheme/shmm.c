@@ -73,8 +73,8 @@ SS_C_procedure *_SS_mk_C_proc_va(PFPHand phand, int n, ...)
 
 /* _SS_MK_SCHEME_PROC - instantiate a scheme procedure */
 
-SS_procedure *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
-			      SS_C_procedure *cp)
+SS_procedure *_SS_mk_scheme_proc(const char *pname, const char *pdoc,
+				 SS_form ptype, SS_C_procedure *cp)
    {char *ds, *ns;
     SS_procedure *pp;
 
@@ -105,7 +105,8 @@ SS_procedure *_SS_mk_scheme_proc(char *pname, char *pdoc, SS_form ptype,
  *             - the purposes of _SS_install
  */
 
-void _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
+void _SS_install(SS_psides *si, const char *pname, const char *pdoc,
+		 PFPHand phand,
 		 int n, PFVoid *pr, SS_form ptype)
    {object *op, *vp;
     SS_procedure *pp;
@@ -145,7 +146,8 @@ void _SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand,
  *            - purpose mechanism
  */
 
-void SS_install(SS_psides *si, char* pname, char *pdoc, PFPHand phand, ...)
+void SS_install(SS_psides *si, const char *pname, const char *pdoc,
+		PFPHand phand, ...)
 /*                PFVoid pproc, SS_form ptype */
    {SS_form ptype;
     PFVoid *pr;
@@ -631,7 +633,7 @@ object *SS_mk_esc_proc(SS_psides *si, int err, int type)
 
 /* SS_MK_VARIABLE - encapsulate an SS_VARIABLE in an object */
 
-object *SS_mk_variable(SS_psides *si, char *n, object *v)
+object *SS_mk_variable(SS_psides *si, const char *n, object *v)
    {SS_variable *vp;
     object *op;
 
@@ -649,7 +651,7 @@ object *SS_mk_variable(SS_psides *si, char *n, object *v)
 
 /* SS_MK_REFERENCE - encapsulate an SS_REFERENCE in an object */
 
-object *SS_mk_reference(SS_psides *si, char *n,
+object *SS_mk_reference(SS_psides *si, const char *n,
 			PFREFGet get, PFREFSet set, void *a)
    {SS_reference *rp;
     object *op;
@@ -694,7 +696,7 @@ object *SS_mk_string(SS_psides *si, const char *s)
  *              - a port struct with FILE pointer str
  */
 
-object *SS_mk_inport(SS_psides *si, FILE *str, char *name)
+object *SS_mk_inport(SS_psides *si, FILE *str, const char *name)
    {SS_input_port *pp;
     object *op;
 
@@ -718,7 +720,7 @@ object *SS_mk_inport(SS_psides *si, FILE *str, char *name)
  *               - a port struct with FILE pointer str
  */
 
-object *SS_mk_outport(SS_psides *si, FILE *str, char *name)
+object *SS_mk_outport(SS_psides *si, FILE *str, const char *name)
    {SS_output_port *pp;
     object *op;
 
@@ -807,7 +809,7 @@ object *SS_mk_quaternion(SS_psides *si, quaternion q)
 
 /* SS_MK_BOOLEAN - encapsulate a BOOLEAN in an object */
 
-object *SS_mk_boolean(SS_psides *si, char *s, int v)
+object *SS_mk_boolean(SS_psides *si, const char *s, int v)
    {SS_boolean *bp;
     object *op;
 
@@ -930,7 +932,7 @@ int _SS_object_map(SS_psides *si, FILE *fp, int flag)
 /* SS_MK_OBJECT - make a new object and initialize its garbage collection */
 
 object *SS_mk_object(SS_psides *si,
-		     void *np, int type, SS_eval_mode evt, char *pname,
+		     void *np, int type, SS_eval_mode evt, const char *pname,
 		     void (*print)(SS_psides *si, object *obj, object *strm),
 		     void (*release)(SS_psides *si, object *obj))
    {object *o;
@@ -1126,7 +1128,8 @@ object *_SS_numtype_to_object_id(SS_psides *si, int id, void *p, long n)
  *                       - and type TYPE to an object
  */
 
-object *_SS_numtype_to_object(SS_psides *si, char *type, void *p, long n)
+object *_SS_numtype_to_object(SS_psides *si, const char *type,
+			      void *p, long n)
    {int id;
     object *o;
 
@@ -1168,7 +1171,8 @@ object *_SS_numtype_to_list_id(SS_psides *si, int id, void *p, long n)
  *                     - which has type TYPE into a list
  */
 
-object *_SS_numtype_to_list(SS_psides *si, char *type, void *p, long n)
+object *_SS_numtype_to_list(SS_psides *si, const char *type,
+			    void *p, long n)
    {int id;
     object *lst;
 
@@ -1276,7 +1280,7 @@ int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
  *                       - return TRUE iff successful
  */
 
-int _SS_object_to_numtype(char *type, void *p, long n, object *val)
+int _SS_object_to_numtype(const char *type, void *p, long n, object *val)
    {int vid, rv;
 
     vid = SC_type_id(type, FALSE);
@@ -1359,7 +1363,8 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
  *                     - return TRUE iff successful
  */
 
-int _SS_list_to_numtype(SS_psides *si, char *type, void *p, long n, object *o)
+int _SS_list_to_numtype(SS_psides *si, const char *type,
+			void *p, long n, object *o)
    {int vid, rv;
 
     vid = SC_type_id(type, FALSE);

@@ -15,7 +15,7 @@
 
 /* _SS_STRING_LIST - return a list of derived from string S */
 
-object *_SS_string_list(SS_psides *si, char *s)
+object *_SS_string_list(SS_psides *si, const char *s)
    {int i, n;
     char *t, **sa;
     object *o, *lst;
@@ -49,9 +49,10 @@ object *_SS_string_list(SS_psides *si, char *s)
 
 /* _SS_DESCAPE_STRING - convert sequences such as '\\' 'n' to '\n' */
 
-static int _SS_descape_string(char *dst, char *src)
+static int _SS_descape_string(char *dst, const char *src)
    {int c, rv;
-    char *ps, *pd;
+    char *pd;
+    const char *ps;
 
     rv = FALSE;
     if ((src != NULL) && (dst != NULL))
@@ -88,7 +89,7 @@ static int _SS_descape_string(char *dst, char *src)
 /* _SS_STRCMP - Scheme version of strcmp */
 
 static object *_SS_strcmp(SS_psides *si, object *argl,
-			  int (*func)(char *s1, char *s2))
+			  int (*func)(const char *s1, const char *s2))
    {int cmp;
     char *s1, *s2;
     object *rv;
@@ -114,7 +115,7 @@ static object *_SS_strcmp(SS_psides *si, object *argl,
 /* _SS_CISTRCMP - case insensitive Scheme version of strcmp */
 
 static object *_SS_cistrcmp(SS_psides *si, object *argl,
-			    int (*func)(char *s1, char *s2))
+			    int (*func)(const char *s1, const char *s2))
    {int cmp;
     char *s1, *s2;
     object *rv;
@@ -145,7 +146,7 @@ static object *_SS_cistrcmp(SS_psides *si, object *argl,
 
 /* _SS_STREQ - string=? at C level */
 
-static int _SS_streq(char *s1, char *s2)
+static int _SS_streq(const char *s1, const char *s2)
    {int rv;
 
     rv = (strcmp(s1, s2) == 0);
@@ -157,7 +158,7 @@ static int _SS_streq(char *s1, char *s2)
 
 /* _SS_STRGE - string>=? at C level */
 
-static int _SS_strge(char *s1, char *s2)
+static int _SS_strge(const char *s1, const char *s2)
    {int rv;
 
     rv = (strcmp(s1, s2) >= 0);
@@ -169,7 +170,7 @@ static int _SS_strge(char *s1, char *s2)
 
 /* _SS_STRGT - string>? at C level */
 
-static int _SS_strgt(char *s1, char *s2)
+static int _SS_strgt(const char *s1, const char *s2)
    {int rv;
 
     rv = (strcmp(s1, s2) > 0);
@@ -181,7 +182,7 @@ static int _SS_strgt(char *s1, char *s2)
 
 /* _SS_STRLE - string<=? at C level */
 
-static int _SS_strle(char *s1, char *s2)
+static int _SS_strle(const char *s1, const char *s2)
    {int rv;
 
     rv = (strcmp(s1, s2) <= 0);
@@ -193,7 +194,7 @@ static int _SS_strle(char *s1, char *s2)
 
 /* _SS_STRLT - string<? at C level */
 
-static int _SS_strlt(char *s1, char *s2)
+static int _SS_strlt(const char *s1, const char *s2)
    {int rv;
 
     rv = (strcmp(s1, s2) < 0);
@@ -962,7 +963,7 @@ static object *_SS_strtok(SS_psides *si, object *argl,
     _SS_descape_string(d, delim);
     _SS_descape_string(text, text);
 
-    ps = (*fnc)(text, d);
+    ps = fnc(text, d);
 
     rv = (ps == NULL) ? SS_null : SS_mk_string(si, ps);
 

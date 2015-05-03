@@ -952,6 +952,9 @@ memdes *_PD_mk_descriptor(char *member, int defoff)
 /* get rid of any leading white space */
     p = SC_trim_left(member, " \t\n\r\f");
 
+/* get rid of const */
+    p = PS_subst(p, "const ", "", -1);
+
 /* convert 'void *' to 'char *'
  * also 'unsigned <type>' to 'u_<type>'
  * GOTCHA: this should be eliminated by accepting and properly

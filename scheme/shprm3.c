@@ -625,7 +625,7 @@ static object *_SSI_procp(SS_psides *si, object *obj)
 
 /* _SS_FILEP - worker routine for file? and ascii-file? predicates */
 
-static int _SS_filep(SS_psides *si, object *argl, char *dtype)
+static int _SS_filep(SS_psides *si, object *argl, const char *dtype)
    {int ret;
     char *name, *mode, *type, *scope;
     char **list;
@@ -634,7 +634,7 @@ static int _SS_filep(SS_psides *si, object *argl, char *dtype)
     ret   = FALSE;
     name  = NULL;
     mode  = NULL;
-    type  = dtype;
+    type  = (char *) dtype;
     scope = NULL;
 
     SS_args(si, argl,

@@ -619,10 +619,11 @@ static object *_SSI_untrace(SS_psides *si, object *argl)
 
 /* _SS_CHECK_ALL_OBJECTS - take a look at all objects for debugging */
 
-static void _SS_check_all_objects(char *name, char *addr,
+static void _SS_check_all_objects(const char *name, const char *addr,
 				  long length, int count, int type)
    {char atype[MAXLINE];
-    char *on, *p;
+    char *p;
+    const char *on;
     object *o;
 
     if (strcmp(name, "SS_MK_OBJECT:op") == 0)
@@ -650,10 +651,11 @@ static void _SS_check_all_objects(char *name, char *addr,
  *                     - print names for debugging
  */
 
-static void _SS_check_bad_names(char *name, char *addr,
+static void _SS_check_bad_names(const char *name, const char *addr,
 				long length, int count, int type)
    {char atype[MAXLINE];
-    char *on, *p;
+    char *p;
+    const char *on;
     object *o;
 
     if (strcmp(name, "SS_MK_OBJECT:op") == 0)
@@ -735,7 +737,7 @@ long dot(int kind)
 
 /* _SS_DO_WATCH - watch a variable for a change in value */
 
-static void _SS_do_watch(SS_psides *si, object *pfun, char *msg)
+static void _SS_do_watch(SS_psides *si, object *pfun, const char *msg)
    {object *vl;
     FILE *fp;
 

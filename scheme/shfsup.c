@@ -51,7 +51,7 @@ object *_SS_make_funf(SS_psides *si, object *proto, object *body)
 
 /* SS_LOOKUP_IDENTIFIER_F - lookup an identifier for LEX */
 
-int SS_lookup_identifier_f(SS_psides *si, char *txt, object **lval)
+int SS_lookup_identifier_f(SS_psides *si, const char *txt, object **lval)
    {int type;
     object *o;
 

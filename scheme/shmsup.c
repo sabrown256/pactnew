@@ -85,7 +85,7 @@ object *_SS_strip_call(SS_psides *si, object *expr, int paren)
 
 /* SS_LOOKUP_IDENTIFIER_M - lookup an identifier for LEX */
 
-int SS_lookup_identifier_m(SS_psides *si, char *txt, object **lval)
+int SS_lookup_identifier_m(SS_psides *si, const char *txt, object **lval)
    {int type;
     object *o;
 

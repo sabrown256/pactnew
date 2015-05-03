@@ -40,8 +40,8 @@ static char **_SS_list_strings(SS_psides *si, object *argl)
 
 /* _SS_PROC_EXEC - evaluate a function for gexeca */
 
-static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
-			 char *name, int c, char **v)
+static int _SS_proc_exec(const char *db, io_mode m, FILE **fp,
+			 const char *name, int c, char **v)
    {int i, l, rv, type[MAXLINE];
     object *fnc, *expr;
     void *ptr[MAXLINE];
@@ -106,7 +106,7 @@ static int _SS_proc_exec(char *db, io_mode m, FILE **fp,
 
 /* _SS_MAPS - map function name to procedure for function execution */
 
-static PFPCAL _SS_maps(char *s)
+static PFPCAL _SS_maps(const char *s)
    {PFPCAL f;
 
     if (strcmp(s, "var") == 0)

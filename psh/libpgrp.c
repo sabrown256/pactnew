@@ -76,7 +76,7 @@ struct s_statement
     char *shell;            /* shell which runs the individual processes */
     char **env;
     process_group *pg;
-    PFPCAL (*map)(char *nm);};
+    PFPCAL (*map)(const char *nm);};
 
 typedef struct s_process_constants process_constants;
 
@@ -378,7 +378,7 @@ void dprgio(char *tag, int n, process **pa, process **ca)
 
 process_group *make_pgrp(int np, char **env, char *shell,
                          proc_bf fg, int jctl, process_session *ss,
-			 PFPCAL (*map)(char *nm))
+			 PFPCAL (*map)(const char *nm))
    {process_group *pg;
     process_state *ps;
 
@@ -2120,7 +2120,7 @@ void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
     process_group *pg;
     process *pp, **pa;
     PFPCAL f;
-    PFPCAL (*map)(char *nm);
+    PFPCAL (*map)(const char *nm);
 
     pg  = (process_group *) a;
     map = pg->map;
@@ -2524,8 +2524,8 @@ static void free_statements(statement *sl)
  *                 - delimited by: ';', '&&', or '||'
  */
 
-statement *parse_statement(char *s, char **env, char *shell,
-			   PFPCAL (*map)(char *s))
+statement *parse_statement(const char *s, char **env, char *shell,
+			   PFPCAL (*map)(const char *s))
    {int i, n, c;
     char *pt, *t, *ps;
     st_sep trm;
@@ -2664,7 +2664,8 @@ process_session *init_session(void)
 
 /* GEXECS - execute a process group specified by the string S */
 
-int gexecs(char *db, char *s, char **env, int jctl, PFPCAL (*map)(char *s))
+int gexecs(const char *db, const char *s, char **env, int jctl,
+	   PFPCAL (*map)(const char *s))
    {int i, nc, rv, st;
     int fa, fb;
     proc_bf fg;
@@ -2740,8 +2741,8 @@ int gexecs(char *db, char *s, char **env, int jctl, PFPCAL (*map)(char *s))
 
 /* GEXECA - execute a process group specified by C and V */
 
-int gexeca(char *db, int c, char **v, char **env,
-	   int jctl, PFPCAL (*map)(char *s))
+int gexeca(const char *db, int c, char **v, char **env,
+	   int jctl, PFPCAL (*map)(const char *s))
    {int i, rv;
     char *s;
 
@@ -2818,8 +2819,8 @@ int transfer_ff(FILE *fi, FILE *fo)
  *           - return 0 iff successful
  */
 
-int gexec_var(char *db, io_mode md, FILE **fio,
-	      char *name, int c, char **v)
+int gexec_var(const char *db, io_mode md, FILE **fio,
+	      const char *name, int c, char **v)
    {int i, nc, ns, nw, rv;
     char t[BFLRG];
     char *vr, *vl, **sa;
@@ -2902,8 +2903,8 @@ int gexec_var(char *db, io_mode md, FILE **fio,
 
 /* GEXEC_FILE - function to access files */
 
-int gexec_file(char *db, io_mode md, FILE **fio,
-	       char *name, int c, char **v)
+int gexec_file(const char *db, io_mode md, FILE **fio,
+	       const char *name, int c, char **v)
    {int rv;
     static char *fn = NULL;
     static FILE *fp = NULL;

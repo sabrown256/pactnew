@@ -57,7 +57,8 @@ void SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, const char *fmt, ...))
  *                     - _SS.pr_err
  */
 
-static void _SS_print_err_msg_a(SS_psides *si, FILE *str, char *s, object *obj)
+static void _SS_print_err_msg_a(SS_psides *si, FILE *str,
+				const char *s, object *obj)
    {
 
     PRINT(str, "ERROR : %s : ", s);
@@ -276,7 +277,7 @@ static object *_SSI_quit(SS_psides *si, object *arg)
  *                   - return TRUE iff successful
  */
 
-int SS_set_scheme_env(char *exepath, char *path)
+int SS_set_scheme_env(const char *exepath, const char *path)
    {int rv, err, nc, ok;
     char rpath[PATH_MAX];
     char *s, *npath;
@@ -309,7 +310,7 @@ int SS_set_scheme_env(char *exepath, char *path)
 
 /* SS_SCHEME_PATH_ERR - report missing SCHEME file */
 
-void SS_scheme_path_err(char *path)
+void SS_scheme_path_err(const char *path)
    {char *s;
 
     s = NULL;
@@ -336,7 +337,8 @@ void SS_scheme_path_err(char *path)
  *                   - _SS.pr_err
  */
 
-static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
+static void _SS_print_err_msg(SS_psides *si, FILE *str,
+			      const char *s, object *obj)
    {char atype[MAXLINE];
     char *p;
 
@@ -369,7 +371,7 @@ static void _SS_print_err_msg(SS_psides *si, FILE *str, char *s, object *obj)
 
 /* SS_INIT_SCHEME - initialize the interpreter */
 
-SS_psides *SS_init_scheme(char *code, char *vers,
+SS_psides *SS_init_scheme(const char *code, const char *vers,
 			  int c, char **v, char **env, int go)
    {SS_psides *si;
 
@@ -802,7 +804,7 @@ int SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf)
  *          - create a higher level REPL and push on
  */
 
-void SS_error(SS_psides *si, char *s, object *obj)
+void SS_error(SS_psides *si, const char *s, object *obj)
    {int nc;
     char *t;
     FILE *str;

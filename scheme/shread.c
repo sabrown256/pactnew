@@ -187,10 +187,11 @@ static object *_SSI_rd_chr(SS_psides *si, object *arg)
  *             - NOTE: we parse, but do not use, exactness specifications
  */
 
-static int _SS_intstrp(char *s, int64_t *piv)
+static int _SS_intstrp(const char *s, int64_t *piv)
    {int rv, sgn, rdx, c;
     int64_t iv;
-    char *pt;
+    char *pe;
+    const char *pt;
 
     iv = 0;
 
@@ -207,7 +208,7 @@ static int _SS_intstrp(char *s, int64_t *piv)
        rv = FALSE;
 
     else if (strncmp(s, "0x", 2) == 0)
-       {iv = STRTOLL(s, &pt, 16);
+       {iv = STRTOLL(s, &pe, 16);
         rv = TRUE;}
 
     else
@@ -262,8 +263,8 @@ static int _SS_intstrp(char *s, int64_t *piv)
 	   rv = FALSE;
 
 	else
-	   {iv = sgn*STRTOLL(pt, &pt, rdx);
-	    rv = (pt == (s + strlen(s)));};};
+	   {iv = sgn*STRTOLL(pt, &pe, rdx);
+	    rv = (pe == (s + strlen(s)));};};
 
     *piv = iv;
 
@@ -776,7 +777,7 @@ static object *_SSI_strprt(SS_psides *si, object *arg)
 
 /* SS_ADD_VARIABLE - add a symbol the the hash table at parse time */
 
-object *SS_add_variable(SS_psides *si, char *name)
+object *SS_add_variable(SS_psides *si, const char *name)
    {object *op;
     haelem *hp;
 
@@ -802,7 +803,7 @@ object *SS_add_variable(SS_psides *si, char *name)
  *               - associated with a file extension
  */
 
-void SS_add_parser(char *ext, object *(*prs)(SS_psides *si))
+void SS_add_parser(const char *ext, object *(*prs)(SS_psides *si))
    {SC_address ad;
 
     if (_SS.parser_tab == NULL)
@@ -839,7 +840,7 @@ static PFPOprs SS_get_parser(int id)
  *               -   "f"  Fortran parser
  */
 
-PFPOprs SS_use_parser(SS_psides *si, char *sfx)
+PFPOprs SS_use_parser(SS_psides *si, const char *sfx)
    {char t[MAXLINE];
     PFPOprs np, op;
     SC_address ad;
@@ -865,7 +866,7 @@ PFPOprs SS_use_parser(SS_psides *si, char *sfx)
 
 /* _SS_LOOKUP_PARSER - lookup the parser under SFX and return it */
 
-PFPOprs _SS_lookup_parser(SS_psides *si, char *sfx)
+PFPOprs _SS_lookup_parser(SS_psides *si, const char *sfx)
    {PFPOprs np;
     SC_address ad;
 

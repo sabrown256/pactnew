@@ -105,7 +105,7 @@ int SS_set_display_flag(int flg)
  */
 
 void SS_print(SS_psides *si, object *strm, object *obj,
-	      char *begin, char *end)
+	      const char *begin, const char *end)
    {FILE *str;
 
     if (obj != NULL)
@@ -133,10 +133,10 @@ void SS_print(SS_psides *si, object *strm, object *obj,
  *                - and return it
  */
 
-char *_SS_vdsnprintf(int cp, const char *fmt, va_list __a__)
+char *_SS_vdsnprintf(int cp, const char *fmt, va_list VA_VAR)
    {char *s;
 
-    s = SC_vdsnprintf(cp, fmt, __a__);
+    s = SC_vdsnprintf(cp, fmt, VA_VAR);
 
     CFREE(_SS.vbf);
     _SS.vbf = CSTRDUP(s, 3);
@@ -188,7 +188,8 @@ char *_SS_printout(SS_psides *si, const char *fmt, object *obj)
 
 /* _SS_SPRINT - takes an object and produces a printable representation */
 
-static object *_SS_sprint(SS_psides *si, object *obj, const char *fmt, object *strm)
+static object *_SS_sprint(SS_psides *si, object *obj,
+			  const char *fmt, object *strm)
    {char *s;
     FILE *str;
 
@@ -932,7 +933,7 @@ static object *_SSI_describe(SS_psides *si, object *argl)
 
 /* _SS_APR_PROC - do apropos output for a procedure */
 
-static void _SS_apr_proc(FILE *str, char *s, object *op,
+static void _SS_apr_proc(FILE *str, const char *pat, object *op,
 			 int *pnmore, int *pflag)
    {int c;
     char *name, *doc;
@@ -942,13 +943,14 @@ static void _SS_apr_proc(FILE *str, char *s, object *op,
     c    = SS_PROCEDURE_TYPE(op);
     if ((c == SS_PR_PROC)  || (c == SS_UR_MACRO) ||
 	(c == SS_UE_MACRO) || (c == SS_EE_MACRO))
-       {if ((SC_strstri(doc, s) != NULL) || (SC_strstri(name, s) != NULL))
+       {if ((SC_strstri(doc, pat) != NULL) ||
+	    (SC_strstri(name, pat) != NULL))
 	   {PRINT(str, "%s :\n%s\n\n", name, doc);
 	    *pnmore += 3;
 	    *pflag   = 1;};}
 
     else if (c == SS_PROC)
-       {if (SC_strstri(name, s) != NULL)
+       {if (SC_strstri(name, pat) != NULL)
 	   {PRINT(str, "%s : Compound procedure\n\n", name);
 	    *pnmore += 2;
 	    *pflag   = 1;};};
@@ -962,7 +964,8 @@ static void _SS_apr_proc(FILE *str, char *s, object *op,
  *              - name or description
  */
 
-static int _SS_prim_apr(SS_psides *si, FILE *str, char *s, hasharr *tab)
+static int _SS_prim_apr(SS_psides *si, FILE *str,
+			const char *pat, hasharr *tab)
    {int flag, nlp, nmore, vcnt;
     long i;
     char bf[10];
@@ -987,23 +990,23 @@ static int _SS_prim_apr(SS_psides *si, FILE *str, char *s, hasharr *tab)
 
 /* compound procedures */
 	 if (SS_procedurep(obj))
-	    _SS_apr_proc(str, s, obj, &nmore, &flag);
+	    _SS_apr_proc(str, pat, obj, &nmore, &flag);
 
 	 else if (SS_variablep(obj))
 	    {op = SS_VARIABLE_VALUE(obj);
 
 /* procedures named by a variable */
 	     if (SS_procedurep(op))
-	        _SS_apr_proc(str, s, op, &nmore, &flag);
+	        _SS_apr_proc(str, pat, op, &nmore, &flag);
 
 /* variables with non-null values */
-	     else if ((SC_strstri(name, s) != NULL) && (op != SS_null))
+	     else if ((SC_strstri(name, pat) != NULL) && (op != SS_null))
 	        {PRINT(str, "%s : Variable\n\n", name);
 		 nmore += 2;
 		 flag   = 1;}
 
-/* variables whose names match the patter exactly - prevent useless repeats */
-	     else if (strcmp(name, s) == 0)
+/* variables matching the pattern exactly - prevent useless repeats */
+	     else if (strcmp(name, pat) == 0)
 	        {if (vcnt < 1)
 		    {PRINT(str, "%s : Variable\n\n", name);
 		     nmore += 2;
@@ -1019,7 +1022,7 @@ static int _SS_prim_apr(SS_psides *si, FILE *str, char *s, hasharr *tab)
  *             - name or description
  */
 
-int SS_prim_apr(SS_psides *si, FILE *str, char *s)
+int SS_prim_apr(SS_psides *si, FILE *str, const char *s)
    {int i, flag;
     hasharr *tab;
     object *penv, *l, *v;
@@ -1122,15 +1125,15 @@ void SS_wr_lst(SS_psides *si, object *obj, object *strm)
  *             - this is a helper for complex and quaternion number
  */
 
-static void _SS_cmp_cat(char *t, int nc, const char *fmt,
-			long double vl, char *nm, int first)
+static void _SS_cmp_cat(char *t, int nt, const char *fmt,
+			long double vl, const char *nm, int first)
    {
 
     if ((vl >= 0.0) || (first == FALSE))
-       SC_vstrcat(t, nc, "+");
+       SC_vstrcat(t, nt, "+");
 
-    SC_ftos(t, nc, TRUE, fmt, vl);
-    SC_vstrcat(t, nc, nm);
+    SC_ftos(t, nt, TRUE, fmt, vl);
+    SC_vstrcat(t, nt, nm);
 
     return;}
 

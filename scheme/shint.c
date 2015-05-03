@@ -98,7 +98,7 @@ int SS_set_type_method(int type, ...)
 
 /* _SS_LOAD_BF - load the temporary string buffer */
 
-static char *_SS_load_bf(char *s)
+static char *_SS_load_bf(const char *s)
    {int nc;
 
     nc = strlen(s);
@@ -524,17 +524,18 @@ object *SS_define_constant(SS_psides *si, int n, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_VAR_VALUE - given the name of a current SCHEME object which
+/* SS_VAR_VALUE - given the name, NM, of a current SCHEME object which
  *              - has correspondence with a C or FORTRAN variable
  *              - make the given pointer point to its value
  *              - if flag is TRUE and the object is a variable return its
  *              - binding in the current environment
  */
 
-void SS_var_value(SS_psides *si, char *s, int type, void *vr, int flag)
+void SS_var_value(SS_psides *si, const char *nm, int type,
+		  void *vr, int flag)
    {object *obj;
 
-    obj = SS_INQUIRE_OBJECT(si, s);
+    obj = SS_INQUIRE_OBJECT(si, nm);
 
     if (flag && SS_variablep(obj))
        obj = SS_lk_var_val(si, obj);
@@ -550,18 +551,18 @@ void SS_var_value(SS_psides *si, char *s, int type, void *vr, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_VAR_REFERENCE - given the name of a current SCHEME object which
+/* SS_VAR_REFERENCE - given the name, NM, of a current SCHEME object which
  *                  - has correspondence with a C or FORTRAN variable
  *                  - return a pointer to its value
  */
 
-void *SS_var_reference(SS_psides *si, char *s)
+void *SS_var_reference(SS_psides *si, const char *nm)
    {object *obj;
     void *vr;
 
     vr = NULL;
 
-    obj = SS_INQUIRE_OBJECT(si, s);
+    obj = SS_INQUIRE_OBJECT(si, nm);
     if (SS_variablep(obj))
        obj = SS_lk_var_val(si, obj);
 
@@ -780,7 +781,7 @@ object *SS_eval_form(SS_psides *si, object *first, ...)
  * #bind SS_call_scheme  fortran()
  */
 
-object *SS_call_scheme(SS_psides *si, char *func, ...)
+object *SS_call_scheme(SS_psides *si, const char *func, ...)
    {int i, type[MAXLINE];
     object *fnc, *expr, *rv;
     void *ptr[MAXLINE];
@@ -860,7 +861,7 @@ static int _SS_run(SS_psides *si)
  *        - as a string
  */
 
-int SS_run(SS_psides *si, char *s)
+int SS_run(SS_psides *si, const char *s)
    {int rv;
 
     while (strchr(" \t\n\r\f", *s++) != NULL);
@@ -919,7 +920,7 @@ int SS_load_scm(SS_psides *si, const char *fmt, ...)
  *                    - return TRUE if FP conforms to this pattern
  */
 
-int SS_text_data_filep(char *fname, int cmnt)
+int SS_text_data_filep(const char *fname, int cmnt)
    {int ok, nb;
     char *bf, *s, *p, *token;
     FILE *fp;

@@ -226,7 +226,7 @@ object *_SS_make_cast(SS_psides *si, object *type, object *expr)
 
 /* SS_LOOKUP_IDENTIFIER_C - lookup an identifier for LEX */
 
-int SS_lookup_identifier_c(SS_psides *si, char *txt, object **lval)
+int SS_lookup_identifier_c(SS_psides *si, const char *txt, object **lval)
    {int type;
     object *o;
 

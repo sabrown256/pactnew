@@ -40,7 +40,8 @@ typedef object *(*PFBINOBJ)(SS_psides *si, object *argl);
  *               -                        exp, PM_cexp, PM_qexp, SS_PR_PROC)
  */
 
-void SS_install_mf(SS_psides *si, char* pname, char *pdoc, PFPHand phand, ...)
+void SS_install_mf(SS_psides *si, const char* pname,
+		   const char *pdoc, PFPHand phand, ...)
    {int i, n;
     SS_form ptype;
     PFVoid *pr;

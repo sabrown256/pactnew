@@ -301,15 +301,15 @@ extern int
  _PS_fnc_wait(process_group *pg, int ip, int st),
  PS_wait_pgrp(process_group *pg),
  PS_show_pgrp(process_group *pg),
- PS_gexeca(char *db, int c, char **v, char **env,
-	   int jctl, PFPCAL (*map)(char *s)),
- PS_gexecs(char *db, char *s, char **env,
-	   int jctl, PFPCAL (*map)(char *s)),
+ PS_gexeca(const char *db, int c, char **v, char **env,
+	   int jctl, PFPCAL (*map)(const char *s)),
+ PS_gexecs(const char *db, const char *s, char **env,
+	   int jctl, PFPCAL (*map)(const char *s)),
  PS_transfer_ff(FILE *fi, FILE *fo),
- PS_gexec_var(char *db, io_mode md, FILE **fio,
-	      char *name, int c, char **v),
- PS_gexec_file(char *db, io_mode md, FILE **fio,
-	       char *name, int c, char **v);
+ PS_gexec_var(const char *db, io_mode md, FILE **fio,
+	      const char *name, int c, char **v),
+ PS_gexec_file(const char *db, io_mode md, FILE **fio,
+	       const char *name, int c, char **v);
 
 extern proc_bf
  PS_job_foreground(process_group *pg, proc_bf cont),
@@ -320,8 +320,8 @@ extern char
  **PS_subst_syntax(char **sa);
 
 extern statement
- *PS_parse_statement(char *s, char **env, char *shell,
-		     PFPCAL (*map)(char *s));
+ *PS_parse_statement(const char *s, char **env, char *shell,
+		     PFPCAL (*map)(const char *s));
 
 extern process_session
  *PS_make_session(int pgid, int fin, int iact, proc_bf fg),

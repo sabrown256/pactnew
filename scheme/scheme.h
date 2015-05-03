@@ -610,7 +610,7 @@ typedef struct s_SS_scope_public SS_scope_public;
 typedef struct s_object object;
 
 struct s_object
-   {char *print_name;            /* specific members */
+   {const char *print_name;      /* specific members */
     void *val;
 
     SS_eval_mode eval_type;      /* generic members */
@@ -620,7 +620,8 @@ struct s_object
 DEF_FUNCTION_PTR(object *, PObject);
 
 typedef int (*PFPrChIn)(object *str, int ign_ws);
-typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str, char *s, object *obj);
+typedef void (*PFPrintErrMsg)(SS_psides *si, FILE *str,
+			      const char *s, object *obj);
 typedef object *(*PFPHand)(SS_psides *si, SS_C_procedure *cp, object *argl);
 typedef object *(*PFPOprs)(SS_psides *si);
 
@@ -650,7 +651,7 @@ struct s_SS_psides
 
     char prompt[MAXLINE];
     char ans_prompt[MAXLINE];
-    char *lex_text;
+    const char *lex_text;
 
     SS_continuation *continue_int;
     SS_err_continuation *continue_err;
@@ -683,7 +684,7 @@ struct s_SS_psides
     int (*post_print)(SS_psides *si);
     void (*post_read)(SS_psides *si, object *fp);
     void (*post_eval)(SS_psides *si, object *fp);
-    void (*name_reproc)(SS_psides *si, char *s, int sz, char *name);
+    void (*name_reproc)(SS_psides *si, char *d, int nd, const char *s);
     void (*get_arg)(SS_psides *si, object *obj, void *v, SC_type *td);
     object *(*read)(SS_psides *si, object *fp);
     object *(*call_arg)(SS_psides *si, SC_type *td, void *v);
@@ -853,13 +854,13 @@ extern object
  *SS_sargs(SS_psides *si, SS_C_procedure *cp, object *argl),
  *SS_nargs(SS_psides *si, SS_C_procedure *cp, object *argl),
  *SS_znargs(SS_psides *si, SS_C_procedure *cp, object *argl),
- *SS_bound_name(SS_psides *si, char *name),
+ *SS_bound_name(SS_psides *si, const char *name),
  *SS_mk_new_frame(SS_psides *si, object *name, hasharr *tab),
  *SS_lk_var_val(SS_psides *si, object *vr),
  *SS_bind_env(SS_psides *si, object *vr, object *penv);
 
 extern char
- **SS_bound_vars(SS_psides *si, char *patt, object *penv);
+ **SS_bound_vars(SS_psides *si, const char *patt, object *penv);
 
 extern void
  SS_save_registers(SS_psides *si, int vp),
@@ -893,20 +894,21 @@ extern object
  *SS_make_list(SS_psides *si, int first, ...),
  *SS_make_form(SS_psides *si, object *first, ...),
  *SS_eval_form(SS_psides *si, object *first, ...),
- *SS_call_scheme(SS_psides *si, char *func, ...);
+ *SS_call_scheme(SS_psides *si, const char *func, ...);
 
 extern int
  SS_args(SS_psides *si, object *s, ...),
- SS_run(SS_psides *si, char *s),
- SS_text_data_filep(char *fname, int cmnt),
+ SS_run(SS_psides *si, const char *s),
+ SS_text_data_filep(const char *fname, int cmnt),
  SS_load_scm(SS_psides *si, const char *fmt, ...),
  SS_define_argv(SS_psides *si, int c, char **v, int go);
 
 extern void
- SS_var_value(SS_psides *si, char *s, int type, void *vr, int flag);
+ SS_var_value(SS_psides *si, const char *nm,
+	      int type, void *vr, int flag);
 
 extern void
- *SS_var_reference(SS_psides *si, char *s);
+ *SS_var_reference(SS_psides *si, const char *nm);
 
 extern char
  *SS_exe_script(int c, char **v);
@@ -938,20 +940,20 @@ extern object
  *SS_mk_procedure(SS_psides *si, object *name,
 		  object *lam_exp, object *penv),
  *SS_mk_esc_proc(SS_psides *si, int err, int type),
- *SS_mk_variable(SS_psides *si, char *n, object *v),
- *SS_mk_reference(SS_psides *si, char *n,
+ *SS_mk_variable(SS_psides *si, const char *n, object *v),
+ *SS_mk_reference(SS_psides *si, const char *n,
 		  PFREFGet get, PFREFSet set, void *a),
  *SS_mk_string(SS_psides *si, const char *s),
- *SS_mk_inport(SS_psides *si, FILE *str, char *name),
- *SS_mk_outport(SS_psides *si, FILE *str, char *name),
+ *SS_mk_inport(SS_psides *si, FILE *str, const char *name),
+ *SS_mk_outport(SS_psides *si, FILE *str, const char *name),
  *SS_mk_integer(SS_psides *si, int64_t i),
  *SS_mk_float(SS_psides *si, double d),
  *SS_mk_complex(SS_psides *si, double _Complex d),
  *SS_mk_quaternion(SS_psides *si, quaternion d),
- *SS_mk_boolean(SS_psides *si, char *s, int v),
+ *SS_mk_boolean(SS_psides *si, const char *s, int v),
  *SS_mk_cons(SS_psides *si, object *ca, object *cd),
  *SS_mk_object(SS_psides *si,
-	       void *np, int type, SS_eval_mode evt, char *pname,
+	       void *np, int type, SS_eval_mode evt, const char *pname,
 	       void (*print)(SS_psides *si, object *obj, object *strm),
 	       void (*release)(SS_psides *si, object *obj)),
  *SS_mk_char(SS_psides *si, int i),
@@ -959,7 +961,8 @@ extern object
 
 extern void
  SS_register_types(void),
- SS_install(SS_psides *si, char *pname, char *pdoc, PFPHand phand, ...),
+ SS_install(SS_psides *si, const char *pname, const char *pdoc,
+	    PFPHand phand, ...),
  SS_rl_object(SS_psides *si, object *obj),
  SS_gc(SS_psides *si, object *obj);
 
@@ -1019,7 +1022,8 @@ extern object
 
 extern void
  SS_set_prompt(SS_psides *si, const char *fmt, ...),
- SS_print(SS_psides *si, object *strm, object *obj, char *begin, char *end),
+ SS_print(SS_psides *si, object *strm, object *obj,
+	  const char *begin, const char *end),
  SS_wr_lst(SS_psides *si, object *obj, object *strm),
  SS_wr_proc(SS_psides *si, object *obj, object *strm),
  SS_wr_atm(SS_psides *si, object *obj, object *strm);
@@ -1031,7 +1035,7 @@ extern object
 extern int
  SS_puts(const char *s, FILE *fp, PFfputs put),
  SS_prim_des(SS_psides *si, object *strm, object *obj),
- SS_prim_apr(SS_psides *si, FILE *str, char *s),
+ SS_prim_apr(SS_psides *si, FILE *str, const char *s),
  SS_get_display_flag(void),
  SS_set_display_flag(int flg);
 
@@ -1039,40 +1043,40 @@ extern int
 /* SHREAD.C declarations */
 
 extern PFPOprs
- SS_use_parser(SS_psides *si, char *sfx);
+ SS_use_parser(SS_psides *si, const char *sfx);
 
 extern object
- *SS_add_variable(SS_psides *si, char *name),
+ *SS_add_variable(SS_psides *si, const char *name),
  *SS_gread(object *obj),
  *SS_read(SS_psides *si, object *str),
  *SS_load(SS_psides *si, object *argl);
 
 extern void
- SS_add_parser(char *ext, object *(*prs)(SS_psides *si)),
+ SS_add_parser(const char *ext, object *(*prs)(SS_psides *si)),
  SS_set_parser(object *(*prs)(SS_psides *si));
 
 
 /* SHSYNT.C declarations */
 
 extern int
- SS_parse_error_synt(SS_psides *si, char *s, PFPObject fnc),
+ SS_parse_error_synt(SS_psides *si, const char *s, PFPObject fnc),
  SS_wrap_input_synt(void),
- SS_input_synt(SS_psides *si, char *ltxt);
+ SS_input_synt(SS_psides *si, const char *ltxt);
 
 extern void
  SS_unput_synt(SS_psides *si, int c),
- SS_name_map_synt(SS_psides *si, char *d, int nd, char *s);
+ SS_name_map_synt(SS_psides *si, char *d, int nd, const const char *s);
 
 extern object
- *SS_lookup_variable(SS_psides *si, char *txt, int verbose),
+ *SS_lookup_variable(SS_psides *si, const char *txt, int verbose),
  *SS_mk_string_synt(SS_psides *si, char *s),
- *SS_add_type_synt(SS_psides *si, char *name);
+ *SS_add_type_synt(SS_psides *si, const char *name);
 
 
 /* SHTLEV.C declarations */
 
 extern SS_psides
- *SS_init_scheme(char *code, char *vers,
+ *SS_init_scheme(const char *code, const char *vers,
 		 int c, char **v, char **env, int go);
 
 extern PFPrintErrMsg
@@ -1084,7 +1088,7 @@ extern object
  *SS_pop_err(SS_psides *si, int n, int flag);
 
 extern int
- SS_set_scheme_env(char *exepath, char *path),
+ SS_set_scheme_env(const char *exepath, const char *path),
  SS_err_catch(SS_psides *si, int (*fint)(SS_psides *si), PFInt errf);
 
 extern char
@@ -1094,13 +1098,13 @@ extern void
  SS_set_put_string(SS_psides *si, PFfputs ps),
  SS_set_put_line(SS_psides *si, int (*pf)(FILE *fp, const char *fmt, ...)),
  SS_interrupt_handler(int sig),
- SS_scheme_path_err(char *path),
+ SS_scheme_path_err(const char *path),
  SS_init_path(void),
  SS_repl(SS_psides *si),
  SS_end_scheme(SS_psides *si, int val),
  SS_expand_stack(SS_psides *si),
  SS_push_err(SS_psides *si, int flag),
- SS_error(SS_psides *si, char *s, object *obj);
+ SS_error(SS_psides *si, const char *s, object *obj);
 
 
 /* SHTTY.C declarations */
@@ -1121,8 +1125,9 @@ extern char
 /* SHVAR.C declarations */
 
 extern object
- *SS_install_cf(SS_psides *si, char *name, char *document, ...),
- *SS_install_cv(SS_psides *si, char *name, void *pval, int type),
+ *SS_install_cf(SS_psides *si, const char *name,
+		const char *document, ...),
+ *SS_install_cv(SS_psides *si, const char *name, void *pval, int type),
  *SS_acc_double(SS_psides *si, SS_C_procedure *cp, object *argl),
  *SS_acc_int(SS_psides *si, SS_C_procedure *cp, object *argl),
  *SS_acc_long(SS_psides *si, SS_C_procedure *cp, object *argl),

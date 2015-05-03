@@ -176,8 +176,8 @@ enum e_proc_bf
 
 typedef enum e_proc_bf proc_bf;
 
-typedef int (*PFPCAL)(char *db, io_mode m, FILE **fp,
-		      char *name, int c, char **v);
+typedef int (*PFPCAL)(const char *db, io_mode m, FILE **fp,
+		      const char *name, int c, char **v);
 
 typedef struct pollfd apollfd;
 typedef struct s_process process;
@@ -245,7 +245,7 @@ struct s_process_group
     process **parents;      /* parent process array */
     process **children;     /* child process array */
     process_session *ss;    /* process session of the group */
-    PFPCAL (*map)(char *nm);};
+    PFPCAL (*map)(const char *nm);};
 
 struct s_process_session
    {pid_t pid;                      /* process id of parent shell */

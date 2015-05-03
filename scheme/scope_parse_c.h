@@ -152,7 +152,7 @@ extern void
  SS_init_c_syntax_mode(SS_psides *si);
 
 extern int
- SS_lookup_identifier_c(SS_psides *si, char *txt, object **lval),
+ SS_lookup_identifier_c(SS_psides *si, const char *txt, object **lval),
  *SS_parse_debug_c(void);
 
 #endif

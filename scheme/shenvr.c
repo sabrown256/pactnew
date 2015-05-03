@@ -335,7 +335,8 @@ object *SS_mk_new_frame(SS_psides *si, object *name, hasharr *tab)
  *                 - of OS environment variables add it to the OS environment
  */
 
-static void SS_add_to_frame(SS_psides *si, char *vr, object *vl, hasharr *tab)
+static void SS_add_to_frame(SS_psides *si, const char *vr,
+			    object *vl, hasharr *tab)
    {int nc, ok;
     char *s, *t;
 
@@ -441,7 +442,7 @@ object *SS_do_bindings(SS_psides *si, object *pp, object *argp)
  *               - which match PATT
  */
 
-char **SS_bound_vars(SS_psides *si, char *patt, object *penv)
+char **SS_bound_vars(SS_psides *si, const char *patt, object *penv)
    {int i;
     char *fname, **vrs;
     hasharr *tab;
@@ -467,7 +468,7 @@ char **SS_bound_vars(SS_psides *si, char *patt, object *penv)
  *               - return the name under which it is found in UNDER
  */
 
-object *SS_bound_name(SS_psides *si, char *name)
+object *SS_bound_name(SS_psides *si, const char *name)
    {object *obj;
 
     obj = _SS_bind_envc(si, name, si->env);
@@ -484,7 +485,7 @@ object *SS_bound_name(SS_psides *si, char *name)
  *               - return the name under which it is found in UNDER
  */
 
-static object *_SS_bound_var(SS_psides *si, char *name,
+static object *_SS_bound_var(SS_psides *si, const char *name,
 			     hasharr *tab, char *under, long nb)
    {char s[MAXLINE], t[MAXLINE];
     object *b;
@@ -517,7 +518,7 @@ static object *_SS_bound_var(SS_psides *si, char *name,
  *                  - we just want the variable not what it is bound to
  */
 
-object *_SS_get_variable(SS_psides *si, char *name, object *penv)
+object *_SS_get_variable(SS_psides *si, const char *name, object *penv)
    {int i;
     char *fname;
     hasharr *tab;
@@ -549,7 +550,8 @@ object *_SS_get_variable(SS_psides *si, char *name, object *penv)
  *                   - return the found object if any in A
  */
 
-static object *_SS_search_frames(SS_psides *si, char *name, object *penv,
+static object *_SS_search_frames(SS_psides *si, const char *name,
+				 object *penv,
 				 char *under, long nb, hasharr **ptab)
    {int i;
     char *fname;
@@ -579,7 +581,7 @@ static object *_SS_search_frames(SS_psides *si, char *name, object *penv,
  *               - in the given environment
  */
 
-object *_SS_bind_envc(SS_psides *si, char *name, object *penv)
+object *_SS_bind_envc(SS_psides *si, const char *name, object *penv)
    {object *b;
 
     b = _SS_search_frames(si, name, penv, NULL, 0L, NULL);
@@ -651,7 +653,7 @@ void SS_set_ref(SS_psides *si, object *vr, object *vl, object *penv)
  *              - NOTE: this is used in the C syntax mode if nowhere else
  */
 
-void _SS_rem_varc(SS_psides *si, char *name, object *penv)
+void _SS_rem_varc(SS_psides *si, const char *name, object *penv)
    {char under[MAXLINE];
     hasharr *tab;
     object *b;
@@ -672,7 +674,8 @@ void _SS_rem_varc(SS_psides *si, char *name, object *penv)
  *              - in the specified environment
  */
 
-static void _SS_def_varc(SS_psides *si, char *name, object *vl, object *penv)
+static void _SS_def_varc(SS_psides *si, const char *name,
+			 object *vl, object *penv)
    {char under[MAXLINE];
     object *b;
     hasharr *tab;
@@ -723,7 +726,7 @@ object *_SSI_defp(SS_psides *si, object *vr)
 
 /* _SS_LK_VAR_VALC - look up the variable in the environment */
 
-object *_SS_lk_var_valc(SS_psides *si, char *name, object *penv)
+object *_SS_lk_var_valc(SS_psides *si, const char *name, object *penv)
    {object *b, *obj;
 
     obj = SS_null;
@@ -784,7 +787,8 @@ object *SS_lk_var_val(SS_psides *si, object *vr)
 
 char *_SS_get_print_name(SS_psides *si, object *o)
    {char t[MAXLINE];
-    char *s, *rv;
+    char *rv;
+    const char *s;
     SS_procedure *pp;
 
     rv = NULL;
@@ -961,7 +965,7 @@ static void _SS_sig_handler(int sig)
  *                 - at the C level
  */
 
-static object *_SS_get_ext_ref(SS_psides *si, char *name)
+static object *_SS_get_ext_ref(SS_psides *si, const char *name)
    {char unm[MAXLINE];
     haelem *hp;
     object *o;
@@ -987,7 +991,7 @@ static object *_SS_get_ext_ref(SS_psides *si, char *name)
  *                      - get a reference at the C level
  */
 
-object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
+object *_SS_make_ext_boolean(SS_psides *si, const char *name, int val)
    {object *o;
 
     o = SS_mk_boolean(si, name, val);
@@ -1006,7 +1010,7 @@ object *_SS_make_ext_boolean(SS_psides *si, char *name, int val)
  *                  - used to register enumsw
  */
 
-object *_SS_make_ext_int(SS_psides *si, char *name, long val)
+object *_SS_make_ext_int(SS_psides *si, const char *name, long val)
    {object *o;
 
     o = SS_mk_integer(si, val);
