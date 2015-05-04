@@ -1674,7 +1674,7 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
  * #bind SX_rep_to_ac fortran()
  */
 
-PM_set *SX_rep_to_ac(char *name, double *rx, double *ry,
+PM_set *SX_rep_to_ac(const char *name, double *rx, double *ry,
 		     int n_nodes, int n_zones, int *zones)
    {int iz, j, ja, jb, incr;
     int n_sides, *nc, *nbp, *pzone;

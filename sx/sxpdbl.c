@@ -23,9 +23,9 @@
 
 object
  *_SX_make_list_indirection(SS_psides *si, PDBfile *file,
-			    char **vr, inti ni, char *type),
+			    char **vr, inti ni, const char *type),
  *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
-		     char *vr, inti ni, char *type);
+		     const char *vr, inti ni, const char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -33,7 +33,7 @@ object
 /* _SX_MAKE_LIST_SYMENT - convert a syment into a list */
 
 object *_SX_make_list_syment(SS_psides *si, PDBfile *file,
-			     void *vr, inti ni, char *type)
+			     void *vr, inti ni, const char *type)
    {object *obj;
 
 /* if the type is an indirection, follow the pointer */
@@ -60,7 +60,7 @@ object *_SX_make_list_syment(SS_psides *si, PDBfile *file,
  */
 
 object *_SX_make_list_indirection(SS_psides *si, PDBfile *file, char **vr,
-				  inti ni, char *type)
+				  inti ni, const char *type)
    {inti i, ditems;
     char *dtype;
     object *obj, *obj1, *o;
@@ -99,12 +99,13 @@ object *_SX_make_list_indirection(SS_psides *si, PDBfile *file, char **vr,
  */
 
 object *_SX_make_list_leaf(SS_psides *si, PDBfile *file,
-			   char *vr, inti ni, char *type)
+			   const char *vr, inti ni, const char *type)
    {inti ii;
     intb sz, member_offs;
     defstr *defp;
     memdes *desc, *mem_lst;
-    char *mtype, *svr;
+    char *mtype;
+    const char *svr;
     object *obj, *obj1, *obj2;
 
     mem_lst = NULL;
@@ -162,7 +163,7 @@ static object *_SX_mk_boolean(SS_psides *si, bool b)
 /* _SX_MAKE_LIST_IO - convert a primitive type into a list */
 
 object *_SX_make_list_io(SS_psides *si, PDBfile *file,
-			 char *vr, inti ni, char *type)
+			 const char *vr, inti ni, const char *type)
    {int id, offset;
     object *obj;
 

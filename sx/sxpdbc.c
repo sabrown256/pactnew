@@ -12,9 +12,9 @@
 
 void
  _SX_copy_indirection(SS_psides *si, PDBfile *file,
-		      char **vrin, char **vrout, char *type), 
+		      char **vrin, char **vrout, const char *type), 
  _SX_copy_leaf(SS_psides *si, PDBfile *file,
-	       char *vrin, char*vrout, inti ni, char *type);
+	       const char *vrin, char *vrout, inti ni, const char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -26,8 +26,9 @@ void
  *               - how long it is until we look at the string.
  */
 
-void _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
-		   inti ni, char *type)
+void _SX_copy_tree(SS_psides *si, PDBfile *file,
+		   const char *vrin, char *vrout,
+		   inti ni, const char *type)
    {inti i;
     char **lvr, **lvo, *dtype;
 
@@ -52,7 +53,7 @@ void _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
  */
 
 void _SX_copy_indirection(SS_psides *si, PDBfile *file,
-			  char **vrin, char **vrout, char *type)
+			  char **vrin, char **vrout, const char *type)
    {inti ni, nb;
     intb bpi;
     char *pv;
@@ -85,11 +86,13 @@ void _SX_copy_indirection(SS_psides *si, PDBfile *file,
  *               - return the number of items successfully read
  */
 
-void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
-		   inti ni, char *type)
+void _SX_copy_leaf(SS_psides *si, PDBfile *file,
+		   const char *vrin, char *vrout,
+		   inti ni, const char *type)
    {inti i;
-    intb bpi, member_offs, sz;
-    char *mtype, *dtype, *svrin, *svrout;
+    intb bpi, moff, sz;
+    char *mtype, *dtype, *svrout;
+    const char *svrin;
     defstr *dp;
     memdes *desc, *mem_lst;
 
@@ -122,16 +125,16 @@ void _SX_copy_leaf(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
 	    svrout = vrout;
 	    for (i = 0L; i < ni; i++, svrin += sz, svrout += sz)
 	        {for (desc = mem_lst; desc != NULL; desc = desc->next)
-		     {member_offs = desc->member_offs;
+		     {moff = desc->member_offs;
 		      SX_CAST_TYPE(si, mtype, desc,
-				   svrin + member_offs, svrin,
+				   svrin + moff, svrin,
 				   "BAD CAST - _SX_COPY_LEAF", SS_null);
 
 		      if (_PD_indirection(mtype))
 			 {dtype = PD_dereference(CSTRSAVE(mtype));
 			  _SX_copy_indirection(si, file,
-					       (char **) (svrin + member_offs),
-					       (char **) (svrout + member_offs),
+					       (char **) (svrin + moff),
+					       (char **) (svrout + moff),
                                           dtype);
 			  CFREE(dtype);};};};};};
 

@@ -290,7 +290,7 @@ struct s_SX_object
 struct s_SX_menu_item
    {char *vname;
     char *label;
-    char *type;};
+    const char *type;};
 
 struct s_SX_reparsed
    {char bf[BFLRG];
@@ -451,8 +451,8 @@ extern void
  SX_init_env(SS_psides *si);
 
 extern int
- SX_rd_scm(SS_psides *si, char *name),
- SX_command(SS_psides *si, char *file, char *cmd);
+ SX_rd_scm(SS_psides *si, const char *name),
+ SX_command(SS_psides *si, const char *file, const char *cmd);
 
 
 /* SXCONT.C declarations */
@@ -462,11 +462,13 @@ extern int
  SX_expand_expr(char *s, int nb);
 
 extern char
- *SX_wrap_paren(char *open, char *form, char *close, size_t ln);
+ *SX_wrap_paren(const char *open, char *form,
+		const char *close, size_t ln);
 
 extern void
  SX_register_devices(void),
- SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb),
+ SX_load_rc(SS_psides *si, const char *ffn, int ldrc,
+	    const char *ifna, const char *ifnb),
  SX_parse(SX_reparsed *pd, object *strm),
  SX_init_device_vars(int idev, double *xf, double *dxf),
  SX_install_global_vars(SS_psides *si);
@@ -484,9 +486,9 @@ extern object
  *SX_get_curve_var(int j),
  *SX_mk_curve_proc(int i),
  *SX_mk_curve(SS_psides *si, int na, double **xa,
-	      char *label, char *filename,
+	      const char *label, const char *filename,
 	      object *(*plt)(SS_psides *si)),
- *SX_set_crv_id(int i, char *id),
+ *SX_set_crv_id(int i, const char *id),
  *SX_re_id(SS_psides *si),
  *SX_get_data_domain(SS_psides *si, object *argl),
  *SX_get_data_range(SS_psides *si, object *argl),
@@ -498,11 +500,11 @@ extern void
  SX_enlarge_dataset(SS_psides *si, PFVoid eval);
 
 extern int
- SX_get_data_index(char *s),
+ SX_get_data_index(const char *s),
  SX_get_crv_index_i(object *obj),
- SX_get_curve_id(char *s),
+ SX_get_curve_id(const char *s),
  SX_get_crv_index_j(object *obj),
- SX_curvep(char *s),
+ SX_curvep(const char *s),
  SX_next_space(SS_psides *si),
  SX_curve_id(object *c),
  SX_curvep_b(object *obj),
@@ -555,7 +557,8 @@ extern int
 /* SXHBO.C declarations */
 
 extern PM_mapping
- *SX_build_return_mapping(SS_psides *si, PM_mapping *h, char *label,
+ *SX_build_return_mapping(SS_psides *si, PM_mapping *h,
+			  const char *label,
 			  PM_set *domain, int init, int wgt);
 
 
@@ -609,15 +612,15 @@ extern void
 
 extern int
  SX_pdbfilep(object *arg),
- SX_ipdbfilep(object *arg),
- SX_convert(char *dtype, void **pd, char *stype, void *s, int n, int flag);
+ SX_ipdbfilep(object *arg);
 
 extern object
  *SX_get_pdbfile(SS_psides *si, object *argl,
 		 PDBfile **pfile, SX_file **gfile),
  *SX_get_file(SS_psides *si, object *argl, SX_file **pfile),
  *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
-		     char *name, char *type, void *vr, int flag);
+		     const char *name, const char *type,
+		     void *vr, int flag);
 
 
 /* SXPDBA.C declarations */
@@ -631,11 +634,11 @@ extern void
 extern object
  *SX_mk_graph(SS_psides *si, PG_graph *g),
  *SX_mk_dev_attributes(SS_psides *si, PG_dev_attributes *da),
- *SX_get_ref_map(SS_psides *si, SX_file *po, int indx, char *dtype);
+ *SX_get_ref_map(SS_psides *si, SX_file *po, int indx);
 
 extern pcons
  *SX_set_attr_alist(SS_psides *si, pcons *inf,
-		    char *name, char *type, object *val);
+		    const char *name, const char *type, object *val);
 
 extern int
  SX_next_color(PG_device *dev);
@@ -665,7 +668,8 @@ extern object
  *SX_arg_prep(SS_psides *si, object *argl);
 
 extern SS_psides
- *SX_init(char *code, char *vers, int c, char **v, char **env);
+ *SX_init(const char *code, const char *vers,
+	  int c, char **v, char **env);
 
 extern void
  SX_reset_prefix(void),
@@ -673,7 +677,8 @@ extern void
 
 extern int
  SX_next_prefix(void),
- SX_import_so(SS_psides *si, char *hdr, char *so, char *flags);
+ SX_import_so(SS_psides *si, const char *hdr,
+	      const char *so, const char *flags);
 
 
 /* SXULIO.C declarations */

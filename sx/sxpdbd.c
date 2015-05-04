@@ -62,7 +62,7 @@ struct s_differr
     JMP_BUF cpu;};
 
 static int
- _SX_diff_tree(SS_psides *si, char *nma, char *nmb, 
+ _SX_diff_tree(SS_psides *si, const char *nma, const char *nmb, 
 	       PDBfile *pfa, PDBfile *pfb, 
 	       syment *epa, syment *epb, int flag);
 
@@ -91,9 +91,9 @@ static void _SX_diff_signal(int sig)
  */
 
 static int _SX_check_pointers(PDBfile *pfa, PDBfile *pfb, 
-			      char *nma, char *nmb, char *ta, 
-			      long na, int64_t ada, char *tb, 
-			      long nb, int64_t adb)
+			      const char *nma, const char *nmb,
+			      const char *ta, long na, int64_t ada,
+			      const char *tb, long nb, int64_t adb)
    {int rv;
 
     rv = FALSE;
@@ -118,7 +118,8 @@ static int _SX_check_pointers(PDBfile *pfa, PDBfile *pfb,
  *                - or in the same class and that class' promote flag is set.
  */
 
-int _SX_type_equal(PDBfile *pfa, PDBfile *pfb, char *typa, char *typb)
+int _SX_type_equal(PDBfile *pfa, PDBfile *pfb,
+		   const char *typa, const char *typb)
    {int ret, ln;
     char *token;
     defstr *dpa, *dpb;
@@ -228,10 +229,11 @@ object *_SXI_display_diff(SS_psides *si, object *argl)
 
 /* _SX_PRINT_INDIVID_DIFF - print individual differences side by side */
 
-static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb, 
-				   char *pva, char *pvb, char *indx, 
-				   inti ni, char *type, dimdes *dims, 
-				   int mjr)
+static void _SX_print_individ_diff(PDBfile *pf,
+				   const char *nma,  const char *nmb, 
+				   const char *pva, const char *pvb,
+				   const char *indx, inti ni,
+				   const char *type, dimdes *dims, int mjr)
    {int id, nn, nt, def_off, samen, lna, lnb;
     inti i;
     long isz, msz;
@@ -305,7 +307,8 @@ static void _SX_print_individ_diff(PDBfile *pf, char *nma,  char *nmb,
  *                      - return TRUE iff they are the same
  */
 
-static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb, 
+static int _SX_diff_indirection(SS_psides *si,
+				const char *nma, const char *nmb, 
 			        PDBfile *pfa, PDBfile *pfb)
    {int fla, flb, ret;
     long na, nb;
@@ -417,12 +420,14 @@ static int _SX_diff_indirection(SS_psides *si, char *nma, char *nmb,
 
 static int _SX_diff_leaf_indirects(SS_psides *si,
 				   PDBfile *pfa, PDBfile *pfb, 
-				   PDBfile *pfc, char *bfa, char *bfb, 
-				   long na, char *nma, char *nmb, 
+				   PDBfile *pfc,
+				   const char *bfa, const char *bfb, 
+				   long na,
+				   const char *nma, const char *nmb, 
 				   defstr *dp)
    {int ret;
     long i, sz;
-    char *sva, *svb;
+    const char *sva, *svb;
     char mnma[MAXLINE], mnmb[MAXLINE];
     memdes *desc, *mem_lst;
 
@@ -452,9 +457,10 @@ static int _SX_diff_leaf_indirects(SS_psides *si,
 
 /* _SX_DISPLAY_DIFF - print out the given differences */
 
-static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb, 
-			    char *pva, char *pvb, char *indx, 
-			    inti ni, char *type, dimdes *dims)
+static int _SX_display_diff(PDBfile *pf, const char *nma, const char *nmb, 
+			    const char *pva, const char *pvb,
+			    const char *indx, 
+			    inti ni, const char *type, dimdes *dims)
    {int mjr, def_off;
     PD_printdes prnt;
 
@@ -497,9 +503,9 @@ static int _SX_display_diff(PDBfile *pf, char *nma, char *nmb,
 
 /* _SX_DIFF_PRIMITIVES - compare two arrays of primitive data types */
 
-static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb, 
-			       char *bfa, char *bfb, char *type, 
-			       inti ni, dimdes *dims)
+static int _SX_diff_primitives(PDBfile *pf, const char *nma, const char *nmb, 
+			       const char *bfa, const char *bfb,
+			       const char *type, inti ni, dimdes *dims)
    {int id, ret, n;
     char *indx;
     precisionfp *fp_pre;
@@ -560,14 +566,15 @@ static int _SX_diff_primitives(PDBfile *pf, char *nma, char *nmb,
 
 static int _SX_diff_structs(SS_psides *si,
 			    PDBfile *pfa, PDBfile *pfb, 
-			    char *nma, char *nmb, 
-                            char *bfa, char *bfb, 
-			    char *typa, char *typb, inti ni)
+			    const char *nma, const char *nmb, 
+                            const char *bfa, const char *bfb, 
+			    const char *typa, const char *typb, inti ni)
    {int ret;
     inti i;
     long mitems, sza, szb;
     memdes *desca, *descb;
-    char *sva, *svb, *tva, *tvb, mnma[MAXLINE], mnmb[MAXLINE];
+    char mnma[MAXLINE], mnmb[MAXLINE];
+    const char *tva, *tvb, *sva, *svb;
     defstr *dpa, *dpb;
     dimdes *mdims;
 
@@ -625,8 +632,9 @@ static int _SX_diff_structs(SS_psides *si,
 
 /* _SX_RD_LEAF_T - read a leaf into a temporary space passed in */
 
-static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype, 
-			 inti ni, intb bpi, char *outtype)
+static int _SX_rd_leaf_t(PDBfile *pf, syment *ep,
+			 const char *vr, const char *intype, 
+			 inti ni, intb bpi, const char *outtype)
    {int cnv, rv;
     inti i, n, nrd, nr, nib;
     int64_t addr;
@@ -660,7 +668,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype,
         if (buf == NULL)
            return(FALSE);}
     else
-       buf = vr;       
+       buf = (char *) vr;
 
     nrd = 0L;
     for (i = 0; i < n; i++)
@@ -683,7 +691,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype,
 
     else if (cnv == TRUE)
        {vbuf = buf;
-        svr  = vr;
+        svr  = (char *) vr;
         PD_convert(&svr, &vbuf, intype, outtype, ni, 
                    pf->std, pf->host_std, pf->host_std, 
                    pf->chart, pf->host_chart, 0, PD_TRACE);
@@ -696,7 +704,7 @@ static int _SX_rd_leaf_t(PDBfile *pf, syment *ep, char *vr, char *intype,
 
 /* _SX_DIFF_LEAF - compare two arrays of numbers */
 
-static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb, 
+static int _SX_diff_leaf(SS_psides *si, const char *nma, const char *nmb, 
 			 PDBfile *pfa, PDBfile *pfb, 
 			 syment *epa, syment *epb)
    {int ret;
@@ -803,7 +811,7 @@ static int _SX_diff_leaf(SS_psides *si, char *nma, char *nmb,
  *               - but their contents must compare)
  */
 
-static int _SX_diff_tree(SS_psides *si, char *nma, char *nmb, 
+static int _SX_diff_tree(SS_psides *si, const char *nma, const char *nmb, 
 			 PDBfile *pfa, PDBfile *pfb, 
 			 syment *epa, syment *epb, int flag)
    {inti i, ni;
@@ -855,7 +863,7 @@ static int _SX_diff_tree(SS_psides *si, char *nma, char *nmb,
  */
 
 static int _SX_diff_var(SS_psides *si, PDBfile *pfa, PDBfile *pfb, 
-		        char *nma, char *nmb, 
+		        const char *nma, const char *nmb, 
 			long *nia, long *nib)
    {int ret;
     FILE *fpa, *fpb;

@@ -416,7 +416,8 @@ static void _PD_print_char_kind(PD_printdes *prnt, const char *vr, inti ni,
    {int max1, max2;
     inti i, offset;
     char bf[MAXLINE];
-    char *cp, *prefix, *before, *after, *nodename;
+    char *cp, *prefix, *before, *after;
+    const char *nodename;
     FILE *f0;
 
     offset   = prnt->offset;
@@ -512,7 +513,8 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, const char *vr,
     char *t;
     defstr *pd;
     FILE *f0;
-    char *prefix, *before, *nodename;
+    char *prefix, *before;
+    const char *nodename;
 
     prefix   = prnt->prefix;
     before   = prnt->before;
@@ -678,7 +680,8 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
     inti i, ditems, nc, nr;
     char field[80], bf[MAXLINE];
     char *dtype, *s;
-    char *prefix, *before, *after, *nodename;
+    char *prefix, *before, *after;
+    const char *nodename;
     dimdes *dims;
     FILE *f0;
 
@@ -858,9 +861,9 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file,
     int size, min_index, nchars, status;
     inti ii;
     char field[80], mfield[80];
-    char *prefix, *before, *after, *nodename;
+    char *prefix, *before, *after;
     char *s, *s2, *sm, *mbefore, *mafter;
-    const char *svr;
+    const char *nodename, *svr;
     defstr *defp;
     dimdes *dims;
     memdes *desc, *mem_lst, *next;

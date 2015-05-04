@@ -1067,10 +1067,10 @@ void _PD_setup_chart(hasharr *chart, data_standard *fstd, data_standard *hstd,
 
 /* _PD_DEF_REAL - get the miserable, pesky type REAL in once and for all!! */
 
-void _PD_def_real(char *type, PDBfile *file)
+void _PD_def_real(PDBfile *file, const char *fty)
    {
 
-    if (strcmp(type, G_PDBFILE_S) == 0)
+    if (strcmp(fty, G_PDBFILE_S) == 0)
        {PD_typedef_primitive_types(file);
 	_PD_init_typedefs(file);};
 

@@ -11,8 +11,8 @@
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_chr(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_chr(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      char *a, *b;
@@ -34,8 +34,8 @@ static int _SX_diff_primitives_chr(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_wchr(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_wchr(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      wchar_t *a, *b;
@@ -57,8 +57,8 @@ static int _SX_diff_primitives_wchr(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_int8(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_int8(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      int8_t *a, *b;
@@ -80,8 +80,8 @@ static int _SX_diff_primitives_int8(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_shrt(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_shrt(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      short *a, *b;
@@ -103,8 +103,8 @@ static int _SX_diff_primitives_shrt(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_int(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_int(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      int *a, *b;
@@ -126,8 +126,8 @@ static int _SX_diff_primitives_int(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_lng(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_lng(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      long *a, *b;
@@ -149,8 +149,8 @@ static int _SX_diff_primitives_lng(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_ll(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_ll(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      long long *a, *b;
@@ -172,8 +172,8 @@ static int _SX_diff_primitives_ll(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_flt(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_flt(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      float *a, *b;
@@ -195,8 +195,8 @@ static int _SX_diff_primitives_flt(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_dbl(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_dbl(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      double *a, *b;
@@ -218,8 +218,8 @@ static int _SX_diff_primitives_dbl(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_ldbl(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_ldbl(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      long double *a, *b;
@@ -241,8 +241,8 @@ static int _SX_diff_primitives_ldbl(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_fcx(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_fcx(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      float *a, *b;
@@ -264,8 +264,8 @@ static int _SX_diff_primitives_fcx(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_dcx(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_dcx(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      double *a, *b;
@@ -287,8 +287,8 @@ static int _SX_diff_primitives_dcx(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_ldcx(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_ldcx(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      long double *a, *b;
@@ -310,8 +310,8 @@ static int _SX_diff_primitives_ldcx(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-static int _SX_diff_primitives_qut(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+static int _SX_diff_primitives_qut(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      double *a, *b;
@@ -333,8 +333,8 @@ static int _SX_diff_primitives_qut(char *indx, void *bfa, void *bfb, long n,
 
 /*--------------------------------------------------------------------------*/
 
-typedef int (*PF_SX_diff_primitives)(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt);
+typedef int (*PF_SX_diff_primitives)(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt);
 
 static PF_SX_diff_primitives
  _SX_diff_primitives_fnc[] = {

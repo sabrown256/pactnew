@@ -277,7 +277,7 @@ static object *_SXI_graph_pdbdata(SS_psides *si, object *argl)
 /* _SX_PDBDATA_GRAPH - worker for mapping side of _SXI_pdbdata_graph */
 
 static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
-				 char *name, syment *ep)
+				 const char *name, syment *ep)
    {int ndd, ndr, nc, clr, ret;
     char dname[MAXLINE];
     char *info_type, *tail;
@@ -383,7 +383,7 @@ static object *_SX_pdbdata_graph(SS_psides *si, PDBfile *file,
 /* _SX_PDBCURVE_GRAPH - worker for curve side of _SXI_pdbdata_graph */
 
 static object *_SX_pdbcurve_graph(SS_psides *si, PDBfile *file,
-				  char *name, syment *ep)
+				  const char *name, syment *ep)
    {int n, clr;
     char label[MAXLINE];
     double *x, *y;
@@ -885,7 +885,7 @@ static object *_SXI_device_props(SS_psides *si, object *argl)
  *                - for this file
  */
 
-object *SX_get_ref_map(SS_psides *si, SX_file *po, int indx, char *dtype)
+object *SX_get_ref_map(SS_psides *si, SX_file *po, int indx)
    {char type;
     object *argl, *ret;
     SX_menu_item *mi;
@@ -1207,7 +1207,7 @@ static object *_SXI_make_pgs_graph(SS_psides *si, object *argl)
  *                - given graph
  */
 
-static void _SX_set_limits(SS_psides *si, char *t, PM_set *s, object *argl)
+static void _SX_set_limits(SS_psides *si, PM_set *s, object *argl)
    {int i, nd, nset;
     double *extr, *pe, xmn, xmx;
 
@@ -1341,7 +1341,7 @@ static object *_SXI_draw_domain(SS_psides *si, object *argl)
 	    0);
 
     if (!SS_nullobjp(extr))
-       _SX_set_limits(si, "LIMITS", data, extr);
+       _SX_set_limits(si, data, extr);
 
     if (data == NULL)
        SS_error(si, "BAD DOMAIN - _SXI_DRAW_DOMAIN", obj);
@@ -1808,7 +1808,7 @@ static object *_SXI_draw_image(SS_psides *si, object *argl)
 /* SX_SET_ATTR_ALIST - set an attribute on an alist */
 
 pcons *SX_set_attr_alist(SS_psides *si, pcons *inf,
-			 char *name, char *type, object *val)
+			 const char *name, const char *type, object *val)
    {int id, sid;
     void *v;
     object *obj;
@@ -2083,7 +2083,7 @@ static object *_SXI_set_dom_limits(SS_psides *si, object *argl)
     else
        SS_error(si, "NO SET IMPLIED - _SXI_SET_DOM_LIMITS", obj);
 
-    _SX_set_limits(si, "LIMITS", s, SS_cadr(si, argl));
+    _SX_set_limits(si, s, SS_cadr(si, argl));
 
     return(obj);}
 
@@ -2115,7 +2115,7 @@ static object *_SXI_set_ran_limits(SS_psides *si, object *argl)
     else
        SS_error(si, "NO SET IMPLIED - _SXI_SET_RAN_LIMITS", obj);
 
-    _SX_set_limits(si, "LIMITS", s, SS_cadr(si, argl));
+    _SX_set_limits(si, s, SS_cadr(si, argl));
 
     return(obj);}
 
@@ -2372,7 +2372,7 @@ static object *_SXI_get_label(SS_psides *si, object *obj)
 /* _SX_SET_INFO - get/set information in the PM_set object given */
 
 static object *_SX_set_info(SS_psides *si, object *obj,
-			    char *name, object *val)
+			    const char *name, object *val)
    {long v;
     char *t;
     PM_set *s, *u;
@@ -2469,7 +2469,7 @@ static object *_SX_set_info(SS_psides *si, object *obj,
 /* _SX_MAP_INFO - get/set information in the PM_mapping object given */
 
 static object *_SX_map_info(SS_psides *si, object *obj,
-			    char *name, object *val)
+			    const char *name, object *val)
    {long v;
     char *t;
     PM_mapping *f, *g;
@@ -2543,7 +2543,7 @@ static object *_SX_map_info(SS_psides *si, object *obj,
 /* _G_PG_GRAPH_INFO - get/set information in the PG_graph object given */
 
 static object *_SX_graph_info(SS_psides *si, object *obj,
-			      char *name, object *val)
+			      const char *name, object *val)
    {long v;
     const char *t;
     PG_graph *g, *h;
@@ -2619,7 +2619,7 @@ static object *_SX_graph_info(SS_psides *si, object *obj,
 /* _G_PG_IMAGE_INFO - get/set information in the PG_image object given */
 
 static object *_SX_image_info(SS_psides *si, object *obj,
-			      char *name, object *val)
+			      const char *name, object *val)
    {long v;
     double d;
     char *t;

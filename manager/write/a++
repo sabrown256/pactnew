@@ -50,15 +50,12 @@ dbmget $WLog AR_Exe^                      \
 setenv BinDir  $PSY_Root/bin
 setenv EtcDir  $PSY_Root/etc
              
-flog $WLog set exe    = $PACT_CX_EXE
-flog $WLog set vers   = $PACT_CX_VERSION
-flog $WLog set comp   = $exe:t
+flog $WLog set exe  = $PACT_CX_EXE
+flog $WLog set vers = $PACT_CX_VERSION
+flog $WLog set comp = $exe:t
 flog $WLog set outf = $BinDir/a++
 flog $WLog $RM $outf
 flog $WLog touch $outf
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 Note $outf '#\!/bin/csh -f'
 Note $outf '#'
@@ -68,122 +65,136 @@ Note $outf '# include "cpyright.h"'
 Note $outf '#'
 Note $outf ''
 
-Note $outf 'unalias *'
-Note $outf ''
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-Note $outf '@ err = 0'
-Note $outf ''
+if ("$PACT_CX_EXE" == "") then
+   Note $outf 'No C++ compiler found - exiting'
+   Note $outf ''
+   
+   @ err = 1
 
-Note $outf "source $EtcDir/env-pact.csh"
-Note $outf ''
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
-Note $outf '@ vrb = 0'
-Note $outf ''
+else
 
-Note $outf "set fdbg = ( $CXX_Debug )"
-Note $outf "set fopt = ( $CXX_Optimize )"
-Note $outf "set fprf = ( $CXX_Profile )"
-Note $outf "set tmpr = ( $PSY_TmpDir/obj )"
+   Note $outf 'unalias *'
+   Note $outf ''
 
-Note $outf "set exe  = $exe"
-Note $outf 'set co   = FALSE'
-Note $outf 'set dbg  = FALSE'
-Note $outf 'set opt  = FALSE'
-Note $outf 'set arc  = ""'
-Note $outf 'set lib  = ""'
-Note $outf 'set prf  = FALSE'
-Note $outf 'set inf  = ""'
-Note $outf 'set pref = ""'
-Note $outf 'set outf = ""'
+   Note $outf '@ err = 0'
+   Note $outf ''
 
-Note $outf 'set args = ""'
-Note $outf 'while ($#argv > 0)'
-Note $outf '   switch ("$1")'
-Note $outf '      case -a:'
-Note $outf '           shift'
-Note $outf '           set arc = $1'
-Note $outf '           breaksw'
-Note $outf '      case -ag:'
-Note $outf '           set dbg = TRUE'
-Note $outf '           set opt = FALSE'
-Note $outf '           breaksw'
-Note $outf '      case -ahelp:'
-Note $outf '           echo ""'
-Note $outf '           echo "Usage: a++ [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb]* -ao <outf> <args>*"'
-Note $outf '           echo "   ag      compile debuggable"'
-Note $outf '           echo "   ahelp   this help message"'
-Note $outf '           echo "   aO      compile optimized"'
-Note $outf '           echo "   apre    preprocess <file> only"'
-Note $outf '           echo "   aprf    compile for profiling"'
-Note $outf '           echo "   avrb    verbosity level"'
-Note $outf '           echo ""'
-Note $outf '           exit(1)'
-Note $outf '           breaksw'
-Note $outf '      case -aO:'
-Note $outf '           set dbg = FALSE'
-Note $outf '           set opt = TRUE'
-Note $outf '           breaksw'
-Note $outf '      case -o:'
-Note $outf '      case -ao:'
-Note $outf '           shift'
-Note $outf '           set outf = $1'
-Note $outf '           breaksw'
-Note $outf '      case -aprf:'
-Note $outf '           set prf = TRUE'
-Note $outf '           breaksw'
-Note $outf '      case -apre:'
-Note $outf '           shift'
-Note $outf '           set pref = $1'
-Note $outf '           breaksw'
-Note $outf '      case -avrb:'
-Note $outf '           @ vrb = $vrb + 1'
-Note $outf '           breaksw'
-Note $outf '      case -c:'
-Note $outf '           set co = TRUE'
-Note $outf '           breaksw'
-Note $outf '      case -l*:'
-Note $outf '           set lib = ( $lib "$1" )'
-Note $outf '           breaksw'
-Note $outf '      default:'
+   Note $outf "source $EtcDir/env-pact.csh"
+   Note $outf ''
+
+   Note $outf '@ vrb = 0'
+   Note $outf ''
+
+   Note $outf "set fdbg = ( $CXX_Debug )"
+   Note $outf "set fopt = ( $CXX_Optimize )"
+   Note $outf "set fprf = ( $CXX_Profile )"
+   Note $outf "set tmpr = ( $PSY_TmpDir/obj )"
+
+   Note $outf "set exe  = $exe"
+   Note $outf 'set co   = FALSE'
+   Note $outf 'set dbg  = FALSE'
+   Note $outf 'set opt  = FALSE'
+   Note $outf 'set arc  = ""'
+   Note $outf 'set lib  = ""'
+   Note $outf 'set prf  = FALSE'
+   Note $outf 'set inf  = ""'
+   Note $outf 'set pref = ""'
+   Note $outf 'set outf = ""'
+
+   Note $outf 'set args = ""'
+   Note $outf 'while ($#argv > 0)'
+   Note $outf '   switch ("$1")'
+   Note $outf '      case -a:'
+   Note $outf '           shift'
+   Note $outf '           set arc = $1'
+   Note $outf '           breaksw'
+   Note $outf '      case -ag:'
+   Note $outf '           set dbg = TRUE'
+   Note $outf '           set opt = FALSE'
+   Note $outf '           breaksw'
+   Note $outf '      case -ahelp:'
+   Note $outf '           echo ""'
+   Note $outf '           echo "Usage: a++ [-ag] [-ahelp] [-aO] [-apre <file>] [-aprf] [-avrb]* -ao <outf> <args>*"'
+   Note $outf '           echo "   ag      compile debuggable"'
+   Note $outf '           echo "   ahelp   this help message"'
+   Note $outf '           echo "   aO      compile optimized"'
+   Note $outf '           echo "   apre    preprocess <file> only"'
+   Note $outf '           echo "   aprf    compile for profiling"'
+   Note $outf '           echo "   avrb    verbosity level"'
+   Note $outf '           echo ""'
+   Note $outf '           exit(1)'
+   Note $outf '           breaksw'
+   Note $outf '      case -aO:'
+   Note $outf '           set dbg = FALSE'
+   Note $outf '           set opt = TRUE'
+   Note $outf '           breaksw'
+   Note $outf '      case -o:'
+   Note $outf '      case -ao:'
+   Note $outf '           shift'
+   Note $outf '           set outf = $1'
+   Note $outf '           breaksw'
+   Note $outf '      case -aprf:'
+   Note $outf '           set prf = TRUE'
+   Note $outf '           breaksw'
+   Note $outf '      case -apre:'
+   Note $outf '           shift'
+   Note $outf '           set pref = $1'
+   Note $outf '           breaksw'
+   Note $outf '      case -avrb:'
+   Note $outf '           @ vrb = $vrb + 1'
+   Note $outf '           breaksw'
+   Note $outf '      case -c:'
+   Note $outf '           set co = TRUE'
+   Note $outf '           breaksw'
+   Note $outf '      case -l*:'
+   Note $outf '           set lib = ( $lib "$1" )'
+   Note $outf '           breaksw'
+   Note $outf '      default:'
 
 # literal foo.a, foo.so, or foo.so.2 goes into lib
-Note $outf '           if (("$1" =~ *.a) || ("$1" =~ *.so*)) then'
-Note $outf '              set lib = ( $lib "$1" )'
+   Note $outf '           if (("$1" =~ *.a) || ("$1" =~ *.so*)) then'
+   Note $outf '              set lib = ( $lib "$1" )'
 
 # arguments which are existing C++ files go into inf
-Note $outf '           else if (("$1" =~ *.cc) && (-f "$1")) then'
-Note $outf '              set inf = ( $inf "$1" )'
+   Note $outf '           else if (("$1" =~ *.cc) && (-f "$1")) then'
+   Note $outf '              set inf = ( $inf "$1" )'
 
 # everything goes into lib once lib has anything
 # otherwise it goes into args
-Note $outf '           else'
-Note $outf '              if ("$lib" != "") then'
-Note $outf '                 set lib = ( $lib "$1" )'
-Note $outf '              else'
-Note $outf '                 set args = ( $args "$1" )'
-Note $outf '              endif'
-Note $outf '           endif'
-Note $outf '           breaksw'
-Note $outf '   endsw'
-Note $outf '   shift'
-Note $outf 'end'
-Note $outf ''
+   Note $outf '           else'
+   Note $outf '              if ("$lib" != "") then'
+   Note $outf '                 set lib = ( $lib "$1" )'
+   Note $outf '              else'
+   Note $outf '                 set args = ( $args "$1" )'
+   Note $outf '              endif'
+   Note $outf '           endif'
+   Note $outf '           breaksw'
+   Note $outf '   endsw'
+   Note $outf '   shift'
+   Note $outf 'end'
+   Note $outf ''
 
-Note $outf 'if ("$inf" == "") then'
-Note $outf '   echo "No input file specified - exiting"'
-Note $outf '   exit(1)'
-Note $outf 'endif'
-Note $outf ''
+   Note $outf 'if ("$inf" == "") then'
+   Note $outf '   echo "No input file specified - exiting"'
+   Note $outf '   exit(1)'
+   Note $outf 'endif'
+   Note $outf ''
 
-Note $outf 'if (("$outf" == "") && ("$pref" == "") && ($co == FALSE)) then'
-Note $outf '   echo "No output file specified - exiting"'
-Note $outf '   exit(1)'
-Note $outf 'endif'
-Note $outf ''
+   Note $outf 'if (("$outf" == "") && ("$pref" == "") && ($co == FALSE)) then'
+   Note $outf '   echo "No output file specified - exiting"'
+   Note $outf '   exit(1)'
+   Note $outf 'endif'
+   Note $outf ''
 
-Note $outf 'set CI = ( $exe $args )'
-Note $outf "set LD = ( $LD_Exe )"
-Note $outf ''
+   Note $outf 'set CI = ( $exe $args )'
+   Note $outf "set LD = ( $LD_Exe )"
+   Note $outf ''
 
 #--------------------------------------------------------------------------'
 #--------------------------------------------------------------------------'
@@ -193,44 +204,44 @@ Note $outf ''
 # NOTE: the compilers database is a hand written database
 # and distributions builds do not have this
 
-set wexe = `which $comp`
-if (-x "$wexe") then
-   set compilers = $wexe:h/compilers
-else
-   set compilers = no.file
-endif
-if (-f $compilers) then
-
-   set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") && ($3 == "'$vers'") {print}' $compilers` )
-   if ($#linf < 4) then
-      set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") {print}' $compilers | tail -n 1` )
+   set wexe = `which $comp`
+   if (-x "$wexe") then
+      set compilers = $wexe:h/compilers
+   else
+      set compilers = no.file
    endif
+   if (-f $compilers) then
 
-   if ($#linf > 4) then
-      shift linf
-      shift linf
-      shift linf
-      shift linf
+      set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") && ($3 == "'$vers'") {print}' $compilers` )
+      if ($#linf < 4) then
+         set linf = ( `awk '($2 == "'$comp'") && ($1 == "'$PSY_Arch'") {print}' $compilers | tail -n 1` )
+      endif
+
+      if ($#linf > 4) then
+         shift linf
+         shift linf
+         shift linf
+         shift linf
 
 # get other key,value pairs
 # useful for setting compiler license variables
-      while ($#linf > 1)
-         set var = $linf[1]
-         set val = $linf[2]
-         shift linf
-         shift linf
-         Note $outf 'if ($vrb > 0) then'
-         Note $outf '   echo "   setenv '$var $val'"'
-         Note $outf 'endif'
-         Note $outf "setenv $var $val"
-      end
-   endif
+         while ($#linf > 1)
+            set var = $linf[1]
+            set val = $linf[2]
+            shift linf
+            shift linf
+            Note $outf 'if ($vrb > 0) then'
+            Note $outf '   echo "   setenv '$var $val'"'
+            Note $outf 'endif'
+            Note $outf "setenv $var $val"
+         end
+      endif
 
-   unset linf
-   unset sys
-endif
-unset wexe
-unset compilers
+      unset linf
+      unset sys
+   endif
+   unset wexe
+   unset compilers
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
@@ -241,79 +252,81 @@ unset compilers
 # for example, recent poorly built GNU compilers which will not
 # run without LD_LIBRARY_PATH being set
 
-if ("$RPATH" != "") then
-   Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
-   Note $outf '   setenv LD_LIBRARY_PATH '$RPATH':$LD_LIBRARY_PATH'
+   if ("$RPATH" != "") then
+      Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
+      Note $outf '   setenv LD_LIBRARY_PATH '$RPATH':$LD_LIBRARY_PATH'
+      Note $outf 'else'
+      Note $outf '   setenv LD_LIBRARY_PATH '$RPATH
+      Note $outf 'endif'
+      Note $outf ''
+   endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+   Note $outf 'set path   = ( '$BinDir' $path )'
+   Note $outf 'set action = ""'
+
+   Note $outf 'if ($?SC_EXEC_N_ATTEMPTS == 1) then'
+   Note $outf '   @ na = $SC_EXEC_N_ATTEMPTS'
    Note $outf 'else'
-   Note $outf '   setenv LD_LIBRARY_PATH '$RPATH
+   Note $outf '   @ na = 1'
    Note $outf 'endif'
    Note $outf ''
-endif
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-Note $outf 'set path   = ( '$BinDir' $path )'
-Note $outf 'set action = ""'
-
-Note $outf 'if ($?SC_EXEC_N_ATTEMPTS == 1) then'
-Note $outf '   @ na = $SC_EXEC_N_ATTEMPTS'
-Note $outf 'else'
-Note $outf '   @ na = 1'
-Note $outf 'endif'
-Note $outf ''
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
-
-switch ($comp)
+   switch ($comp)
 
 # NOTE: newest GNU compilers require this to run because
 # for some reason they were not built with -rpath
 # this is not for the compiled executables but the compiler
-   case g++:
-        Note $outf 'set root = $exe:h'
-        Note $outf 'set root = $root:h'
-        Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
-        Note $outf '   setenv LD_LIBRARY_PATH  $root/lib64:$root/lib:${LD_LIBRARY_PATH}'
-        Note $outf 'else'
-        Note $outf '   setenv LD_LIBRARY_PATH  $root/lib64:$root/lib'
-        Note $outf 'endif'
+      case g++:
+           Note $outf 'set root = $exe:h'
+           Note $outf 'set root = $root:h'
+           Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
+           Note $outf '   setenv LD_LIBRARY_PATH  $root/lib64:$root/lib:${LD_LIBRARY_PATH}'
+           Note $outf 'else'
+           Note $outf '   setenv LD_LIBRARY_PATH  $root/lib64:$root/lib'
+           Note $outf 'endif'
 
-        Note $outf 'unset root'
-        breaksw
+           Note $outf 'unset root'
+           breaksw
 
-   case pathCC:
-        Note $outf 'set root  = $exe:h'
-        Note $outf 'set root  = $root:h'
-        Note $outf 'set lvers = `ls $root/lib`'
-        Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
-        Note $outf '   setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32:${LD_LIBRARY_PATH}'
-        Note $outf 'else'
-        Note $outf '   setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32'
-        Note $outf 'endif'
+      case pathCC:
+           Note $outf 'set root  = $exe:h'
+           Note $outf 'set root  = $root:h'
+           Note $outf 'set lvers = `ls $root/lib`'
+           Note $outf 'if ($?LD_LIBRARY_PATH == 1) then'
+           Note $outf '   setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32:${LD_LIBRARY_PATH}'
+           Note $outf 'else'
+           Note $outf '   setenv LD_LIBRARY_PATH  $root/lib/${lvers}:$root/lib/${lvers}/32'
+           Note $outf 'endif'
 
-        Note $outf 'unset root'
-        breaksw
+           Note $outf 'unset root'
+           breaksw
 
-   case pgCC:
-        breaksw
-endsw
-Note $outf ''
+      case pgCC:
+           breaksw
+   endsw
+   Note $outf ''
+
+# add the common backend of the compiler wrapper
+   cat write/acbe >>& $outf
+
+   @ err = 0
 
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
-cat write/acbe >>& $outf
+endif
 
 Note $outf 'exit($err)'
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 
 flog $WLog chmod a+x $outf
 
 source $Me:h/post-common
 
-exit(0)
+exit($err)
 

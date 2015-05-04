@@ -98,7 +98,7 @@ object *_SX_call_args(SS_psides *si, SC_type *td, void *v)
  *                   - given pattern
  */
 
-static object *_SX_list_vobjects(SS_psides *si, char *patt,
+static object *_SX_list_vobjects(SS_psides *si, const char *patt,
 				 SX_file *po, int type)
    {long i, n;
     int t;
@@ -285,7 +285,8 @@ void _SX_get_menu(SS_psides *si, SX_file *po)
 
 /* _SX_PUSH_MENU_ITEM - add the given symbol table entry to the file menu */
 
-void _SX_push_menu_item(SS_psides *si, SX_file *po, char *name, char *type)
+void _SX_push_menu_item(SS_psides *si, SX_file *po,
+			const char *name, const char *type)
    {int nc;
     char s[MAXLINE];
     char *var, *lb;
@@ -469,7 +470,7 @@ void SX_parse(SX_reparsed *pd, object *strm)
 
 /* SX_WRAP_PAREN - enclose second arg by first and third args */
 
-char *SX_wrap_paren(char *opn, char *form, char *cls, size_t ln)
+char *SX_wrap_paren(const char *opn, char *form, const char *cls, size_t ln)
    {char tmp[MAXLINE];
 
    SC_strncpy(tmp, MAXLINE, form, -1);
@@ -483,10 +484,13 @@ char *SX_wrap_paren(char *opn, char *form, char *cls, size_t ln)
 
 /* _SX_ISTHROUGH - return pointer if :range found, otherwise NULL */
 
-static char *_SX_isthrough(char *s)
-   {char *sp;
+static char *_SX_isthrough(const char *s)
+   {char *rv;
+    const char *sp;
 
-    for (sp = s; *sp != '\0'; sp++)
+    rv = NULL;
+
+    for (sp = s; (*sp != '\0') && (rv == NULL); sp++)
 
 /* skip quoted strings */
         {if (*sp == '\"')
@@ -500,9 +504,9 @@ static char *_SX_isthrough(char *s)
 
 /* do not stop on a UDL */
 	    {if (_SC_udlp(sp) == FALSE)
-	        return(sp);};};
+	        rv = (char *) sp;};};
 
-    return(NULL);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -835,7 +839,8 @@ void SX_register_devices(void)
  *            - one of the init files IFNA or IFNB
  */
 
-void SX_load_rc(SS_psides *si, char *ffn, int ldrc, char *ifna, char *ifnb)
+void SX_load_rc(SS_psides *si, const char *ffn, int ldrc,
+		const char *ifna, const char *ifnb)
    {int st;
 
 /* figure out the runtime file */

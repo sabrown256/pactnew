@@ -53,7 +53,7 @@ object *SX_get_curve_var(int j)
 
 /* _SX_CURVE_ID - given the curve character return the integer identifier */
 
-static int _SX_curve_id(char *s)
+static int _SX_curve_id(const char *s)
    {int id, c, len, i;
     int alldigits = TRUE;
 
@@ -250,7 +250,7 @@ int SX_next_space(SS_psides *si)
  *                   - this means an index in SX_gs.dataset (i.e. I) space
  */
 
-int SX_get_data_index(char *s)
+int SX_get_data_index(const char *s)
    {int i, j;
 
     j = _SX_curve_id(s);
@@ -307,7 +307,7 @@ int SX_get_crv_index_j(object *obj)
  *                 - this means an index in SX_gs.data_index (i.e. J) space
  */
 
-int SX_get_curve_id(char *s)
+int SX_get_curve_id(const char *s)
    {int j;
 
     j = _SX_curve_id(s);
@@ -389,7 +389,7 @@ object *SX_mk_curve_proc(int i)
 /* SX_MK_CURVE - the C level function that creates a new curve object */
 
 object *SX_mk_curve(SS_psides *si, int na, double **x,
-		    char *label, char *filename,
+		    const char *label, const char *filename,
 		    object *(*plt)(SS_psides *si))
    {int i, j, id, nd, ng;
     int lnc, lns;
@@ -502,7 +502,7 @@ object *SX_rl_curve(int j)
  *               - SX_gs.data_index
  */
 
-object *SX_set_crv_id(int j, char *id)
+object *SX_set_crv_id(int j, const char *id)
    {int i, ja;
     object *obj, *v;
 
@@ -621,7 +621,7 @@ object *SX_get_data_range(SS_psides *si, object *argl)
 
 /* SX_CURVEP - tests whether object is legitimate curve */
 
-int SX_curvep(char *s)
+int SX_curvep(const char *s)
    {int i, j, rv;
         
     rv = FALSE;

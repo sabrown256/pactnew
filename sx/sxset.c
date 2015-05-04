@@ -103,7 +103,8 @@ void SX_install_funcs(SS_psides *si)
 
 /* SX_INIT - initialize SX */
 
-SS_psides *SX_init(char *code, char *vers, int c, char **v, char **env)
+SS_psides *SX_init(const char *code, const char *vers,
+		   int c, char **v, char **env)
    {char *script;
     SS_psides *si;
 
@@ -323,7 +324,8 @@ int _SX_get_input(SS_psides *si, object *str)
  *              - the specified shared library
  */
 
-int SX_import_so(SS_psides *si, char *hdr, char *so, char *flags)
+int SX_import_so(SS_psides *si, const char *hdr,
+		 const char *so, const char *flags)
    {int ok, st;
     char cmd[MAXLINE], pck[MAXLINE], fnc[MAXLINE];
     char gso[MAXLINE], path[MAXLINE];

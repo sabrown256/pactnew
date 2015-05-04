@@ -12,15 +12,15 @@
 
 static void
  _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
-			 char **vr, char *type),
+			 char **vr, const char *type),
  _SX_rd_io_list(SS_psides *si, object *obj,
 		char *vr, inti ni, defstr *dp),
  _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file, char *vr,
-		  inti ni, char *type, dimdes *dims);
+		  inti ni, const char *type, dimdes *dims);
 
 syment
  *_SX_rd_data(SS_psides *si, PDBfile *file,
-	      char *name, syment *ep, SC_address *addr,
+	      const char *name, syment *ep, SC_address *addr,
 	      object *name_obj);
 
 /*--------------------------------------------------------------------------*/
@@ -33,7 +33,7 @@ syment
 
 void _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file,
 		      char *vr, inti ni,
-		      char *type, dimdes *dims)
+		      const char *type, dimdes *dims)
    {inti i;
     char **lvr;
     char *dtype;
@@ -58,7 +58,7 @@ void _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file,
  */
 
 static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
-				    char **vr, char *type)
+				    char **vr, const char *type)
    {inti ni;
     intb bpi;
     char *pv;
@@ -92,7 +92,8 @@ static void _SX_rd_indirection_list(SS_psides *si, object *obj, PDBfile *file,
  */
 
 static void _SX_rd_leaf_list(SS_psides *si, object *obj, PDBfile *file,
-			     char *vr, inti ni, char *type, dimdes *dims)
+			     char *vr, inti ni,
+			     const char *type, dimdes *dims)
    {inti i, sz;
     defstr *dp;
     memdes *desc, *mem_lst;
@@ -249,7 +250,8 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
 
 /* _SX_RD_DATA - grab some data from the specified file */
 
-syment *_SX_rd_data(SS_psides *si, PDBfile *file, char *name, syment *ep,
+syment *_SX_rd_data(SS_psides *si, PDBfile *file, const char *name,
+		    syment *ep,
 		    SC_address *addr, object *name_obj)
    {inti n;
     char *type, *dtype;

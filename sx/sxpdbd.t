@@ -10,8 +10,8 @@
 #--------------------------------------------------------------------------
 
 template<char|long long>
-int _SX_diff_primitives(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+int _SX_diff_primitives(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      <CTYPE> *a, *b;
@@ -38,8 +38,8 @@ int _SX_diff_primitives(char *indx, void *bfa, void *bfb, long n,
 #--------------------------------------------------------------------------
 
 template<float|quaternion>
-int _SX_diff_primitives(char *indx, void *bfa, void *bfb, long n,
-			long double tol, int ipt)
+int _SX_diff_primitives(char *indx, const void *bfa, const void *bfb,
+                        long n, long double tol, int ipt)
     {int ok, ret;
      long i, ne;
      <CTYPE> *a, *b;

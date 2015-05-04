@@ -18,7 +18,8 @@
 
 /* _SX_MK_PDBDATA - make and return SX_pdbdata */
 
-SX_pdbdata *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file)
+SX_pdbdata *_SX_mk_pdbdata(const char *name, void *data,
+			   syment *ep, PDBfile *file)
    {SX_pdbdata *pp;
 
     pp = CMAKE(SX_pdbdata);
@@ -76,7 +77,7 @@ static void _SX_wr_gpdbdata(SS_psides *si, object *obj, object *strm)
 
 /* _SX_MK_GPDBDATA - encapsulate a SX_pdbdata as an object */
 
-object *_SX_mk_gpdbdata(SS_psides *si, char *name,
+object *_SX_mk_gpdbdata(SS_psides *si, const char *name,
 			void *data, syment *ep, PDBfile *file)
    {SX_pdbdata *pp;
     object *op;
@@ -126,7 +127,7 @@ static void _SX_wr_gfile(SS_psides *si, object *obj, object *strm)
 
 /* _SX_MK_FILE - make and return a SX_file */
 
-SX_file *_SX_mk_file(char *name, char *type, void *file)
+SX_file *_SX_mk_file(const char *name, const char *type, void *file)
    {SX_file *po;
 
     po = CMAKE(SX_file);
@@ -218,9 +219,10 @@ object *SX_mk_gfile(SS_psides *si, SX_file *po)
  *                  - to it
  */
 
-SX_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
+SX_file *_SX_mk_open_file(SS_psides *si, const char *name,
+			  const char *type, const char *mode)
    {char nm[MAXLINE];
-    char *pnm;
+    const char *pnm;
     PDBfile *file;
     object *obj;
     SX_file *po;
@@ -238,7 +240,7 @@ SX_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
 
 /* if append or write mode open failed then try read-only mode */
     if ((file == NULL) && (strcmp(mode, "r") != 0))
-       file = PD_open(name, "r");
+       file = PD_open(pnm, "r");
 
     if (file == NULL)
 
@@ -260,7 +262,7 @@ SX_file *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode)
                SS_error(si, "CAN'T OPEN FILE - _SX_MK_OPEN_FILE", 
                         SS_mk_string(si, name));};};
 
-    _PD_def_real(type, file);
+    _PD_def_real(file, type);
 
     po  = _SX_mk_file(name, type, file);
     obj = SX_mk_gfile(si, po);

@@ -140,7 +140,7 @@ struct s_PD_printdes
     char *prefix;
     char *before;
     char *after;
-    char *nodename;
+    const char *nodename;
     dimdes *dims;
     FILE *fp;};
 
@@ -529,7 +529,7 @@ extern void
 		    intb bpi, int align, PD_byte_order ord,
 		    int *ordr, long *formt,
 		    int unsgned, int onescmp, int conv),
- _PD_def_real(char *type, PDBfile *file),
+ _PD_def_real(PDBfile *file, const char *type),
  _PD_d_install(PDBfile *file, const char *name, defstr *def,
 	       PD_chart_kind chk, const char *alias),
  _PD_e_install(PDBfile *file, char *name, syment *entr, int lookup),
@@ -625,7 +625,7 @@ extern int
 extern tr_layer
  *_PD_lookup(char *type),
  *_PD_lookup_fmt(const char *fmt),
- *_PD_lookup_fn(char *fn);
+ *_PD_lookup_fn(const char *fn);
 
 extern void
  _PD_install_funcs(void),

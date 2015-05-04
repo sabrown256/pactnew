@@ -68,7 +68,7 @@ static int _SX_rd_scm(SS_psides *si)
 
 /* SX_RD_SCM - do a SCHEME level rd with error protection */
 
-int SX_rd_scm(SS_psides *si, char *name)
+int SX_rd_scm(SS_psides *si, const char *name)
    {int rv;
 
     SC_strncpy(_SX.bf, MAXLINE, name, -1);
@@ -137,8 +137,7 @@ void SX_init_view(SS_psides *si)
 
 /* _SX_MAPPING_REF - give a SCHEME level reference to a mapping */
 
-static object *_SX_mapping_ref(SS_psides *si, char *fname,
-			       char *dtype, int indx)
+static object *_SX_mapping_ref(SS_psides *si, const char *fname, int indx)
    {SX_file *po;
     object *ret;
 
@@ -146,7 +145,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
        {for (po = SX_gs.file_list; po != NULL; po = po->next)
             {_SX_get_menu(si, po);
 
-             ret = SX_get_ref_map(si, po, indx, dtype);
+             ret = SX_get_ref_map(si, po, indx);
              if (!SS_nullobjp(ret))
                 return(ret);}
 
@@ -157,7 +156,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
        {po = SX_gs.gvif;
         _SX_get_menu(si, po);
 
-        ret = SX_get_ref_map(si, po, indx, dtype);
+        ret = SX_get_ref_map(si, po, indx);
         if (!SS_nullobjp(ret))
           return(ret);}
 
@@ -171,7 +170,7 @@ static object *_SX_mapping_ref(SS_psides *si, char *fname,
 
         _SX_get_menu(si, po);
 
-        ret = SX_get_ref_map(si, po, indx, dtype);
+        ret = SX_get_ref_map(si, po, indx);
         if (!SS_nullobjp(ret))
            return(ret);};
 
@@ -196,7 +195,7 @@ static object *SXI_mapping_ref(SS_psides *si, object *argl)
             G_INT_I, &indx,
             0);
 
-    o = _SX_mapping_ref(si, fname, dtype, indx);
+    o = _SX_mapping_ref(si, fname, indx);
 
     return(o);}
 
@@ -436,7 +435,7 @@ void SX_init_env(SS_psides *si)
  *            - return the exit status of the command
  */
 
-int SX_command(SS_psides *si, char *file, char *cmd)
+int SX_command(SS_psides *si, const char *file, const char *cmd)
    {int ret, zsp;
     static int first = TRUE;
 

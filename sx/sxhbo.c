@@ -539,7 +539,7 @@ static void _SX_init_range(SS_psides *si,
  */
 
 PM_mapping *SX_build_return_mapping(SS_psides *si,
-				    PM_mapping *h, char *label,
+				    PM_mapping *h, const char *label,
 				    PM_set *domain, int init, int wgt)
    {PM_mapping *f;
 

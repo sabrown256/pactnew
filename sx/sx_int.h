@@ -241,7 +241,8 @@ extern void
  _SX_args(SS_psides *si, object *obj, void *v, SC_type *td),
  *_SX_opt_generic(void *x, bind_opt wh, void *a),
  _SX_get_menu(SS_psides *si, SX_file *po),
- _SX_push_menu_item(SS_psides *si, SX_file *po, char *name, char *type);
+ _SX_push_menu_item(SS_psides *si, SX_file *po,
+		    const char *name, const char *type);
 
 extern int
  _SX_isodd(int n),
@@ -327,15 +328,16 @@ extern void
 /* SXMM.C declarations */
 
 extern object
- *_SX_mk_gpdbdata(SS_psides *si, char *name,
+ *_SX_mk_gpdbdata(SS_psides *si, const char *name,
 		  void *data, syment *ep, PDBfile *file);
 
 extern SX_file
- *_SX_mk_file(char *name, char *type, void *file),
- *_SX_mk_open_file(SS_psides *si, char *name, char *type, char *mode);
+ *_SX_mk_file(const char *name, const char *type, void *file),
+ *_SX_mk_open_file(SS_psides *si, const char *name,
+		   const char *type, const char *mode);
 
 extern SX_pdbdata
- *_SX_mk_pdbdata(char *name, void *data, syment *ep, PDBfile *file);
+ *_SX_mk_pdbdata(const char *name, void *data, syment *ep, PDBfile *file);
 
 extern void
  _SX_free_menu(SX_file *po, int re),
@@ -361,8 +363,9 @@ extern object
 /* SXPDB.C declarations */
 
 extern int
- _SX_file_varp(PDBfile *file, char *name, int flag),
- _SX_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr);
+ _SX_file_varp(PDBfile *file, const char *name, int flag),
+ _SX_read_entry(PDBfile *fp, const char *path, const char *ty,
+		syment *ep, void *vr);
 
 extern void
  *_SX_opt_haelem(haelem *x, bind_opt wh, void *a),
@@ -375,30 +378,32 @@ extern void
  _SX_type_container(char *d, size_t nd, const char *s, size_t ns);
 
 extern object
- *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode),
+ *_SX_open_file(SS_psides *si, object *arg,
+		const char *type, const char *mode),
  *_SX_pdbfile_to_list(SS_psides *si, PDBfile *file),
  *_SX_syment_to_list(SS_psides *si, syment *ep),
  *_SX_defstr_to_list(SS_psides *si, defstr *dp),
- *_SX_pdbdata_to_list(SS_psides *si, char *name, void *vr,
+ *_SX_pdbdata_to_list(SS_psides *si, const char *name, void *vr,
 		      syment *ep, PDBfile *file),
  *_SX_make_dims_obj(SS_psides *si, dimdes *dims);
 
 extern syment
- *_SX_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
-		  void *vr, dimdes *dims);
+ *_SX_write_entry(PDBfile *fp, const char *path, const char *inty,
+		  const char *outty, void *vr, dimdes *dims);
 
 
 /* SXPDBC.C declarations */
 
 extern void
- _SX_copy_tree(SS_psides *si, PDBfile *file, char *vrin, char *vrout,
-	       inti ni, char *type);
+ _SX_copy_tree(SS_psides *si, PDBfile *file, const char *vrin, char *vrout,
+	       inti ni, const char *type);
 
 
 /* SXPDBD.C declarations */
 
 extern int
- _SX_type_equal(PDBfile *file_a, PDBfile *file_b, char *typea, char *typeb);
+ _SX_type_equal(PDBfile *file_a, PDBfile *file_b,
+		const char *typea, const char *typeb);
 
 extern object
  *_SXI_diff_var(SS_psides *si, object *argl),
@@ -415,16 +420,16 @@ extern object
 
 extern object
  *_SX_make_list_io(SS_psides *si, PDBfile *file,
-		   char *vr, inti ni, char *type),
+		   const char *vr, inti ni, const char *type),
  *_SX_make_list_syment(SS_psides *si, PDBfile *file,
-		       void *vr, inti ni, char *type);
+		       void *vr, inti ni, const char *type);
 
 
 /* SXPDBR.C declarations */
 
 extern void
  _SX_rd_tree_list(SS_psides *si, object *obj, PDBfile *file, char *vr,
-		  inti ni, char *type, dimdes *dims);
+		  inti ni, const char *type, dimdes *dims);
 
 extern object
  *_SXI_read_numeric_data(SS_psides *si, object *argl);
@@ -446,7 +451,7 @@ extern void
 /* SXPML.C declarations */
 
 extern PM_set
- *SX_rep_to_ac(char *name, double *rx, double *ry,
+ *SX_rep_to_ac(const char *name, double *rx, double *ry,
 	       int n_nodes, int n_zones, int *zones);
 
 extern object

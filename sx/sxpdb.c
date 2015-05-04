@@ -12,10 +12,10 @@
 #include "scope_proc.h"
 #include "scope_mpi.h"
 
-typedef syment *(*PDBFileWrite)(PDBfile *fp, char *path,
-				char *inty, char *outty,
+typedef syment *(*PDBFileWrite)(PDBfile *fp, const char *path,
+				const char *inty, const char *outty,
 				void *vr, dimdes *dims);
-typedef int (*PDBFileRead)(PDBfile *fp, char *path, char *ty,
+typedef int (*PDBFileRead)(PDBfile *fp, const char *path, const char *ty,
 			   syment *ep, void *vr);
 
 /*--------------------------------------------------------------------------*/
@@ -873,7 +873,8 @@ object *SX_get_file(SS_psides *si, object *argl, SX_file **pfile)
  *               - cons its object to SX_gs.file_list.
  */
 
-object *_SX_open_file(SS_psides *si, object *arg, char *type, char *mode)
+object *_SX_open_file(SS_psides *si, object *arg,
+		      const char *type, const char *mode)
    {char *name;
     SX_file *po, *pn;
     object *o;
@@ -1480,7 +1481,7 @@ static object *_SX_memdes_to_list(SS_psides *si, memdes *mp)
  *                     - (name (type dimension) data)
  */
 
-object *_SX_pdbdata_to_list(SS_psides *si, char *name, void *vr,
+object *_SX_pdbdata_to_list(SS_psides *si, const char *name, void *vr,
 			    syment *ep, PDBfile *file)
    {object *obj, *obj1;
 
@@ -2382,29 +2383,33 @@ static object *_SXI_file_varp(SS_psides *si, object *argl)
 
 /* _SX_FILE_VARP - return TRUE iff the named variable is in the file */
 
-int _SX_file_varp(PDBfile *file, char *name, int flag)
+int _SX_file_varp(PDBfile *file, const char *name, int flag)
    {int rv;
-    char *token;
+    char *token, *nm;
     syment *ep;
 
     ep = NULL;
 
+    nm = CSTRSAVE(name);
+
     if (name != NULL)
        {if (flag)
-	   {ep = _PD_effective_ep(file, name, TRUE, NULL);
+	   {ep = _PD_effective_ep(file, nm, TRUE, NULL);
 	    if (ep != NULL)
 	       _PD_rl_syment_d(ep);}
 
         else
 
 /* check the literal name first - e.g. {t=1!000e-01,x(3:7)} */
-	   {ep = PD_inquire_entry(file, name, TRUE, NULL);
+	   {ep = PD_inquire_entry(file, nm, TRUE, NULL);
 	    if (ep == NULL)
-	       {token = SC_firsttok(name, ".([ ");
+	       {token = SC_firsttok(nm, ".([ ");
 
 		_SC_udl_container(token, TRUE);
 
 		ep = PD_inquire_entry(file, token, TRUE, NULL);};};};
+
+    CFREE(nm);
 
     rv = (ep != NULL);
 
@@ -2669,7 +2674,8 @@ static void _SX_setup_filedata_vif(PDBfile **pfp, int *pwrfl,
 
 /* _SX_READ_ENTRY - read entry method for PDB spoke */
 
-int _SX_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr)
+int _SX_read_entry(PDBfile *fp, const char *path, const char *ty,
+		   syment *ep, void *vr)
    {int rv;
 
     rv = _PD_hyper_read(fp, path, ty, ep, vr);
@@ -2681,8 +2687,8 @@ int _SX_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr)
 
 /* _SX_WRITE_ENTRY - write entry method for PDB spoke */
 
-syment *_SX_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
-			void *vr, dimdes *dims)
+syment *_SX_write_entry(PDBfile *fp, const char *path, const char *inty,
+			const char *outty, void *vr, dimdes *dims)
    {int new;
     syment *ep;
 
@@ -3461,7 +3467,8 @@ static object *_SXI_hash_to_pdbdata(SS_psides *si, object *argl)
  */
 
 object *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
-			   char *name, char *type, void *vr, int flag)
+			   const char *name, const char *type,
+			   void *vr, int flag)
    {int new;
     char fullpath[MAXLINE];
     syment *ep;
@@ -3477,7 +3484,8 @@ object *SX_pdbdata_handler(SS_psides *si, PDBfile *file,
 /* if the next object is a pdbfile, use it, otherwise, use default file */
     else if (file->virtual_internal == TRUE)
 
-/* if its an indirection, chances are high that vr is on the stack as something
+/* if its an indirection,
+ * chances are high that vr is on the stack as something
  * like &f where f is a local variable
  * this had better be guarded against
  */
@@ -3599,7 +3607,7 @@ static object *_SXI_set_track_pointers(SS_psides *si, object *argl)
  */
 
 static object *_SX_set_user_format(SS_psides *si, int i,
-				   char *format, int whch)
+				   const char *format, int whch)
    {int h1, h2;
     object *rv;
     char **fmts, **fmta;

@@ -103,7 +103,7 @@ tr_layer *_PD_lookup_fmt(const char *fmt)
  *               - the filename, FN, suffux
  */
 
-tr_layer *_PD_lookup_fn(char *fn)
+tr_layer *_PD_lookup_fn(const char *fn)
    {int ns;
     char **sa;
     tr_layer *ptr;
@@ -391,7 +391,7 @@ PDBfile *_PD_open_bin(const char *name, const char *mode, void *a)
 	     if (ok == TRUE)
 	        {file = _PD_open_bin_aux(pu, name, mode, tr, a);
 		 if (file != NULL)
-		    {_PD_def_real(type, file);
+		    {_PD_def_real(file, type);
 		     break;};};};};
 
     if ((file == NULL) && (pu != NULL))
