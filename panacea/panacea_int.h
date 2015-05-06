@@ -168,7 +168,7 @@ extern PA_scope_private
 
 extern void
  *_PA_init_space(PA_variable *pp, long psz),
- *_PA_alloc(defstr *dp, char *type, inti ni, void *pval);
+ *_PA_alloc(defstr *dp, const char *type, inti ni, void *pval);
 
 
 /* PADSYS.C declarations */
@@ -181,10 +181,10 @@ extern void
 /* PADUMP.C declarations */
 
 extern int
- _PA_get_data(double *d, char *vr, inti ni, long offset, long stride);
+ _PA_get_data(double *d, const char *vr, inti ni, long offset, long stride);
 
 extern void
- _PA_init_pp(char *ppname, char *gfname),
+ _PA_init_pp(const char *ppname, const char *gfname),
  _PA_scan_pp(void),
  _PA_allocate_mapping_space(PA_package *pck),
  _PA_dump_package_mappings(PA_package *pck, double t, double dt, int cycle);
@@ -196,19 +196,19 @@ extern PA_plot_request
 /* PAGNRD.C declarations */
 
 extern PA_plot_request
- *_PA_mk_plot_request(PA_set_spec *range, PA_set_spec *domain, char *text,
-		      PA_plot_request *req);
+ *_PA_mk_plot_request(PA_set_spec *range, PA_set_spec *domain,
+		      const char *text, PA_plot_request *req);
 
 extern PA_set_spec
- *_PA_proc_set_spec(char *s, PA_set_spec *lst);
+ *_PA_proc_set_spec(const char *s, PA_set_spec *lst);
 
 
 /* PAMM.C declarations */
 
 extern PA_variable
- *_PA_mk_variable(char *vname, PA_dimens *vdims, void *iv,
+ *_PA_mk_variable(const char *vname, PA_dimens *vdims, void *iv,
 		  PFVarInit ifn,
-		  int *vattr, char *vtype,
+		  int *vattr, const char *vtype,
 		  double conv_fact, double unit_fact,
 		  pcons *nu, pcons *du, pcons *alist);
 
@@ -219,7 +219,8 @@ extern dimdes
  *_PA_mk_sym_dims(PA_dimens *vdims);
 
 extern PA_src_variable
- *_PA_mk_src_variable(char *name, int vindx, int n, double *pt, PDBfile *fp);
+ *_PA_mk_src_variable(const char *name, int vindx, int n,
+		      double *pt, PDBfile *fp);
 
 extern void
  _PA_rl_variable(PA_variable *pp),
@@ -238,7 +239,7 @@ extern long
 /* PANACEA.C declarations */
 
 extern void
- _PA_init_files(char *edname, char *ppname, char *gfname);
+ _PA_init_files(const char *edname, const char *ppname, const char *gfname);
 
 
 /* PAPP.C declarations */
@@ -250,13 +251,13 @@ extern void
 /* PASHAR.C declarations */
 
 extern void
- *_PA_pdb_read(PDBfile *file, char *name, syment **psp, long *indx);
+ *_PA_pdb_read(PDBfile *file, const char *name, syment **psp, long *indx);
 
 extern void
- _PA_install_var(char *vname, PA_variable *pp),
+ _PA_install_var(const char *vname, PA_variable *pp),
  _PA_rd_variable(PDBfile *pdrs, PA_variable *pp, int conv_flag, int scope),
  _PA_wrrstrt(char *rsname, int conv_flag),
- _PA_rdrstrt(char *fname, int conv_flag);
+ _PA_rdrstrt(const char *fname, int conv_flag);
 
 
 /* PASRC.C declartions */
@@ -270,7 +271,7 @@ extern void
 /* PADEF.C declarations */
 
 extern PA_variable
- *_PA_process_def_var(char *vname, va_list *list);
+ *_PA_process_def_var(const char *vname, va_list *list);
 
 extern PA_dimens
  *_PA_process_dimension(va_list *list);

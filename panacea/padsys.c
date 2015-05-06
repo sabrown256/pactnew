@@ -49,9 +49,10 @@ void _PA_internal_init(void)
  *                - package installation
  */
 
-PA_package *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
+PA_package *PA_gen_package(const char *name,
+			   PFPkgGencmd cmd, PFPkgDfstrc dfs,
                            PFPkgDefun dfu, PFPkgDefvar dfr, PFPkgDefcnt cnt,
-                           PFPkgIntrn inr, char *fname)
+                           PFPkgIntrn inr, const char *fname)
    {PA_package *pck;
 
     PA_gs.n_packages++;
@@ -108,10 +109,10 @@ PA_package *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
  *                     - then install the runtime routines
  */
 
-void PA_run_time_package(char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
+void PA_run_time_package(const char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
                          PFPkgDefvar dfr, PFPkgDefcnt cnt, PFPkgInizer izr,
                          PFPkgMain mn, PFPkgPpsor psr, PFPkgFinzer fzr,
-                         char *fname)
+                         const char *fname)
    {PA_package *pck;
 
     PA_gs.n_packages++;
@@ -166,11 +167,11 @@ void PA_run_time_package(char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
  *                - then install the runtime routines
  */
 
-void PA_def_package(char *name, PFPkgGencmd gcmd, PFPkgDfstrc dfs,
+void PA_def_package(const char *name, PFPkgGencmd gcmd, PFPkgDfstrc dfs,
                     PFPkgDefun dfu, PFPkgDefvar dfr, PFPkgDefcnt cnt,
                     PFPkgIntrn inr, PFPkgInizer izr, PFPkgMain mn,
                     PFPkgPpsor psr, PFPkgFinzer fzr, PFPkgPpcmd pcmd,
-                    char *fname)
+                    const char *fname)
    {PA_package *pck;
 
     pck = PA_gen_package(name, gcmd, dfs, dfu, dfr, cnt, inr, fname);
@@ -192,7 +193,7 @@ void PA_def_package(char *name, PFPkgGencmd gcmd, PFPkgDfstrc dfs,
  * #bind PA_control_set fortran() scheme()
  */
 
-void PA_control_set(char *s)
+void PA_control_set(const char *s)
    {PA_package *pck;
     PA_variable *pp;
     PA_thread_state *ps;

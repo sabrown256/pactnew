@@ -20,7 +20,7 @@
  *                 - variable table
  */
 
-PA_variable *PA_def_variable(char *name, ...)
+PA_variable *PA_def_variable(const char *name, ...)
    {PA_variable *pp;
 
     SC_VA_START(name);
@@ -48,7 +48,7 @@ PA_variable *PA_def_variable(char *name, ...)
  *                    - package scoping instead of a different table
  */
 
-PA_variable *PA_def_var_default(char *name, ...)
+PA_variable *PA_def_var_default(const char *name, ...)
    {PA_variable *pp;
 
     SC_VA_START(name);
@@ -71,7 +71,7 @@ PA_variable *PA_def_var_default(char *name, ...)
  *                      - attributes for variable
  */
 
-pcons *PA_def_var_attribute(char *name, ...)
+pcons *PA_def_var_attribute(const char *name, ...)
    {int enough;
     int tag;
     pcons *att_alist = NULL;
@@ -118,7 +118,7 @@ pcons *PA_def_var_attribute(char *name, ...)
 
 /* PA_DEF_VAR_DIMENSION - define variable dimensions */
 
-PA_dimens *PA_def_var_dimension(char *name, ...)
+PA_dimens *PA_def_var_dimension(const char *name, ...)
    {PA_dimens *vdims;
 
     SC_VA_START(name);
@@ -137,7 +137,7 @@ PA_dimens *PA_def_var_dimension(char *name, ...)
 
 /* PA_DEF_VAR_UNIT - define variable units */
 
-pcons *PA_def_var_units(char *name, ...)
+pcons *PA_def_var_units(const char *name, ...)
    {pcons *unit_alist;
 
     unit_alist = NULL;
@@ -157,7 +157,7 @@ pcons *PA_def_var_units(char *name, ...)
 
 /* PA_DEF_VAR_DOMAIN - define a variable domain */
 
-void PA_def_var_domain(char *name, ...)
+void PA_def_var_domain(const char *name, ...)
   {
 
    SC_VA_START(name);
@@ -233,16 +233,12 @@ void PA_def_var_init(void)
  *                     - this will find the highest precedence last
  */
 
-PA_variable *_PA_process_def_var(char *vname, va_list *lst)
-   {int i;
-    int enough;
-    int tag;
-    int *pival;
+PA_variable *_PA_process_def_var(const char *vname, va_list *lst)
+   {int i, enough, tag;
     int vattr[N_ATTRIBUTES];
+    int *pival;
+    char *name, *vtype, *tag_name;
     char *attr_name[N_ATTRIBUTES];
-    char *name;
-    char *vtype;
-    char *tag_name;
     pcons *nu, *du, *alist;
     PA_variable *pp;
     PA_dimens *vdims;
@@ -643,7 +639,8 @@ pcons *_PA_process_units(va_list *list, pcons *alist)
  *                  - return a pointer to the hash table
  */
 
-hasharr *PA_install_table(char *s, void *vr, char *type, hasharr *tab)
+hasharr *PA_install_table(const char *s, void *vr,
+			  const char *type, hasharr *tab)
    {
 
     if (tab == NULL)

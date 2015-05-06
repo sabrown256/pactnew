@@ -353,7 +353,7 @@ int _PD_remove_type(PDBfile *file, char *name)
 
 /* _PD_E_INSTALL - install a syment in the given hash table */
 
-void _PD_e_install(PDBfile *file, char *name, syment *ep, int lookup)
+void _PD_e_install(PDBfile *file, const char *name, syment *ep, int lookup)
    {hasharr *tab;
     dimdes *dms;
 
@@ -1507,7 +1507,7 @@ PDBfile *_PD_open(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a)
  *                  - used primarily with filter chains
  */
 
-void _PD_replace_file(PDBfile *file, char *name, int64_t addr)
+void _PD_replace_file(PDBfile *file, const char *name, int64_t addr)
    {SC_udl *pu;
     PD_smp_state *pa;
     FILE *fp;

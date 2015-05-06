@@ -21,7 +21,7 @@
  *                   - return TRUE iff successful
  */
 
-int PA_connect_ptrs_p(char *name, char **pvn, void **pp, int *pn)
+int PA_connect_ptrs_p(const char *name, char **pvn, void **pp, int *pn)
    {int i, n;
     char *vname, s[MAXLINE];
     void **ptr;
@@ -472,7 +472,7 @@ static void _PA_proc_db_tab(PA_package *pck, hasharr *tab)
  *                 - the number of entries in the table
  */
 
-static PA_tab_head *_PA_rd_tab_head(FILE *fp, char *fn)
+static PA_tab_head *_PA_rd_tab_head(FILE *fp, const char *fn)
    {int j, nf, ne;
     char *token, *name, *key, *pb, bf[MAXLINE], *s;
     pcons *keys, *next, *prev;
@@ -772,7 +772,7 @@ int _PA_rd_db_tab(PA_package *pck, FILE *fp)
  *             - database for the package which the file represents
  */
 
-void PA_read_def(PA_package *pck, char *name)
+void PA_read_def(PA_package *pck, const char *name)
    {FILE *fp;
 
     fp = io_open(name, "r");
@@ -814,7 +814,7 @@ int _PA_alist_length(pcons *alist)
  *                     - on request on behalf of the application
  */
 
-void PA_install_function(char *s, PFVoid fnc)
+void PA_install_function(const char *s, PFVoid fnc)
    {SC_address addr;
 
     addr.funcaddr = (PFInt) fnc;
@@ -833,7 +833,7 @@ void PA_install_function(char *s, PFVoid fnc)
  *                       - access on behalf of the application
  */
 
-void PA_install_identifier(char *s, void *vr)
+void PA_install_identifier(const char *s, void *vr)
    {
 
     if (PA_gs.symbol_tab == NULL)
@@ -851,14 +851,15 @@ void PA_install_identifier(char *s, void *vr)
 
 /* PA_ADD_HOOK - add an item to the global list of hooks */
 
-void PA_add_hook(char *name, void *fnc)
+void PA_add_hook(const char *name, void *fnc)
    {SC_address ad;
 
     if (PA_gs.symbol_tab == NULL)
        PA_gs.symbol_tab = SC_make_hasharr(HSZLARGE, NODOC, SC_HA_NAME_KEY, 0);
 
     ad.funcaddr = (PFInt) fnc;
-    SC_hasharr_install(PA_gs.symbol_tab, name, ad.memaddr, G_POINTER_S, 2, -1);
+    SC_hasharr_install(PA_gs.symbol_tab, name, ad.memaddr,
+		       G_POINTER_S, 2, -1);
 
     return;}
 

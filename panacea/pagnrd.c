@@ -106,7 +106,7 @@ hasharr *PA_inst_com(void)
  *           -
  */
  
-void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
+void PA_inst_c(const char *cname, void *cvar, int ctype, int cnum,
 	       PFVoid cproc, PFPanHand chand)
    {PA_command *cp;
  
@@ -130,7 +130,7 @@ void PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
 
 /* PA_DEF_ALIAS - define an alias for a constant value */
 
-void PA_def_alias(char *name, char *type, void *pv)
+void PA_def_alias(const char *name, const char *type, void *pv)
    {int id;
     void *v;
 
@@ -151,7 +151,7 @@ void PA_def_alias(char *name, char *type, void *pv)
  *                - NOTE: the value can be cast to its true type
  */
 
-double PA_alias_value(char *s)
+double PA_alias_value(const char *s)
    {int id;
     double d;
     haelem *hp;
@@ -370,7 +370,7 @@ void PA_proc_iv_spec(PA_iv_specification *lst)
 
 /* PA_READ_FILE - handle the work of the read command */
 
-void PA_read_file(char *str, int sfl)
+void PA_read_file(const char *str, int sfl)
    {char s[MAXLINE], *t;
     PFBaseName hook;
     PFGenErr errfnc;
@@ -412,7 +412,7 @@ void PA_read_file(char *str, int sfl)
  * #bind PA_readh fortran() scheme(pa-read-commands)
  */
 
-void PA_readh(char *str)
+void PA_readh(const char *str)
    {
 
 /* by now verify/force the PDBNet hooks to be setup */
@@ -492,7 +492,7 @@ char *PA_get_next_line(void)
 
 /* PA_GET_FIELD - get the next field from the command string */
 
-char *PA_get_field(char *s, char *t, int optp)
+char *PA_get_field(const char *s, const char *t, int optp)
    {char *token, *b;
 
     b = (_PA.input_flag) ? _PA.input_bf : NULL;
@@ -512,7 +512,7 @@ char *PA_get_field(char *s, char *t, int optp)
  *                  - does alias expansion
  */
 
-double PA_get_num_field(char *s, char *t, int optp)
+double PA_get_num_field(const char *s, const char *t, int optp)
    {char *token;
     double val;
 
@@ -705,17 +705,18 @@ void PA_nploth(void)
 
 /* PA_TIME_PLOT - make a time plot request from the source */
 
-void PA_time_plot(char *rname, void *vr)
+void PA_time_plot(const char *rname, void *vr)
    {char text[MAXLINE];
     PA_set_spec *range, *domain;
 
     PA_gs.n_graphs++;
 
     snprintf(text, MAXLINE, "%s->{t}", rname);
-    range     = _PA_proc_set_spec(rname, NULL);
-    domain    = _PA_proc_set_spec("t", NULL);
-    PA_gs.plot_reqs = _PA_mk_plot_request(range, domain, text, PA_gs.plot_reqs);
+    range  = _PA_proc_set_spec(rname, NULL);
+    domain = _PA_proc_set_spec("t", NULL);
 
+    PA_gs.plot_reqs             = _PA_mk_plot_request(range, domain, text,
+						      PA_gs.plot_reqs);
     PA_gs.plot_reqs->data       = (PM_set *) vr;
     PA_gs.plot_reqs->data_index = 0;
     PA_gs.plot_reqs->conv       = 1.0;
@@ -730,7 +731,7 @@ void PA_time_plot(char *rname, void *vr)
  */
 
 PA_plot_request *_PA_mk_plot_request(PA_set_spec *range, PA_set_spec *domain,
-				     char *text, PA_plot_request *next)
+				     const char *text, PA_plot_request *next)
    {PA_plot_request *req;
 
     req = CMAKE(PA_plot_request);
@@ -765,7 +766,7 @@ PA_plot_request *_PA_mk_plot_request(PA_set_spec *range, PA_set_spec *domain,
  *                  - TRUE iff T is of the form func(a;b;c)
  */
 
-int PA_function_form(char *t, PA_set_spec *spec)
+int PA_function_form(const char *t, PA_set_spec *spec)
    {int n, ret;
     char *ps;
     char fnc[MAXLINE], s[MAXLINE], arg[MAXLINE];
@@ -821,7 +822,7 @@ int PA_function_form(char *t, PA_set_spec *spec)
  *                   - in a plot request
  */
 
-PA_set_spec *_PA_proc_set_spec(char *s, PA_set_spec *lst)
+PA_set_spec *_PA_proc_set_spec(const char *s, PA_set_spec *lst)
    {char t[MAXLINE], *token;
     double vc;
     PA_set_spec *spec;
@@ -920,17 +921,22 @@ NORETURN void PA_done(void)
 
 /* PA_NAME_FILES - name the various files and log them in the name array */
 
-void PA_name_files(char *base_name, char **ped, char **prs,
+void PA_name_files(const char *base, char **ped, char **prs,
 		   char **ppp, char **pgf)
-   {char s[50], t[MAXLINE], *token, *pt;
+   {char s[50], t[MAXLINE];
+    char *token, *pt, *nm;
+
+    nm = CSTRSAVE(base);
 
 /* silence compilers that warn about uninitialized variables */
     pt = NULL;
 
 /* strip off any directory names */
-    token = SC_strtok(base_name, "/\\:", pt);
+    token = SC_strtok(nm, "/\\:", pt);
     if (token != NULL)
        SC_strncpy(t, MAXLINE, token, -1);
+
+    CFREE(nm);
 
     while ((token = SC_strtok(NULL, "/\\:", pt)) != NULL)
        SC_strncpy(t, MAXLINE, token, -1);

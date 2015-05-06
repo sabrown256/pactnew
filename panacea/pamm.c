@@ -17,9 +17,9 @@
  *                 - and return a pointer to it
  */
 
-PA_variable *_PA_mk_variable(char *vname, PA_dimens *vdims, void *iv,
+PA_variable *_PA_mk_variable(const char *vname, PA_dimens *vdims, void *iv,
 			     PFVarInit ifn,
-			     int *vattr, char *vtype,
+			     int *vattr, const char *vtype,
 			     double conv_fact, double unit_fact,
 			     pcons *nu, pcons *du, pcons *alist)
    {int nd;
@@ -161,7 +161,7 @@ dimdes *_PA_mk_sym_dims(PA_dimens *vdims)
  *                     - and return a pointer to it
  */
 
-PA_src_variable *_PA_mk_src_variable(char *name, int vindx, int n,
+PA_src_variable *_PA_mk_src_variable(const char *name, int vindx, int n,
 				     double *pt, PDBfile *fp)
    {PA_src_variable *svp;
 
@@ -190,7 +190,7 @@ PA_src_variable *_PA_mk_src_variable(char *name, int vindx, int n,
  *               - arrays
  */
 
-void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
+void PA_mk_control(PA_package *pck, const char *s, int n_a, int n_p, int n_s)
    {char bf[MAXLINE], **pb;
     double *pd;
     int i, *pi, *pn_a, *pn_p, *pn_s;
@@ -258,7 +258,8 @@ void PA_mk_control(PA_package *pck, char *s, int n_a, int n_p, int n_s)
  *            - and return it in a pointer to an PA_iv_specification struct
  */
 
-PA_iv_specification *PA_mk_spec(char *id, int type, char *fn, int n,
+PA_iv_specification *PA_mk_spec(const char *id, int type,
+				const char *fn, int n,
 				int interp, pcons *lst,
 				PA_iv_specification *nxt)
    {PA_iv_specification *sp;

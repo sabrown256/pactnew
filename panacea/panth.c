@@ -30,7 +30,8 @@ struct s_th_info
 
 /* PA_TH_OPEN - start a time history file family */
 
-PDBfile *PA_th_open(char *name, char *mode, long size, char *prev)
+PDBfile *PA_th_open(const char *name, const char *mode,
+		    long size, const char *prev)
    {PDBfile *file;
 
     file = PD_open(name, mode);
@@ -142,7 +143,7 @@ PDBfile *PA_th_family(PDBfile *file)
  *               -           - the member names
  */
 
-defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
+defstr *PA_th_def_rec(PDBfile *file, const char *name, const char *type,
 		      int nmemb, char **members, char **labels)
    {int i, n, count, err;
     char bf[MAXLINE], **lbls, **mbrs, *ltyp;
@@ -230,7 +231,7 @@ defstr *PA_th_def_rec(PDBfile *file, char *name, char *type,
  *                    - return the new, truncated syment
  */
 
-static syment *_PA_truncate_entry(PDBfile *file, char *name, long indx)
+static syment *_PA_truncate_entry(PDBfile *file, const char *name, long indx)
    {long numb, pags, enmb, dlen;
     syment *ep;
     dimdes *odims, *od;
@@ -312,8 +313,8 @@ static syment *_PA_truncate_entry(PDBfile *file, char *name, long indx)
  * #bind PA_th_write fortran() scheme()
  */
 
-int PA_th_write(PDBfile *strm, char *name, char *type, int inst, int nr,
-		void *vr)
+int PA_th_write(PDBfile *strm, const char *name, const char *type,
+		int inst, int nr, void *vr)
    {long nd, ind[3];
     int ret;
     syment *ep;
@@ -369,8 +370,8 @@ int PA_th_write(PDBfile *strm, char *name, char *type, int inst, int nr,
  * #bind PA_th_wr_member fortran() scheme()
  */
 
-int PA_th_wr_member(PDBfile *strm, char *name, char *member, char *type,
-		    int inst, void *vr)
+int PA_th_wr_member(PDBfile *strm, const char *name, const char *member,
+		    const char *type, int inst, void *vr)
    {int ret;
     char lname[MAXLINE], *mtype, *ltype;
     syment *ep;
@@ -456,7 +457,8 @@ int PA_th_wr_member(PDBfile *strm, char *name, char *member, char *type,
  * #bind PA_th_wr_iattr fortran() scheme()
  */
 
-int PA_th_wr_iattr(PDBfile *strm, char *vr, int inst, char *attr, void *avl)
+int PA_th_wr_iattr(PDBfile *strm, const char *vr, int inst,
+		   const char *attr, void *avl)
    {int rv;
     char t[MAXLINE];
 
@@ -478,7 +480,7 @@ int PA_th_wr_iattr(PDBfile *strm, char *vr, int inst, char *attr, void *avl)
  * #bind PA_th_trans_family fortran() scheme()
  */
 
-int PA_th_trans_family(char *name, int ord, int ncpf)
+int PA_th_trans_family(const char *name, int ord, int ncpf)
    {int i, nthf, ret;
     char **thfiles;
 
@@ -503,7 +505,7 @@ int PA_th_trans_family(char *name, int ord, int ncpf)
  *                   - PFILES: pointer to list of files
  */
 
-int PA_th_family_list(char *name, int c, char ***pfiles)
+int PA_th_family_list(const char *name, int c, char ***pfiles)
    {int n;
     char bf[MAXLINE];
     SC_array *fa;
@@ -663,11 +665,13 @@ int PA_th_link_list(int n, char **names, char ***pthfiles)
  *                     - the corresponding ULTRA file family
  */
 
-static int _PA_setup_uf_family(char *name, char **thfiles,
+static int _PA_setup_uf_family(const char *name, char **thfiles,
 			       int nthf, int ncpf, int flag)
    {int i, j, k, n_max, nc, np;
     long ind[3];
-    char bf[MAXLINE], name2[MAXLINE], tag[MAXLINE], type[MAXLINE], *pl, *nm, *s;
+    char bf[MAXLINE], name2[MAXLINE], tag[MAXLINE], type[MAXLINE];
+    char *pl, *nm;
+    const char *s;
     double ext[2];
     syment *ep;
     dimdes *dp;
@@ -813,8 +817,9 @@ static int _PA_setup_uf_family(char *name, char **thfiles,
  *                      - the curve arrays which are of type double
  */
 
-static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
-			        char *type, char *mix, int na, int nrd)
+static int _PA_transpose_stripe(PDBfile *file, double **crve,
+				const char *stripe, const char *type,
+				const char *mix, int na, int nrd)
    {int j, k, nv, ns, rv, sid;
     defstr *dp;
     memdes *desc;
@@ -832,7 +837,8 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
     if ((dp != NULL) && (strcmp(mix, _PA.heterogeneous) == 0))
        {int tmp, incr;
         long mitems, offs, bpm;
-        char *ps, *mtype;
+        char *mtype;
+	const char *ps;
         hasharr *tab;
 
         tab  = file->host_chart;
@@ -848,7 +854,8 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
                  {mitems = desc->number;
                   mtype  = desc->type;
                   bpm    = mitems*_PD_lookup_size(mtype, tab);
-                  incr   = _PD_align(offs, mtype, desc->is_indirect, tab, &tmp);
+                  incr   = _PD_align(offs, mtype, desc->is_indirect,
+				     tab, &tmp);
 		  sid    = SC_type_id(mtype, FALSE);
 
 /* increment the offsets to the alignments */
@@ -856,7 +863,8 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
                   ps   += incr;
 
                   pd = &crve[j][k];
-                  SC_convert_id(G_DOUBLE_I, pd, 0, 1, sid, ps, 0, 1, 1, FALSE);
+                  SC_convert_id(G_DOUBLE_I, pd, 0, 1,
+				sid, ps, 0, 1, 1, FALSE);
 
 /* increment to the next member */
                   offs += bpm;
@@ -887,31 +895,34 @@ static int _PA_transpose_stripe(PDBfile *file, double **crve, char *stripe,
  *              - else return HETEROGENEOUS
  */
 
-static char *_PA_type_mix(PDBfile *file, char *type)
-   {defstr *dp;
+static char *_PA_type_mix(PDBfile *file, const char *type)
+   {char *rv;
+    defstr *dp;
     memdes *desc;
 
+    rv = NULL;
+
     dp = PD_inquire_type(file, type);
-    if (dp == NULL)
-       return(NULL);
+    if (dp != NULL)
+       {desc = dp->members;
+	if (desc == NULL)
+	   rv = (char *) type;
+	else
+	   {SC_strncpy(_PA.type, MAXLINE, desc->type, -1);
+	    for (; desc != NULL; desc = desc->next)
+	        {if (strcmp(_PA.type, desc->type) != 0)
+		    return(_PA.heterogeneous);};};
 
-    desc = dp->members;
-    if (desc == NULL)
-       return(type);
+	rv = _PA.type;};
 
-    SC_strncpy(_PA.type, MAXLINE, desc->type, -1);
-    for (; desc != NULL; desc = desc->next)
-        {if (strcmp(_PA.type, desc->type) != 0)
-            return(_PA.heterogeneous);};
-
-    return(_PA.type);}
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PA_PROC_REC - process a single time history data set from a single file */
 
-static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
+static int _PA_proc_rec(const char *name, PDBfile *th, int ncpf, int recn)
    {int j, n, nc, nv, nptm;
     long offs, ind[3];
     inti i, ni, ns, na, nrd;
@@ -1028,7 +1039,7 @@ static int _PA_proc_rec(char *name, PDBfile *th, int ncpf, int recn)
  *                   - FLAG TRUE is verbose
  */
 
-int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
+int PA_th_trans_files(const char *name, int ncpf, int nthf, char **thfiles,
 		      int ord, int flag)
    {int i, j, n, ret;
     int n_min, n_inc;
@@ -1113,14 +1124,14 @@ int PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles,
  *                 - into one family of files.
  *
  *                 - BASE:   base name of the merged (target) files.
- *                 - FAMILY: is the base name of the family of files to merge. 
+ *                 - FAMILY: is the base name of the family to merge. 
  *                 - NCPF:   approximate number of curves per target file.
  *                 -         (If NCPF = 0, don't family merged file.)
  *
  * #bind PA_merge_family fortran() scheme()
  */
 
-int PA_merge_family(char *base, char *family, int ncpf)
+int PA_merge_family(const char *base, const char *family, int ncpf)
    {int i, n, ret;
     char **files;
 
@@ -1156,7 +1167,7 @@ int PA_merge_family(char *base, char *family, int ncpf)
  * #bind PA_merge_files fortran() scheme()
  */
 
-int PA_merge_files(char *base, int n, char **files, int ncpf)
+int PA_merge_files(const char *base, int n, char **files, int ncpf)
    {int i, ics, ix, ict, nc, npts, err;
     PDBfile *fpt, *fps;
     char s[MAXLINE], **names;
@@ -1236,7 +1247,7 @@ int PA_merge_files(char *base, int n, char **files, int ncpf)
  *                 - USE PA_TH_TRANS_FAMILY INSTEAD
  */
 
-int PA_th_transpose(char *name, int sncpf)
+int PA_th_transpose(const char *name, int sncpf)
    {int i, nthf, ret;
     char **thfiles;
 

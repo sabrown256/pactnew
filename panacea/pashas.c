@@ -232,7 +232,7 @@ void PA_file_mon(char *edname, char *ppname, char *gfname)
  * #bind PA_rd_restart fortran() scheme(pa-read-state-file)
  */
 
-void PA_rd_restart(char *rsname, int convs)
+void PA_rd_restart(const char *rsname, int convs)
    {int64_t lsa, lsb;
     float space;
 
@@ -527,7 +527,7 @@ void PA_change_dim(int *pdm, int val)
  *                - by the dimensions specified (PA_FILE or PA_DATABASE)
  */
 
-void PA_change_size(char *name, int flag)
+void PA_change_size(const char *name, int flag)
    {PA_variable *pp;
 
     pp = PA_inquire_variable(name);
@@ -549,7 +549,7 @@ void PA_change_size(char *name, int flag)
  * #bind PA_intern fortran() scheme()
  */
 
-void *PA_intern(void *vr, char *name)
+void *PA_intern(void *vr, const char *name)
    {PA_variable *pp;
     char *ptype;
     long psz;

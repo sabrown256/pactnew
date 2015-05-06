@@ -135,7 +135,7 @@ void _PA_init_sources(double t, double dt)
  *               - so that multiple sources with the same name may be used
  */
 
-PA_src_variable *PA_get_source(char *s, int start_flag)
+PA_src_variable *PA_get_source(const char *s, int start_flag)
    {int i;
     PA_src_variable *svp, *rv;
     char *pb, bf[MAXLINE];
@@ -170,7 +170,7 @@ PA_src_variable *PA_get_source(char *s, int start_flag)
 
 /* PA_GET_IV_SOURCE - this routine gets the named PA_iv_specification */
  
-PA_iv_specification *PA_get_iv_source(char *name)
+PA_iv_specification *PA_get_iv_source(const char *name)
    {PA_iv_specification *rv;
 
     rv = PA_find_iv_source(name, 0);
@@ -182,7 +182,7 @@ PA_iv_specification *PA_get_iv_source(char *name)
 
 /* PA_FIND_IV_SOURCE - this routine gets the named PA_iv_specification */
  
-PA_iv_specification *PA_find_iv_source(char *name, int off)
+PA_iv_specification *PA_find_iv_source(const char *name, int off)
    {PA_iv_specification *sp;
     double *data;
 

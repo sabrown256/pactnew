@@ -21,7 +21,8 @@
  *                 - a type defined in the virtual internal file
  */
 
-syment *PA_int_instance(char *name, char *type, long n, void *data)
+syment *PA_int_instance(const char *name, const char *type,
+			long n, void *data)
    {syment *ep;
     SC_address addr;
 
@@ -39,7 +40,7 @@ syment *PA_int_instance(char *name, char *type, long n, void *data)
  *                - a type defined in the virtual internal file
  */
 
-void *PA_mk_instance(char *name, char *type, long n)
+void *PA_mk_instance(const char *name, const char *type, long n)
    {void *data;
     syment *ep;
     SC_address addr;
@@ -60,7 +61,7 @@ void *PA_mk_instance(char *name, char *type, long n)
  *                - in the virtual internal file
  */
 
-void PA_rl_instance(char *name)
+void PA_rl_instance(const char *name)
    {syment *ep;
     SC_address addr;
 
@@ -83,7 +84,7 @@ void PA_rl_instance(char *name)
  *               - point to the given space
  */
 
-void PA_set_member(char *name, void *data, char *member)
+void PA_set_member(const char *name, void *data, const char *member)
    {int id;
     char s[MAXLINE], **ppc, *type;
     syment *ep;
@@ -113,7 +114,7 @@ void PA_set_member(char *name, void *data, char *member)
  *               - and return a pointer to it
  */
 
-void *PA_get_member(char *name, char *member)
+void *PA_get_member(const char *name, const char *member)
    {char s[MAXLINE];
     void *rv;
     syment *ep;

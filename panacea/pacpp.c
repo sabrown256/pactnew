@@ -54,10 +54,10 @@
  */
 
 struct s_PA_cpp_node
-   {char *name;
-    char *group;
-    int itype;
-    char *type;
+   {int itype;
+    const char *name;
+    const char *group;
+    const char *type;
     void *data;};
 
 typedef struct s_PA_cpp_node PA_cpp_node;
@@ -88,7 +88,7 @@ void PA_cpp_init(void)
  *            (i.e. not a user defined type)
  */
 
-void PA_cpp_add_group(char *name, int itype, char *type)
+void PA_cpp_add_group(const char *name, int itype, const char *type)
    {PA_cpp_node *node;
 
     node        = CMAKE(PA_cpp_node);
@@ -98,7 +98,8 @@ void PA_cpp_add_group(char *name, int itype, char *type)
     node->type  = type;
     node->data  = NULL;
 
-    SC_hasharr_install(PA_gs.cpp_value_tab, name, node, PA_gs.cpp_node, 3, -1);
+    SC_hasharr_install(PA_gs.cpp_value_tab, name, node,
+		       PA_gs.cpp_node, 3, -1);
   
     return;}
 
@@ -118,7 +119,7 @@ void PA_cpp_add_group(char *name, int itype, char *type)
  *             so the pointer must not be changed.
  */
 
-static void *_PA_cpp_data(int alloc, char *name0, long nb, char *group,
+static void *_PA_cpp_data(int alloc, char *name0, long nb, const char *group,
                           int itype, va_list *input)
    {char bf[MAXLINE], v[MAX_PRSZ];
     void *data;
@@ -136,7 +137,8 @@ static void *_PA_cpp_data(int alloc, char *name0, long nb, char *group,
        {if (SC_is_type_ptr(itype) == TRUE)
 	   data = *(void **) v;
 	else
-	   data = SC_convert_id(itype, NULL, 0, 1, itype, v, 0, 1, 1, FALSE);};
+	   data = SC_convert_id(itype, NULL, 0, 1, itype, v,
+				0, 1, 1, FALSE);};
   
     SC_VA_RESTORE(input);
 
@@ -150,12 +152,13 @@ static void *_PA_cpp_data(int alloc, char *name0, long nb, char *group,
 
 /* PA_CPP_ADD_NAME - add a preprocessor name and value to the table */
 
-void PA_cpp_add_name(char *name, char *group, ...)
+void PA_cpp_add_name(const char *name, const char *group, ...)
    {char name0[MAXLINE];
     PA_cpp_node *g_node, *node;
 
 /* find the type for this group */
-    g_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab, group);
+    g_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab,
+						   group);
     PA_ERR((g_node == NULL),
 	   "NO SUCH CPP GROUP %s", group);
 
@@ -173,10 +176,12 @@ void PA_cpp_add_name(char *name, char *group, ...)
     SC_VA_END;
 
 /* install into hash table */
-    SC_hasharr_install(PA_gs.cpp_name_tab, name, node, PA_gs.cpp_node, 3, -1);
+    SC_hasharr_install(PA_gs.cpp_name_tab, name, node,
+		       PA_gs.cpp_node, 3, -1);
 
 /* build cross reference from value to name */
-    SC_hasharr_install(PA_gs.cpp_value_tab, name0, node, PA_gs.cpp_node, 3, -1);
+    SC_hasharr_install(PA_gs.cpp_value_tab, name0, node,
+		       PA_gs.cpp_node, 3, -1);
 
     return;}
 
@@ -185,7 +190,7 @@ void PA_cpp_add_name(char *name, char *group, ...)
 
 /* PA_CPP_NAME_TO_VALUE - return a pointer to the names value */
 
-void *PA_cpp_name_to_value(char *name)
+void *PA_cpp_name_to_value(const char *name)
    {void *data;
     PA_cpp_node *node;
 
@@ -205,7 +210,7 @@ void *PA_cpp_name_to_value(char *name)
  *                   - using G_TYPE_I defines
  */
 
-int PA_cpp_name_itype(char *name)
+int PA_cpp_name_itype(const char *name)
    {int itype;
     PA_cpp_node *node;
 
@@ -225,13 +230,14 @@ int PA_cpp_name_itype(char *name)
  *                      - belongs to and a value
  */
 
-char *PA_cpp_value_to_name(char *group, ...)
+char *PA_cpp_value_to_name(const char *group, ...)
    {char *cpp_name = NULL;
     char name0[MAXLINE];
     PA_cpp_node *g_node, *cpp_node;
 
 /* find the type for this group */
-    g_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab, group);
+    g_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab,
+						   group);
 
     if (g_node != NULL)
        {SC_VA_START(group);
@@ -239,10 +245,11 @@ char *PA_cpp_value_to_name(char *group, ...)
 	SC_VA_END;
 
 /* look up value */
-	cpp_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab, name0);
+	cpp_node = (PA_cpp_node *) SC_hasharr_def_lookup(PA_gs.cpp_value_tab,
+							 name0);
 
 	if (cpp_node != NULL)
-	   cpp_name = cpp_node->name;};
+	   cpp_name = (char *) cpp_node->name;};
 
     return(cpp_name);}
 
@@ -407,7 +414,7 @@ void PA_cpp_default(void)
  *                  - type identifier
  */
 
-int convert_type_s_i(char *type_name)
+int convert_type_s_i(const char *type_name)
    {int type, *ptype;
 
     ptype = (int *) PA_cpp_name_to_value(type_name);

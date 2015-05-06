@@ -85,7 +85,7 @@ static void handler(int sig)
 
     PM_clear_fpu();
 
-    PM_enable_fpe_n(-1, handler, cpu);
+    PM_enable_fpe_n(TRUE, handler, cpu);
     msg_out(">>> Caught signal %d", sig);
 
     LONGJMP(*cpu, 1);

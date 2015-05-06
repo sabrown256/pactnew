@@ -72,7 +72,7 @@
  */
  
 
-void PA_def_var(char *vname, char *vtype, void *viv,
+void PA_def_var(const char *vname, const char *vtype, void *viv,
                 PFVarInit vif, ...)
    {PA_variable *pp;
     int dm, *pv, *mini, *maxi, meth;
@@ -218,7 +218,7 @@ void PA_def_var(char *vname, char *vtype, void *viv,
  */
  
 
-void PA_inst_var(char *vname, char *vtype, void *viv,
+void PA_inst_var(const char *vname, const char *vtype, void *viv,
                  PFVarInit vif, ...)
    {int dm, *pv, *mini, *maxi, meth;
     int enough, v, vattr[N_ATTRIBUTES];
@@ -349,8 +349,8 @@ void PA_inst_var(char *vname, char *vtype, void *viv,
  */
  
 
-void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
-		    PFVarInit vif, ...)
+void PA_inst_scalar(const char *vname, const char *vtype,
+		    void *vaddr, void *viv, PFVarInit vif, ...)
    {PA_variable *pp;
     int dm, *pv, itype;
     int v, enough, vattr[N_ATTRIBUTES];
@@ -444,7 +444,7 @@ void PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
  *                 - the actual database name will depend on PA_name_space
  */
 
-void _PA_install_var(char *vname, PA_variable *pp)
+void _PA_install_var(const char *vname, PA_variable *pp)
    {char *name, s[MAXLINE];
     PA_package *pck;
 
@@ -469,7 +469,7 @@ void _PA_install_var(char *vname, PA_variable *pp)
  *              - and NULL otherwise
  */
 
-void *_PA_pdb_read(PDBfile *file, char *name, syment **psp, long *indx)
+void *_PA_pdb_read(PDBfile *file, const char *name, syment **psp, long *indx)
    {char *token, memb[MAXLINE], *vtype, *s;
     void *vr;
     syment *ep;
@@ -519,7 +519,7 @@ void *_PA_pdb_read(PDBfile *file, char *name, syment **psp, long *indx)
  *         - return the PDB file pointer iff successful
  */
 
-PDBfile *PA_open(char *name, char *mode, int flag)
+PDBfile *PA_open(const char *name, const char *mode, int flag)
    {PDBfile *fp;
 
     if (strcmp(name, "vif") == 0)
@@ -776,7 +776,7 @@ void _PA_wrrstrt(char *rsname, int conv_flag)
  *             - take up more space in buffering potentially huge arrays.
  */
 
-void _PA_rdrstrt(char *fname, int conv_flag)
+void _PA_rdrstrt(const char *fname, int conv_flag)
    {int n_dmnd;
     long i;
     char *ty;
@@ -789,7 +789,9 @@ void _PA_rdrstrt(char *fname, int conv_flag)
     PA_control_set("global");
 
 /* set the rsname to this name to be able to CONNECT DeMaND variables */
-    _PA.rsname = fname;
+    CFREE(_PA.rsname)
+    _PA.rsname = CSTRSAVE(fname);
+
     SC_strncpy(bf, MAXLINE, fname, -1);
     tok = SC_strtok(bf, ". \r\n\t", s);
     if (tok != NULL)
@@ -1044,7 +1046,7 @@ void PA_warning_handler(int test, const char *fmt, ...)
  * #bind PA_error fortran() scheme()
  */
 
-void PA_error(char *msg)
+void PA_error(const char *msg)
    {
 
     PRINT(stdout, "%s \n\n", msg);

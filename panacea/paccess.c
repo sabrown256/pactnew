@@ -21,7 +21,7 @@ SC_thread_lock
  *                     - the PA_gs.variable_tab
  */
 
-PA_variable *PA_inquire_variable(char *x)
+PA_variable *PA_inquire_variable(const char *x)
    {char *name, s[MAXLINE];
     PA_package *pck;
     PA_variable *vr;
@@ -49,7 +49,7 @@ PA_variable *PA_inquire_variable(char *x)
  * #bind PA_equivalence fortran() scheme()
  */
 
-void PA_equivalence(void *vr, char *s)
+void PA_equivalence(void *vr, const char *s)
    {PA_variable *pp;
     int pall;
     long sz;
@@ -101,7 +101,7 @@ void PA_equivalence(void *vr, char *s)
  * #bind PA_set_equiv fortran() scheme(pa-set-equivalence!)
  */
 
-void PA_set_equiv(char *s, void *vl)
+void PA_set_equiv(const char *s, void *vl)
    {PA_variable *pp;
     int pall;
     long sz;
@@ -233,7 +233,7 @@ static void _PA_load_space(PA_variable *pp, long psz)
         PA_interp_src(pdata, svp, 0, psz, t, dt);}
 
     else if (pfun != NULL)
-       {(*pfun)(pdata, psz, pname);
+       {pfun(pdata, psz, pname);
 
 /* initialize statics at most once */
         if (pall == STATIC)
@@ -245,7 +245,8 @@ static void _PA_load_space(PA_variable *pp, long psz)
         char *pvr;
 
         psz = max(1, psz);
-        bpi = _PD_lookup_size(PA_VARIABLE_TYPE(pp)->type, PA_gs.vif->host_chart);
+        bpi = _PD_lookup_size(PA_VARIABLE_TYPE(pp)->type,
+			      PA_gs.vif->host_chart);
         for (pvr = (char *) pdata, i = 0L; i < psz; i++, pvr += bpi)
             memcpy(pvr, pval, bpi);
 
@@ -270,7 +271,7 @@ static void _PA_load_space(PA_variable *pp, long psz)
  * #bind PA_get_access fortran() scheme()
  */
 
-void *PA_get_access(void **vr, char *s, long offs, long ne, int track)
+void *PA_get_access(void **vr, const char *s, long offs, long ne, int track)
    {PA_variable *pp;
     char *pname, bf[MAXLINE];
     int pclass, pscope, pall;
@@ -515,7 +516,7 @@ void *_PA_init_space(PA_variable *pp, long psz)
  *              - of the named variable
  */
 
-void *PA_load_data(char *s)
+void *PA_load_data(const char *s)
    {PA_variable *pp;
     char *pname;
     long psz;
@@ -586,7 +587,7 @@ static int _PA_remove_ref(void **vp, PA_variable *pp)
  * #bind PA_rel_access fortran() scheme()
  */
 
-void PA_rel_access(void **vp, char *s, long offs, long ne)
+void PA_rel_access(void **vp, const char *s, long offs, long ne)
    {PA_variable *pp;
     int pscope, ppersist, refs;
     long psz, nvoids;
@@ -661,7 +662,7 @@ void PA_rel_access(void **vp, char *s, long offs, long ne)
  *                - via PA_INST_SCALAR
  */
 
-void PA_init_scalar(char *s)
+void PA_init_scalar(const char *s)
    {int id, pclass;
     char *pname, *ptype;
     void *pdata, *pval;
@@ -695,7 +696,7 @@ void PA_init_scalar(char *s)
 		       "SOURCE VARIABLE NOT SCALAR - PA_INIT_SCALAR");
 		SC_convert_id(id, pdata, 0, 1, id, &sp->num, 0, 1, 1, FALSE);}
 	    else if (pfun != NULL)
-	       (*pfun)(pdata, 1L, pname);
+	       pfun(pdata, 1L, pname);
 	    else if (pval != NULL)
 	       SC_convert_id(id, pdata, 0, 1, id, pval, 0, 1, 1, FALSE);};};
 
@@ -710,7 +711,7 @@ void PA_init_scalar(char *s)
  *           - points to something of type TYPE
  */
 
-void *_PA_alloc(defstr *dp, char *type, inti ni, void *pval)
+void *_PA_alloc(defstr *dp, const char *type, inti ni, void *pval)
    {inti i;
     intb bpi;
     char *pvr;

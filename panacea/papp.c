@@ -61,7 +61,7 @@ static void _PA_next_uf(char *ufname, int flag)
  *                 - NOTE: the family part isn't implemented yet
  */
 
-void PA_transpose_pp(char *ppname, int ntp, int nuv)
+void PA_transpose_pp(const char *ppname, int ntp, int nuv)
    {char s[MAXLINE], *ufname, *ps;
 
     if (ntp <= 0)

@@ -239,7 +239,7 @@ static int _PA_init_time_plot(PA_plot_request *pr,
  *                     - the latter half is _PA_SCAN_TIME_PLOTS
  */
 
-static void _PA_init_time_plots(char *ppname)
+static void _PA_init_time_plots(const char *ppname)
    {int itu, i, n_dom;
     char bf[MAXLINE], **labels, **members;
     PA_plot_request *pr, *nxt;
@@ -839,7 +839,9 @@ PA_set_spec *PA_non_time_domain(PA_plot_request *pr)
  *                  -       may have routines to handle these specially!!!
  */
 
-PM_mapping *PA_build_mapping(PA_plot_request *pr, PM_set *(*build_ran)(PA_plot_request *pr, char *name),
+PM_mapping *PA_build_mapping(PA_plot_request *pr,
+			     PM_set *(*build_ran)(PA_plot_request *pr,
+						  const char *name),
 			     double t)
    {PM_mapping *f;
     PM_set *range;
@@ -907,7 +909,7 @@ static inti _PA_copy_sub_select(int did, void *d, long od,
  *             - sub-selections of the data
  */
 
-double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
+double *PA_set_data(const char *name, C_array *arr, PM_centering *pcent)
    {int nd, id;
     unsigned long ni, dims, offset;
     unsigned long strides[50], maxes[50];
@@ -955,7 +957,7 @@ double *PA_set_data(char *name, C_array *arr, PM_centering *pcent)
  *              - return TRUE iff successful
  */
 
-int _PA_get_data(double *d, char *vr, inti ni, long offset, long stride)
+int _PA_get_data(double *d, const char *vr, inti ni, long offset, long stride)
    {int id;
     char *type;
     void *pv;
@@ -971,11 +973,11 @@ int _PA_get_data(double *d, char *vr, inti ni, long offset, long stride)
 
     if (SC_is_type_num(id) == TRUE)
        {pv = PA_VARIABLE_DATA(pp);
-	SC_convert_id(G_DOUBLE_I, d, 0, 1, id, pv, offset, stride, ni, FALSE);}
+	SC_convert_id(G_DOUBLE_I, d, 0, 1, id,
+		      pv, offset, stride, ni, FALSE);}
 
     else
-       PA_ERR(TRUE,
-              "CAN'T HANDLE TYPE %s - _PA_GET_DATA", type);
+       PA_ERR(TRUE, "CAN'T HANDLE TYPE %s - _PA_GET_DATA", type);
 
     conv_fac = PA_VARIABLE_EXT_UNIT(pp)/PA_VARIABLE_INT_UNIT(pp);
     PM_array_scale(d, ni, conv_fac);
@@ -1157,7 +1159,7 @@ void _PA_allocate_mapping_space(PA_package *pck)
  *               - unless an error occurs then return NULL
  */
 
-static PM_set *_PA_get_n_set(PA_plot_request *pr, char *name)
+static PM_set *_PA_get_n_set(PA_plot_request *pr, const char *name)
    {int ne, nd, nde;
     int *maxes;
     double **elem;
@@ -1217,7 +1219,7 @@ static PM_mapping *_PA_build_mapping(PA_plot_request *pr, double t)
  *                  - may fail here but will be correctly handled later)
  */
 
-static PM_set *_PA_build_domain(char *base_name, C_array *arr, double t)
+static PM_set *_PA_build_domain(const char *base, C_array *arr, double t)
    {int i, n, nd, ne, nde, ist;
     int *maxes, *pm;
     double **elem;
@@ -1229,7 +1231,7 @@ static PM_set *_PA_build_domain(char *base_name, C_array *arr, double t)
     PM_ARRAY_CONTENTS(arr, PA_set_index, n, NULL, dmap);
 
 /* build the domain name */
-    snprintf(dname, MAXLINE, "{t=%.2e,%s", t, &base_name[1]);
+    snprintf(dname, MAXLINE, "{t=%.2e,%s", t, &base[1]);
     PD_process_set_name(dname);
 
     nd = 0;
@@ -1295,7 +1297,7 @@ static PM_set *_PA_build_domain(char *base_name, C_array *arr, double t)
  *                   - the latter half is PA_SCAN_MAPPINGS
  */
 
-static void _PA_init_mappings(char *ppname)
+static void _PA_init_mappings(const char *ppname)
    {PA_plot_request *pr, *nxt;
     PFPreMap hook;
 
@@ -1327,7 +1329,7 @@ static void _PA_init_mappings(char *ppname)
  *             - the latter half is PA_SCAN_PP
  */
 
-void _PA_init_pp(char *ppname, char *gfname)
+void _PA_init_pp(const char *ppname, const char *gfname)
    {int n_maps, ok;
     PA_plot_request *pr;
     PA_package *pck;

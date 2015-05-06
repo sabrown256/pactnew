@@ -25,7 +25,8 @@ PA_scope_public
 
 /* _PA_INIT_FILES - initialize the auxilliary files */
 
-void _PA_init_files(char *edname, char *ppname, char *gfname)
+void _PA_init_files(const char *edname, const char *ppname,
+		    const char *gfname)
    {
 
 /* make the name of the first edit file */
@@ -65,7 +66,8 @@ void PA_simulate(double tc, int nc, int nz,
 		 double ti, double tf,
 		 double dtf_init, double dtf_min,
 		 double dtf_max, double dtf_inc,
-		 char *rsname, char *edname, char *ppname, char *gfname)
+		 const char *rsname, char *edname,
+		 char *ppname, char *gfname)
    {double deltat, tconv, dtmn, dtmx, dtf, dt, t;
     int cycle;
 
@@ -129,7 +131,8 @@ void PA_simulate(double tc, int nc, int nz,
  */
 
 void PA_init_system(double t, double dt, int nc,
-		    char *edname, char *ppname, char *gfname)
+		    const char *edname, const char *ppname,
+		    const char *gfname)
    {PA_package *pck;
     PFPkgInizer pck_init;
     PFBuildMap hook;
@@ -374,7 +377,8 @@ void PA_fin_system(int nz, int nc, int silent)
  * #bind PA_terminate fortran() scheme()
  */
 
-void PA_terminate(char *edname, char *ppname, char *gfname, int cycle)
+void PA_terminate(const char *edname, const char *ppname,
+		  const char *gfname, int cycle)
    {int i;
 
     if (PA_gs.edit_file != NULL)

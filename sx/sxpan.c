@@ -95,7 +95,7 @@ void *_SX_opt_PA_src_variable(PA_src_variable *x, bind_opt wh, void *a)
 
         case BIND_LABEL :
         case BIND_PRINT :
-	     rv = x->name;
+	     rv = (void *) x->name;
 	     break;
 
         case BIND_FREE :

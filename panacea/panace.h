@@ -530,7 +530,7 @@ typedef void (*PFVarInit)(void *p, long sz, char *s);
 typedef pcons *(*PFUserAttr)(int tag, va_list *a, pcons *alist2);
 typedef int (*PFTimePlotP)(PA_plot_request *pr);
 typedef void (*PFPreMap)(PA_plot_request *pr);
-typedef PM_set *(*PFBuildDom)(char *base_name, C_array *arr, double t);
+typedef PM_set *(*PFBuildDom)(const char *base, C_array *arr, double t);
 typedef PM_mapping *(*PFBuildMap)(PA_plot_request *pr, double t);
 typedef int (*PFNeedPVA)(void);
 typedef int (*PFRegID)(char *s);
@@ -623,7 +623,7 @@ struct s_PA_package
     int n_ascii;                                       /* number of strings */
     char **ascii;                   /* package control strings (characters) */
     PA_plot_request *pseudo_pr;        /* list of edits of pseudo variables */
-    char *db_file;               /* name of text file defining the database */
+    const char *db_file;         /* name of text file defining the database */
     pcons *db_list;               /* list of the database names from a file */
     pcons *alist;                        /* list of package level functions */
     PA_package *next;};                        /* point to the next package */
@@ -676,7 +676,7 @@ struct s_PA_variable
  */
 
 struct s_PA_src_variable
-   {char *name;                             /* variable name (with indexes) */
+   {const char *name;                       /* variable name (with indexes) */
     PA_variable *pp;                        /* associated database variable */
     int var_index;    /* an index into times identifying the last read time */
     int n_times;             /* the number of times for which there is data */
@@ -911,35 +911,36 @@ extern void
 /* PACCESS.C declarations */
 
 extern void
- *PA_load_data(char *s),
- *PA_get_access(void **vr, char *sn, long offs, long ne, int track),
- PA_rel_access(void **vp, char *s, long offs, long ne),
- PA_equivalence(void *vr, char *s),
- PA_set_equiv(char *s, void *vl);
+ *PA_load_data(const char *s),
+ *PA_get_access(void **vr, const char *sn, long offs, long ne, int track),
+ PA_rel_access(void **vp, const char *s, long offs, long ne),
+ PA_equivalence(void *vr, const char *s),
+ PA_set_equiv(const char *s, void *vl),
+ PA_init_scalar(const char *s);
 
 extern PA_variable
- *PA_inquire_variable(char *x);
+ *PA_inquire_variable(const char *x);
 
 
 /* PADSYS.C declarations */
 
 extern PA_package
  *PA_current_package(void),
- *PA_gen_package(char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
+ *PA_gen_package(const char *name, PFPkgGencmd cmd, PFPkgDfstrc dfs,
                  PFPkgDefun dfu, PFPkgDefvar dfr, PFPkgDefcnt cnt,
-                 PFPkgIntrn inr, char *fname);
+                 PFPkgIntrn inr, const char *fname);
 
 extern void
- PA_run_time_package(char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
+ PA_run_time_package(const char *name, PFPkgDfstrc dfs, PFPkgDefun dfu,
                      PFPkgDefvar dfr, PFPkgDefcnt cnt, PFPkgInizer izr,
                      PFPkgMain mn, PFPkgPpsor psr, PFPkgFinzer fzr,
-                     char *fname),
- PA_def_package(char *name, PFPkgGencmd gcmd, PFPkgDfstrc dfs,
+                     const char *fname),
+ PA_def_package(const char *name, PFPkgGencmd gcmd, PFPkgDfstrc dfs,
                 PFPkgDefun dfu, PFPkgDefvar dfr, PFPkgDefcnt cnt,
                 PFPkgIntrn inr, PFPkgInizer izr, PFPkgMain mn,
                 PFPkgPpsor psr, PFPkgFinzer fzr, PFPkgPpcmd pcmd,
-                char *fname),
- PA_control_set(char *s);
+                const char *fname),
+ PA_control_set(const char *s);
 
 
 /* PADUMP.C declarations */
@@ -958,11 +959,14 @@ extern void
 		PG_rendering ptyp);
 
 extern double
- *PA_set_data(char *name, C_array *arr, PM_centering *pcent),
+ *PA_set_data(const char *name, C_array *arr, PM_centering *pcent),
  *PA_fill_component(double *data, int len, int *pist, int ne);
 
 extern PM_mapping
- *PA_build_mapping(PA_plot_request *pr, PM_set *(*build_ran)(PA_plot_request *pr, char *name), double t);
+ *PA_build_mapping(PA_plot_request *pr,
+		   PM_set *(*build_ran)(PA_plot_request *pr,
+					const char *name),
+		   double t);
 
 extern PA_set_spec
  *PA_non_time_domain(PA_plot_request *pr);
@@ -974,13 +978,13 @@ extern C_array
 /* PAFI.C declarations */
 
 extern int
- PA_connect_ptrs_p(char *name, char **pvn, void **pp, int *pn);
+ PA_connect_ptrs_p(const char *name, char **pvn, void **pp, int *pn);
 
 extern void
- PA_read_def(PA_package *pck, char *name),
- PA_install_function(char *s, PFVoid fnc),
- PA_install_identifier(char *s, void *vr),
- PA_add_hook(char *name, void *fnc);
+ PA_read_def(PA_package *pck, const char *name),
+ PA_install_function(const char *s, PFVoid fnc),
+ PA_install_identifier(const char *s, void *vr),
+ PA_add_hook(const char *name, void *fnc);
 
 
 /* PAGNRD.C declarations */
@@ -989,13 +993,13 @@ extern hasharr
  *PA_inst_com(void);
 
 extern int
- PA_function_form(char *t, PA_set_spec *spec);
+ PA_function_form(const char *t, PA_set_spec *spec);
 
 extern void
  PA_inst_pck_gen_cmmnds(void),
  PA_intern_pck_db(void),
- PA_def_alias(char *name, char *type, void *pv),
- PA_inst_c(char *cname, void *cvar, int ctype, int cnum,
+ PA_def_alias(const char *name, const char *type, void *pv),
+ PA_inst_c(const char *cname, void *cvar, int ctype, int cnum,
            PFVoid cproc, PFPanHand chand),
  PA_defh(void),
  PA_specifyh(void),
@@ -1005,22 +1009,22 @@ extern void
  PA_packh(void),
  PA_pshand(PA_command *cp),
  PA_nploth(void),
- PA_time_plot(char *rname, void *vr),
+ PA_time_plot(const char *rname, void *vr),
  PA_wrrstrth(void),
- PA_name_files(char *base_name, char **ped, char **prs,
+ PA_name_files(const char *base_name, char **ped, char **prs,
 	       char **ppp, char **pgf),
- PA_read_file(char *str, int sfl),
- PA_readh(char *str),
+ PA_read_file(const char *str, int sfl),
+ PA_readh(const char *str),
  PA_get_commands(FILE *fp, PFVString errfnc),
  PA_done(void);
 
 extern double
- PA_get_num_field(char *s, char *t, int optp),
- PA_alias_value(char *s);
+ PA_get_num_field(const char *s, const char *t, int optp),
+ PA_alias_value(const char *s);
 
 extern char
  *PA_get_next_line(void),
- *PA_get_field(char *s, char *t, int optp);
+ *PA_get_field(const char *s, const char *t, int optp);
 
 
 /* PAHAND.C declarations */
@@ -1034,14 +1038,14 @@ extern void
 /* PAMM.C declarations */
 
 extern void
- PA_mk_control(PA_package *pck, char *s, int na, int np, int ns),
+ PA_mk_control(PA_package *pck, const char *s, int na, int np, int ns),
  PA_mark_space(PA_package *pck),
  PA_accm_space(PA_package *pck),
  PA_mark_time(PA_package *pck),
  PA_accm_time(PA_package *pck);
 
 extern PA_iv_specification
- *PA_mk_spec(char *id, int type, char *fn, int n, int interp,
+ *PA_mk_spec(const char *id, int type, const char *fn, int n, int interp,
 	     pcons *lst, PA_iv_specification *nxt);
 
 
@@ -1050,12 +1054,14 @@ extern PA_iv_specification
 extern void
  PA_simulate(double tc, int nc, int nz, double ti, double tf,
 	     double dtf_init, double dtf_min, double dtf_max, double dtf_inc,
-	     char *rsname, char *edname, char *ppname, char *gfname),
+	     const char *rsname, char *edname,
+	     char *ppname, char *gfname),
  PA_init_system(double t, double dt, int nc,
-		char *edname, char *ppname, char *gfname),
+		const char *edname, const char *ppname, const char *gfname),
  PA_run_packages(double t, double dt, int cycle),
  PA_fin_system(int nz, int nc, int silent),
- PA_terminate(char *edname, char *ppname, char *gfname, int cycle);
+ PA_terminate(const char *edname, const char *ppname,
+	      const char *gfname, int cycle);
 
 extern double
  PA_advance_t(double dtmn, double dtn, double dtmx);
@@ -1064,34 +1070,38 @@ extern double
 /* PANTH.C declarations */
 
 extern int
- PA_th_write(PDBfile *strm, char *name, char *type, int inst, int nr, void *vr),
- PA_th_wr_iattr(PDBfile *strm, char *vr, int inst, char *attr, void *avl),
- PA_th_transpose(char *name, int ncpf),
- PA_th_trans_family(char *name, int ord, int ncpf),
- PA_th_family_list(char *name, int c, char ***pfiles),
+ PA_th_write(PDBfile *strm, const char *name, const char *type,
+	     int inst, int nr, void *vr),
+ PA_th_wr_iattr(PDBfile *strm, const char *vr, int inst,
+		const char *attr, void *avl),
+ PA_th_transpose(const char *name, int ncpf),
+ PA_th_trans_family(const char *name, int ord, int ncpf),
+ PA_th_family_list(const char *name, int c, char ***pfiles),
  PA_th_trans_name(int n, char **names, int ord, int ncpf),
  PA_th_name_list(int n, char **names, char ***pthfiles),
  PA_th_trans_link(int n, char **names, int ord, int ncpf),
  PA_th_link_list(int n, char **names, char ***pthfiles),
- PA_th_trans_files(char *name, int ncpf, int nthf, char **thfiles, int ord, int flag),
- PA_merge_family(char *base, char *family, int ncpf),
- PA_merge_files(char *base, int n, char **files, int ncpf),
- PA_th_wr_member(PDBfile *strm, char *name, char *member, char *type,
-		 int inst, void *vr);
+ PA_th_trans_files(const char *name, int ncpf, int nthf,
+		   char **thfiles, int ord, int flag),
+ PA_merge_family(const char *base, const char *family, int ncpf),
+ PA_merge_files(const char *base, int n, char **files, int ncpf),
+ PA_th_wr_member(PDBfile *strm, const char *name, const char *member,
+		 const char *type, int inst, void *vr);
 
 extern defstr
- *PA_th_def_rec(PDBfile *file, char *name, char *type, int nmemb,
-	      char **members, char **labels);
+ *PA_th_def_rec(PDBfile *file, const char *name, const char *type,
+		int nmemb, char **members, char **labels);
 
 extern PDBfile
- *PA_th_open(char *name, char *mode, long size, char *prev),
+ *PA_th_open(const char *name, const char *mode, long size,
+	     const char *prev),
  *PA_th_family(PDBfile *file);
 
 
 /* PAPP.C declarations */
 
 extern void
- PA_transpose_pp(char *ppname, int ntp, int nuv);
+ PA_transpose_pp(const char *ppname, int ntp, int nuv);
 
 
 /* PASHAR.C declarations */
@@ -1101,19 +1111,18 @@ extern int
  PA_get_default_offset(void);
 
 extern void
- PA_def_var(char *vname, char *vtype, void *viv,
+ PA_def_var(const char *vname, const char *vtype, void *viv,
 	    PFVarInit vif, ...),
- PA_inst_var(char *vname, char *vtype, void *viv,
+ PA_inst_var(const char *vname, const char *vtype, void *viv,
 	     PFVarInit vif, ...),
- PA_inst_scalar(char *vname, char *vtype, void *vaddr, void *viv,
-		PFVarInit vif, ...),
- PA_init_scalar(char *s),
+ PA_inst_scalar(const char *vname, const char *vtype,
+		void *vaddr, void *viv, PFVarInit vif, ...),
  PA_error_handler(int test, const char *fmt, ...),
  PA_warning_handler(int test, const char *fmt, ...),
- PA_error(char *msg);
+ PA_error(const char *msg);
 
 extern PDBfile
- *PA_open(char *name, char *mode, int flag);
+ *PA_open(const char *name, const char *mode, int flag);
 
 
 /* PASHAS.C declarations */
@@ -1123,13 +1132,13 @@ extern void
  PA_signal_handler(int sig),
  PA_interrupt_handler(int sig),
  PA_file_mon(char *edname, char *ppname, char *gfname),
- PA_rd_restart(char *rsname, int convs),
+ PA_rd_restart(const char *rsname, int convs),
  PA_wr_restart(char *rsname),
  PA_close_pp(void),
  PA_init_strings(void),
  PA_change_dim(int *pdm, int val),
- PA_change_size(char *name, int flag),
- *PA_intern(void *vr, char *name);
+ PA_change_size(const char *name, int flag),
+ *PA_intern(void *vr, const char *name);
 
 extern int
  PA_def_str(PDBfile *pdrs),
@@ -1154,11 +1163,11 @@ extern int
 /* PASRC.C declartions */
 
 extern PA_src_variable
- *PA_get_source(char *s, int start_flag);
+ *PA_get_source(const char *s, int start_flag);
 
 extern PA_iv_specification 
- *PA_get_iv_source(char *name),
- *PA_find_iv_source(char *name, int off);
+ *PA_get_iv_source(const char *name),
+ *PA_find_iv_source(const char *name, int off);
 
 extern double
  PA_intr_spec(PA_iv_specification *sp, double t, double val, long off);
@@ -1172,15 +1181,15 @@ extern void
 /* PASTR.C declarations */
 
 extern void
- *PA_mk_instance(char *name, char *type, long n),
- *PA_get_member(char *name, char *member);
+ *PA_mk_instance(const char *name, const char *type, long n),
+ *PA_get_member(const char *name, const char *member);
 
 extern void
- PA_rl_instance(char *name),
- PA_set_member(char *name, void *data, char *member);
+ PA_rl_instance(const char *name),
+ PA_set_member(const char *name, void *data, const char *member);
 
 extern syment
- *PA_int_instance(char *name, char *type, long n, void *data);
+ *PA_int_instance(const char *name, const char *type, long n, void *data);
 
 
 /* PAVARS.C declarations */
@@ -1209,58 +1218,43 @@ extern int
 
 extern void
  PA_def_var_init(void),
- PA_def_var_domain(char *name, ...);
+ PA_def_var_domain(const char *name, ...);
 
 extern PA_variable
- *PA_def_variable(char *name, ...),
- *PA_def_var_default(char *name, ...);
+ *PA_def_variable(const char *name, ...),
+ *PA_def_var_default(const char *name, ...);
 
 extern PA_dimens
- *PA_def_var_dimension(char *name, ...);
+ *PA_def_var_dimension(const char *name, ...);
 
 extern pcons
  *PA_var_to_alist(PA_variable *pp),
- *PA_def_var_attribute(char *name, ...),
- *PA_def_var_units(char *name, ...);
+ *PA_def_var_attribute(const char *name, ...),
+ *PA_def_var_units(const char *name, ...);
 
 extern hasharr
- *PA_install_table(char *s, void *vr, char *type, hasharr *tab);
-
-
-/* PAINFO.C declarations */
-
-extern int 
- PA_info_check(int info, int value);
-
-extern char
- *PA_info_name(int info),
- *PA_info_type(int info),
- *PA_info_value(int info, int value);
-
-extern void
- PA_info_init(void),
- PA_info_print(void);
+ *PA_install_table(const char *s, void *vr, const char *type, hasharr *tab);
 
 
 /* PACPP.C */
 
 extern int
- PA_cpp_symbol_itype(char *name),
- convert_type_s_i(char *type_name),
- PA_cpp_name_itype(char *name);
+ PA_cpp_symbol_itype(const char *name),
+ convert_type_s_i(const char *type_name),
+ PA_cpp_name_itype(const char *name);
 
 extern char
- *PA_cpp_value_to_name(char *group, ...),
+ *PA_cpp_value_to_name(const char *group, ...),
  *convert_type_i_s(int type);
 
 extern void
  PA_cpp_init(void),
- PA_cpp_add_group(char *name, int itype, char *type),
- PA_cpp_add_name(char *name, char *group, ...),
+ PA_cpp_add_group(const char *name, int itype, const char *type),
+ PA_cpp_add_name(const char *name, const char *group, ...),
  PA_cpp_default(void);
 
 extern void
- *PA_cpp_name_to_value(char *name);
+ *PA_cpp_name_to_value(const char *name);
 
 #ifdef __cplusplus
 }

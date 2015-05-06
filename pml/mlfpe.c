@@ -249,17 +249,18 @@ void PM_enable_fpe_n(int flg, PFSignal_handler hnd, void *a)
 	default :
 	     break;};
 
-    SC_LOCKON(PM_fpe_lock);
+    if (flg != -1)
+       {SC_LOCKON(PM_fpe_lock);
 
 /* set the exceptions which should raise SIGFPE
  * does this have to be done on each thread?
  * seems like doing it once for the CPU/FPU as a whole is the right thing
  */
-    _PM_enable_fpe(flg, hnd);
+	_PM_enable_fpe(flg, hnd);
 
-    _PM.fpe_enabled = (flg != FALSE);
+	_PM.fpe_enabled = (flg != FALSE);
 
-    SC_LOCKOFF(PM_fpe_lock);
+	SC_LOCKOFF(PM_fpe_lock);};
 
     return;}
 
