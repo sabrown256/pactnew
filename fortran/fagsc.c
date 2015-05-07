@@ -65,8 +65,8 @@ FIXNUM FF_ID(pgplcn, PGPLCN)(FIXNUM *sdid, double *ax, double *ay,
 
 /* PGPLIM - low level image plot routine */
 
-FIXNUM FF_ID(pgplim, PGPLIM)(FIXNUM *sdid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type,
+FIXNUM FF_ID(pgplim, PGPLIM)(FIXNUM *sdid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type,
 			     double *az, FIXNUM *sk, FIXNUM *sl,
 			     double *sxn, double *sxx,
 			     double *syn, double *syx,
@@ -112,11 +112,12 @@ FIXNUM FF_ID(pgplim, PGPLIM)(FIXNUM *sdid, FIXNUM *sncn, char *name,
 
 FIXNUM FF_ID(pgplsf, PGPLSF)(FIXNUM *sdid, double *ax, double *ay, double *az,
 			     FIXNUM *sn, double *sxn, double *sxx,
-			     double *syn, double *syx, double *szn, double *szx,
+			     double *syn, double *syx,
+			     double *szn, double *szx,
 			     FIXNUM *skx, FIXNUM *slx,
 			     double *sth, double *sph, double *sch,
 			     FIXNUM *styp, FIXNUM *scol, double *swid,
-			     FIXNUM *ssty, FIXNUM *sncl, char *label)
+			     FIXNUM *ssty, FIXNUM *sncl, const char *label)
    {int sty, clr;
     int maxes[2];
     FIXNUM rv;

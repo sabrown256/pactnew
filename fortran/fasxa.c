@@ -15,7 +15,7 @@
 
 /* SSCHEM - do a Fortran version of SS_call_scheme */
 
-FIXNUM FF_ID(sschem, SSCHEM)(FIXNUM *snc, char *name, ...)
+FIXNUM FF_ID(sschem, SSCHEM)(FIXNUM *snc, const char *name, ...)
    {int i, type[MAXLINE];
     FIXNUM rv;
     void *ptr[MAXLINE];
@@ -63,7 +63,7 @@ FIXNUM FF_ID(sschem, SSCHEM)(FIXNUM *snc, char *name, ...)
 
 /* SXDTAC - Fortran interface to SX_rep_to_ac */
 
-FIXNUM FF_ID(sxdtac, SXDTAC)(FIXNUM *sncn, char *pname,
+FIXNUM FF_ID(sxdtac, SXDTAC)(FIXNUM *sncn, const char *pname,
 			     double *arx, double *ary,
 			     FIXNUM *snn, FIXNUM *snz, FIXNUM *azones)
    {int n_nodes, n_zones;

@@ -80,7 +80,7 @@ FIXNUM FF_ID(scpaus, SCPAUS)(void)
 
 /* SCFTCS - FORTRAN interface to convert FORTRAN string to C string */
 
-FIXNUM FF_ID(scftcs, SCFTCS)(char *out, char *in, FIXNUM *snci)
+FIXNUM FF_ID(scftcs, SCFTCS)(char *out, const char *in, FIXNUM *snci)
    {FIXNUM rv;
 
     SC_FORTRAN_STR_C(out, in, *snci);
@@ -140,7 +140,7 @@ static SC_lexical_stream *SC_lex_str_ptr(int strid)
  *        - return -1 otherwise
  */
 
-FIXNUM FF_ID(scopls, SCOPLS)(FIXNUM *sncn, char *name,
+FIXNUM FF_ID(scopls, SCOPLS)(FIXNUM *sncn, const char *name,
 			     PFInt scan, FIXNUM *sfl)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -330,8 +330,8 @@ FIXNUM FF_ID(scscan, SCSCAN)(FIXNUM *sid, FIXNUM *smxtok, FIXNUM *swidth,
  *        - PTYPE names the type and has one less indirection than PV
  */
 
-FIXNUM FF_ID(scchal, SCCHAL)(FIXNUM *sal, FIXNUM *sncn, char *pname,
-			     FIXNUM *scnt, char *ptype, FIXNUM *snv,
+FIXNUM FF_ID(scchal, SCCHAL)(FIXNUM *sal, FIXNUM *sncn, const char *pname,
+			     FIXNUM *scnt, const char *ptype, FIXNUM *snv,
 			     void *av)
    {long nb, ni;
     FIXNUM rv;
@@ -372,7 +372,7 @@ FIXNUM FF_ID(scchal, SCCHAL)(FIXNUM *sal, FIXNUM *sncn, char *pname,
 
 /* SCRMAL - remove an item from the given association list */
 
-FIXNUM FF_ID(scrmal, SCRMAL)(FIXNUM *sal, FIXNUM *sncn, char *pname)
+FIXNUM FF_ID(scrmal, SCRMAL)(FIXNUM *sal, FIXNUM *sncn, const char *pname)
    {FIXNUM rv;
     char lname[MAXLINE];
     pcons *pc;

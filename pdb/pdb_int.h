@@ -452,14 +452,6 @@ extern void
  _PD_rl_attribute(attribute *attr);
 
 
-/* PDFIA.C declarations */
-
-
-extern FIXNUM
- _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
-	       void *space, FIXNUM nd, FIXNUM *dims);
-
-
 /* PDFLT.C declarations */
 
 extern int

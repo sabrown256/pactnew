@@ -131,10 +131,10 @@ FIXNUM FF_ID(pggbkc, PGGBKC)(FIXNUM *sdid, FIXNUM *sclr)
 /* PGMG11 - make a 1D-1D graph */
 
 FIXNUM FF_ID(pgmg11, PGMG11)(FIXNUM *sid,
-			     FIXNUM *sncl, char *flabel,
+			     FIXNUM *sncl, const char *flabel,
 			     FIXNUM *scp, FIXNUM *sn, double *ax, double *ay,
-			     FIXNUM *sncx, char *fxname,
-			     FIXNUM *sncy, char *fyname)
+			     FIXNUM *sncx, const char *fxname,
+			     FIXNUM *sncy, const char *fyname)
    {int id, cp, n;
     FIXNUM rv;
     char label[MAXLINE], xname[MAXLINE], yname[MAXLINE];
@@ -163,12 +163,12 @@ FIXNUM FF_ID(pgmg11, PGMG11)(FIXNUM *sid,
 /* PGMG21 - make a 2D-1D graph */
 
 FIXNUM FF_ID(pgmg21, PGMG21)(FIXNUM *sid,
-			     FIXNUM *sncl, char *flabel,
+			     FIXNUM *sncl, const char *flabel,
 			     FIXNUM *scp, FIXNUM *sk, FIXNUM *sl,
 			     FIXNUM *scen,
 			     double *ax, double *ay, double *ar,
-			     FIXNUM *sncd, char *fdname,
-			     FIXNUM *sncr, char *frname)
+			     FIXNUM *sncd, const char *fdname,
+			     FIXNUM *sncr, const char *frname)
    {int id, cp, kmax, lmax;
     FIXNUM rv;
     char label[MAXLINE], dname[MAXLINE], rname[MAXLINE];
@@ -201,12 +201,12 @@ FIXNUM FF_ID(pgmg21, PGMG21)(FIXNUM *sid,
 /* PGMG22 - make a 2D-2D graph */
 
 FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *sid,
-			     FIXNUM *sncl, char *flabel,
+			     FIXNUM *sncl, const char *flabel,
 			     FIXNUM *scp, FIXNUM *sk, FIXNUM *sl,
 			     FIXNUM *scen,
 			     double *ax, double *ay, double *au, double *av,
-			     FIXNUM *sncd, char *fdname,
-			     FIXNUM *sncr, char *frname)
+			     FIXNUM *sncd, const char *fdname,
+			     FIXNUM *sncr, const char *frname)
    {int id, cp, kmax, lmax;
     FIXNUM rv;
     char label[MAXLINE], dname[MAXLINE], rname[MAXLINE];
@@ -245,7 +245,7 @@ FIXNUM FF_ID(pgmg22, PGMG22)(FIXNUM *sid,
 
 /* PGMGFS - make a graph from sets */
 
-FIXNUM FF_ID(pgmgfs, PGMGFS)(FIXNUM *sncn, char *fname,
+FIXNUM FF_ID(pgmgfs, PGMGFS)(FIXNUM *sncn, const char *fname,
 			     FIXNUM *sidm, FIXNUM *sirn, FIXNUM *scen,
 			     FIXNUM *sid, FIXNUM *sinxt)
    {int id;
@@ -562,8 +562,8 @@ FIXNUM FF_ID(pgseup, PGSEUP)(FIXNUM *sdid, PFEventHand fnc)
 /* PGSRAT - set a graph's rendering attributes */
 
 FIXNUM FF_ID(pgsrat, PGSRAT)(FIXNUM *sgid,
-			     FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type,
+			     FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type,
 			     char *val)
    {int id;
     FIXNUM rv;

@@ -69,9 +69,10 @@ FIXNUM FF_ID(scstln, SCSTLN)(char *s, FIXNUM *snx)
  */
 
 void FF_ID(scsttk, SCSTTK)(FIXNUM *sncs, char *d, char *s,
-			   FIXNUM sndl, char *dl)
+			   FIXNUM sndl, const char *dl)
    {int j, n, nc, flag;
-    char *dst, *src, *delim;
+    char *dst, *src;
+    const char *delim;
     char c;
 
     nc    = *sncs;
@@ -113,10 +114,11 @@ void FF_ID(scsttk, SCSTTK)(FIXNUM *sncs, char *d, char *s,
  *        - implied in the argument list
  */
 
-void FF_ID(scspnt, SCSPNT)(FIXNUM *sncd, char *d, char *f, ...)
+void FF_ID(scspnt, SCSPNT)(FIXNUM *sncd, char *d, const char *f, ...)
    {int c, nc, nd;
     char local[MAXLINE], tb[10], ce;
-    char *fmt, *le, *lb, *pt, *dst, *s;
+    char *le, *lb, *pt, *dst, *s;
+    const char *fmt;
     FIXNUM *lv;
     double *dv;
     char *sv;

@@ -165,8 +165,8 @@ FIXNUM FF_ID(schclr, SCHCLR)(FIXNUM *sha)
  *        - only info install has to go on
  */
 
-FIXNUM FF_ID(schins, SCHINS)(FIXNUM *sha, FIXNUM *sncn, char *pname,
-			     void *ptr, FIXNUM *snct, char *ptype,
+FIXNUM FF_ID(schins, SCHINS)(FIXNUM *sha, FIXNUM *sncn, const char *pname,
+			     void *ptr, FIXNUM *snct, const char *ptype,
 			     FIXNUM *scp)
    {int cp;
     char name[MAXLINE], type[MAXLINE];
@@ -206,7 +206,7 @@ FIXNUM FF_ID(schins, SCHINS)(FIXNUM *sha, FIXNUM *sncn, char *pname,
  */
 
 FIXNUM FF_ID(schlkp, SCHLKP)(FIXNUM *sha, void *p,
-			     FIXNUM *sncn, char *pname)
+			     FIXNUM *sncn, const char *pname)
    {int n;
     FIXNUM rv;
     char name[MAXLINE];
@@ -237,7 +237,7 @@ FIXNUM FF_ID(schlkp, SCHLKP)(FIXNUM *sha, void *p,
  */
 
 FIXNUM FF_ID(schlku, SCHLKU)(FIXNUM *sha, void **p,
-			     FIXNUM *sncn, char *pname)
+			     FIXNUM *sncn, const char *pname)
    {FIXNUM rv;
     char name[MAXLINE];
     haelem *hp;
@@ -261,7 +261,7 @@ FIXNUM FF_ID(schlku, SCHLKU)(FIXNUM *sha, void **p,
 
 /* SCHREM - remove an object from a hash array */
 
-FIXNUM FF_ID(schrem, SCHREM)(FIXNUM *sha, FIXNUM *sncn, char *pname)
+FIXNUM FF_ID(schrem, SCHREM)(FIXNUM *sha, FIXNUM *sncn, const char *pname)
    {FIXNUM rv;
     char name[MAXLINE];
     hasharr *ha;

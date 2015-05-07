@@ -20,7 +20,7 @@
  */
 
 FIXNUM _SC_make_ff(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
-		   char *pname, int zsp)
+		   const char *pname, int zsp)
    {long id;
     void *s;
     FIXNUM ok;
@@ -65,7 +65,7 @@ FIXNUM _SC_make_ff(void **pm, FIXNUM *pni, FIXNUM *pnb, FIXNUM *pnc,
  */
 
 FIXNUM FF_ID(scmakz, SCMAKZ)(void **am, FIXNUM *sni, FIXNUM *snb,
-			     FIXNUM *sncn, char *pname, FIXNUM *szsp)
+			     FIXNUM *sncn, const char *pname, FIXNUM *szsp)
    {FIXNUM ok;
 
     ok = _SC_make_ff(am, sni, snb, sncn, pname, (int) *szsp);
@@ -82,7 +82,7 @@ FIXNUM FF_ID(scmakz, SCMAKZ)(void **am, FIXNUM *sni, FIXNUM *snb,
  */
 
 FIXNUM FF_ID(scmakf, SCMAKF)(void **am, FIXNUM *sni, FIXNUM *snb,
-			     FIXNUM *sncn, char *pname)
+			     FIXNUM *sncn, const char *pname)
    {FIXNUM ok;
 
     ok = _SC_make_ff(am, sni, snb, sncn, pname, -1);
@@ -247,7 +247,7 @@ FIXNUM FF_ID(scmems, SCMEMS)(double *sal, double *sfr,
 /* SCMEMM - FORTRAN interface to SC_mem_monitor */
 
 FIXNUM FF_ID(scmemm, SCMEMM)(FIXNUM *so, FIXNUM *sl, FIXNUM *sni,
-			     char *pid, FIXNUM *sncm, char *pmsg)
+			     const char *pid, FIXNUM *sncm, char *pmsg)
    {int old, lev, ni, nc, n;
     FIXNUM rv;
     char msg[MAXLINE], id[MAXLINE];

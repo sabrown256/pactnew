@@ -24,7 +24,8 @@
  *              - This can be useful to applications dealing with Fortran
  */
 
-FIXNUM _PD_read_aux(PDBfile *file, char *name, char *type, void *vr,
+FIXNUM _PD_read_aux(PDBfile *file, const char *name,
+		    const char *type, void *vr,
 		    FIXNUM *ind)
    {long *pi;
     FIXNUM i, ne, nd, ret;
@@ -69,7 +70,8 @@ FIXNUM _PD_read_aux(PDBfile *file, char *name, char *type, void *vr,
  *               - This can be useful to applications dealing with Fortran
  */
 
-FIXNUM _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
+FIXNUM _PD_write_aux(PDBfile *file, const char *name,
+		     const char *typi, const char *typo,
 		     void *space, FIXNUM nd, FIXNUM *dims)
    {long i, ne, *pi;
     FIXNUM ret;
@@ -92,7 +94,8 @@ FIXNUM _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
  *                - indexing information to the correct type first
  */
 
-static FIXNUM _PD_append_aux(PDBfile *file, char *name, char *type,
+static FIXNUM _PD_append_aux(PDBfile *file, const char *name,
+			     const char *type,
 			     void *space, FIXNUM nd, FIXNUM *dims)
    {long i, ne, *pi;
     FIXNUM ret;
@@ -122,7 +125,8 @@ static FIXNUM _PD_append_aux(PDBfile *file, char *name, char *type,
  *              - This can be useful to applications dealing with Fortran
  */
 
-FIXNUM _PD_read_aux(PDBfile *file, char *name, char *type, void *vr,
+FIXNUM _PD_read_aux(PDBfile *file, const char *name,
+		    const char *type, void *vr,
 		    FIXNUM *ind)
    {FIXNUM ret;
 
@@ -138,7 +142,8 @@ FIXNUM _PD_read_aux(PDBfile *file, char *name, char *type, void *vr,
  *               - This can be useful to applications dealing with Fortran
  */
 
-FIXNUM _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
+FIXNUM _PD_write_aux(PDBfile *file, const char *name,
+		     const char *typi, const char *typo,
 		     void *space, FIXNUM nd, FIXNUM *dims)
    {FIXNUM ret;
 
@@ -162,7 +167,8 @@ FIXNUM _PD_write_aux(PDBfile *file, char *name, char *typi, char *typo,
  *                - indexing information to the correct type first
  */
 
-static FIXNUM _PD_defent_aux(PDBfile *file, char *name, char *type,
+static FIXNUM _PD_defent_aux(PDBfile *file, const char *name,
+			     const char *type,
 			     FIXNUM nd, FIXNUM *dims)
    {long i, ne, *pi;
     syment *ep;
@@ -595,7 +601,7 @@ FIXNUM FF_ID(pfgvar, PFGVAR)(FIXNUM *sn, FIXNUM *sncn, char *name)
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfivar, PFIVAR)(FIXNUM *sfid, FIXNUM *sncn, char *name,
+FIXNUM FF_ID(pfivar, PFIVAR)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
 			     FIXNUM *snct, char *type,
 			     FIXNUM *ssz, FIXNUM *snd, FIXNUM *dims)
    {FIXNUM nd, rv;
@@ -643,7 +649,7 @@ FIXNUM FF_ID(pfivar, PFIVAR)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  */
 
 FIXNUM FF_ID(pfctyp, PFCTYP)(FIXNUM *ssfid, FIXNUM *sdfid,
-			     FIXNUM *snct, char *type)
+			     FIXNUM *snct, const char *type)
    {FIXNUM rv;
     char ty[MAXLINE];
     PDBfile *sf, *df;
@@ -666,7 +672,7 @@ FIXNUM FF_ID(pfctyp, PFCTYP)(FIXNUM *ssfid, FIXNUM *sdfid,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfityp, PFITYP)(FIXNUM *sfid, FIXNUM *snct, char *type,
+FIXNUM FF_ID(pfityp, PFITYP)(FIXNUM *sfid, FIXNUM *snct, const char *type,
 			     FIXNUM *ssz, FIXNUM *salgn, FIXNUM *sind)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -703,7 +709,7 @@ FIXNUM FF_ID(pfityp, PFITYP)(FIXNUM *sfid, FIXNUM *snct, char *type,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfimbr, PFIMBR)(FIXNUM *sfid, FIXNUM *snct, char *type,
+FIXNUM FF_ID(pfimbr, PFIMBR)(FIXNUM *sfid, FIXNUM *snct, const char *type,
 			     FIXNUM *sn, FIXNUM *ssz, char *space)
    {int i, n, sz, nc;
     FIXNUM rv;
@@ -762,7 +768,7 @@ FIXNUM FF_ID(pfimbr, PFIMBR)(FIXNUM *sfid, FIXNUM *snct, char *type,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfqmbr, PFQMBR)(FIXNUM *sfid, FIXNUM *snct, char *type,
+FIXNUM FF_ID(pfqmbr, PFQMBR)(FIXNUM *sfid, FIXNUM *snct, const char *type,
 			     FIXNUM *sn, FIXNUM *sncn, char *name,
 			     FIXNUM *snco, char *tout,
 			     FIXNUM *snd, FIXNUM *dims)
@@ -860,7 +866,7 @@ FIXNUM FF_ID(pfqmbr, PFQMBR)(FIXNUM *sfid, FIXNUM *snct, char *type,
  *        - given by TYPE (PDBLib will allocated space if necessary)!
  */
 
-FIXNUM FF_ID(pfread, PFREAD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
+FIXNUM FF_ID(pfread, PFREAD)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
 			     void *space)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -887,8 +893,8 @@ FIXNUM FF_ID(pfread, PFREAD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - given by TYPE (PDBLib will allocated space if necessary)!
  */
 
-FIXNUM FF_ID(pfrdas, PFRDAS)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type, void *space)
+FIXNUM FF_ID(pfrdas, PFRDAS)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type, void *space)
    {FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
     PDBfile *file;
@@ -907,8 +913,8 @@ FIXNUM FF_ID(pfrdas, PFRDAS)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 
 /* PFRDAI - FORTRAN interface to PD_read_as_dwim */
 
-FIXNUM FF_ID(pfrdai, PFRDAI)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type,
+FIXNUM FF_ID(pfrdai, PFRDAI)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type,
 			     FIXNUM *sni, void *space)
    {inti ni;
     FIXNUM rv;
@@ -937,7 +943,7 @@ FIXNUM FF_ID(pfrdai, PFRDAI)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - given by TYPE (differs from the conventional PDB rule)
  */
 
-FIXNUM FF_ID(pfrptr, PFRPTR)(FIXNUM *sfid, FIXNUM *sncn, char *name,
+FIXNUM FF_ID(pfrptr, PFRPTR)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
 			     FIXNUM *sni, void *space)
    {FIXNUM rv;
     char s[MAXLINE], fullpath[MAXLINE], *type;
@@ -1013,7 +1019,7 @@ FIXNUM FF_ID(pfrptr, PFRPTR)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - space if necessary)!
  */
 
-FIXNUM FF_ID(pfptrd, PFPTRD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
+FIXNUM FF_ID(pfptrd, PFPTRD)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
 			     void *space, FIXNUM *ind)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -1044,8 +1050,8 @@ FIXNUM FF_ID(pfptrd, PFPTRD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - space if necessary)!
  */
 
-FIXNUM FF_ID(pfrdad, PFRDAD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type,
+FIXNUM FF_ID(pfrdad, PFRDAD)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type,
 			     void *space, FIXNUM *ind)
    {FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
@@ -1070,7 +1076,7 @@ FIXNUM FF_ID(pfrdad, PFRDAD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfappa, PFAPPA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
+FIXNUM FF_ID(pfappa, PFAPPA)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
 			     void *space)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -1095,8 +1101,8 @@ FIXNUM FF_ID(pfappa, PFAPPA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfapas, PFAPAS)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type, void *space)
+FIXNUM FF_ID(pfapas, PFAPAS)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type, void *space)
    {FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
     PDBfile *file;
@@ -1118,7 +1124,7 @@ FIXNUM FF_ID(pfapas, PFAPAS)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfappd, PFAPPD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
+FIXNUM FF_ID(pfappd, PFAPPD)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
 			     void *space, FIXNUM *snd, FIXNUM *dims)
    {FIXNUM rv;
     char s[MAXLINE];
@@ -1141,8 +1147,8 @@ FIXNUM FF_ID(pfappd, PFAPPD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfapad, PFAPAD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type, void *space,
+FIXNUM FF_ID(pfapad, PFAPAD)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type, void *space,
 			     FIXNUM *snd, FIXNUM *dims)
    {FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
@@ -1167,8 +1173,8 @@ FIXNUM FF_ID(pfapad, PFAPAD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfwrta, PFWRTA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type, void *space)
+FIXNUM FF_ID(pfwrta, PFWRTA)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type, void *space)
    {FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
     PDBfile *file;
@@ -1192,9 +1198,9 @@ FIXNUM FF_ID(pfwrta, PFWRTA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfwras, PFWRAS)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snci, char *intype,
-			     FIXNUM *snco, char *outtype, void *space)
+FIXNUM FF_ID(pfwras, PFWRAS)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snci, const char *intype,
+			     FIXNUM *snco, const char *outtype, void *space)
    {FIXNUM rv;
     char s[MAXLINE], t1[MAXLINE], t2[MAXLINE];
     PDBfile *file;
@@ -1217,8 +1223,8 @@ FIXNUM FF_ID(pfwras, PFWRAS)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfwrtd, PFWRTD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type, void *space,
+FIXNUM FF_ID(pfwrtd, PFWRTD)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type, void *space,
 			     FIXNUM *snd, FIXNUM *dims)
    {FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
@@ -1241,9 +1247,9 @@ FIXNUM FF_ID(pfwrtd, PFWRTD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfwrad, PFWRAD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snci, char *intype,
-			     FIXNUM *snco, char *outtype, void *space,
+FIXNUM FF_ID(pfwrad, PFWRAD)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snci, const char *intype,
+			     FIXNUM *snco, const char *outtype, void *space,
 			     FIXNUM *snd,  FIXNUM *dims)
    {FIXNUM rv;
     char s[MAXLINE], ti[MAXLINE], to[MAXLINE];
@@ -1267,8 +1273,8 @@ FIXNUM FF_ID(pfwrad, PFWRAD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE if successful, FALSE otherwise
  */
 
-FIXNUM FF_ID(pfdefa, PFDEFA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type)
+FIXNUM FF_ID(pfdefa, PFDEFA)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type)
    {FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
     syment *ep;
@@ -1292,8 +1298,8 @@ FIXNUM FF_ID(pfdefa, PFDEFA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - return TRUE if successful, FALSE otherwise
  */
 
-FIXNUM FF_ID(pfdefd, PFDEFD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type,
+FIXNUM FF_ID(pfdefd, PFDEFD)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type,
 			     FIXNUM *snd, FIXNUM *dims)
    {FIXNUM rv;
     char s[MAXLINE], t[MAXLINE];
@@ -1316,7 +1322,7 @@ FIXNUM FF_ID(pfdefd, PFDEFD)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  */
 
 FIXNUM FF_ID(pfdefs, PFDEFS)(FIXNUM *sfid,
-			     FIXNUM *sncn, char *name, ...)
+			     FIXNUM *sncn, const char *name, ...)
    {FIXNUM n, rv;
     FIXNUM *pn;
     char *ps;
@@ -1378,11 +1384,13 @@ FIXNUM FF_ID(pfdefs, PFDEFS)(FIXNUM *sfid,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfdeft, PFDEFT)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snm, FIXNUM *nc, char *nm)
+FIXNUM FF_ID(pfdeft, PFDEFT)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snm, FIXNUM *nc, const char *nm)
    {int i, n, indx, mc;
     FIXNUM rv;
-    char lname[MAXLINE], bf[MAXLINE], *lnm, **members;
+    char lname[MAXLINE], bf[MAXLINE];
+    char **members;
+    const char *lnm;
     defstr *dp;
     PDBfile *file;
 
@@ -1420,7 +1428,7 @@ FIXNUM FF_ID(pfdeft, PFDEFT)(FIXNUM *sfid, FIXNUM *sncn, char *name,
  *        - given by TYPE (PDBLib will allocated space if necessary)!
  */
 
-FIXNUM FF_ID(pffree, PFFREE)(FIXNUM *sfid, FIXNUM *snct, char *type,
+FIXNUM FF_ID(pffree, PFFREE)(FIXNUM *sfid, FIXNUM *snct, const char *type,
 			     void *space)
    {FIXNUM rv;
     PDBfile *file;
@@ -1443,7 +1451,7 @@ FIXNUM FF_ID(pffree, PFFREE)(FIXNUM *sfid, FIXNUM *snct, char *type,
  *        - return 0 otherwise
  */
 
-FIXNUM FF_ID(pfopen, PFOPEN)(FIXNUM *sncn, char *name, char *mode)
+FIXNUM FF_ID(pfopen, PFOPEN)(FIXNUM *sncn, const char *name, const char *mode)
    {FIXNUM rv;
     char s[MAXLINE], t[2];
     PDBfile *file;
@@ -1484,7 +1492,7 @@ FIXNUM FF_ID(pfclos, PFCLOS)(FIXNUM *sfid)
 
 /* PFWULC - write an ULTRA curve into a PDB file */
 
-FIXNUM FF_ID(pfwulc, PFWULC)(FIXNUM *sfid, FIXNUM *sncl, char *labl,
+FIXNUM FF_ID(pfwulc, PFWULC)(FIXNUM *sfid, FIXNUM *sncl, const char *labl,
 			     FIXNUM *snp, double *px, double *py,
 			     FIXNUM *sic)
    {int i, n, rv;
@@ -1508,7 +1516,7 @@ FIXNUM FF_ID(pfwulc, PFWULC)(FIXNUM *sfid, FIXNUM *sncl, char *labl,
 
 /* PFWULY - write the y values for an ULTRA curve into a PDB file */
 
-FIXNUM FF_ID(pfwuly, PFWULY)(FIXNUM *sfid, FIXNUM *sncl, char *labl,
+FIXNUM FF_ID(pfwuly, PFWULY)(FIXNUM *sfid, FIXNUM *sncl, const char *labl,
 			     FIXNUM *snp, FIXNUM *six, double *py,
 			     FIXNUM *sic)
    {int i, n, rv;
@@ -1552,7 +1560,7 @@ FIXNUM FF_ID(pfwuly, PFWULY)(FIXNUM *sfid, FIXNUM *sncl, char *labl,
  *        -                                elements
  */
 
-FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *sfid, char *dname,
+FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *sfid, const char *dname,
 			     FIXNUM *adp, double *adm)
    {FIXNUM rv;
     int *ldp;
@@ -1599,8 +1607,8 @@ FIXNUM FF_ID(pfwset, PFWSET)(FIXNUM *sfid, char *dname,
  *        -                                elements
  */
 
-FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *sfid, char *dname,
-			     FIXNUM *adp, double *adm, char *rname,
+FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *sfid, const char *dname,
+			     FIXNUM *adp, double *adm, const char *rname,
 			     FIXNUM *arp, double *arm, FIXNUM *sim)
    {int lsm;
     FIXNUM rv;
@@ -1657,8 +1665,8 @@ FIXNUM FF_ID(pfwmap, PFWMAP)(FIXNUM *sfid, char *dname,
  *        -                                elements
  */
 
-FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
-			     char *rname, FIXNUM *arp, double *arm,
+FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, const char *dname, FIXNUM *sncd,
+			     const char *rname, FIXNUM *arp, double *arm,
 			     FIXNUM *slinf, FIXNUM *sim)
    {int lsm;
     FIXNUM rv;
@@ -1716,8 +1724,8 @@ FIXNUM FF_ID(pfwrae, PFWRAE)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
  *        -                                elements
  */
 
-FIXNUM FF_ID(pfwran, PFWRAN)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
-			     char *rname, FIXNUM *arp, double *arm,
+FIXNUM FF_ID(pfwran, PFWRAN)(FIXNUM *sfid, const char *dname, FIXNUM *sncd,
+			     const char *rname, FIXNUM *arp, double *arm,
 			     FIXNUM *sim)
    {int lsm;
     FIXNUM rv;
@@ -1745,7 +1753,7 @@ FIXNUM FF_ID(pfwran, PFWRAN)(FIXNUM *sfid, char *dname, FIXNUM *sncd,
 
 /* PFWIMA - write a PG_image into a PDB file */
 
-FIXNUM FF_ID(pfwima, PFWIMA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
+FIXNUM FF_ID(pfwima, PFWIMA)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
 			     FIXNUM *skn, FIXNUM *skx,
 			     FIXNUM *sln, FIXNUM *slx,
 			     double *data, double *sxn, double *sxx,
@@ -1810,8 +1818,8 @@ FIXNUM FF_ID(pfwima, PFWIMA)(FIXNUM *sfid, FIXNUM *sncn, char *name,
 
 /* PFDATT - FORTRAN interface routine to define an attribute */
 
-FIXNUM FF_ID(pfdatt, PFDATT)(FIXNUM *sfid, FIXNUM *snca, char *fattr,
-			     FIXNUM *snct, char *ftype)
+FIXNUM FF_ID(pfdatt, PFDATT)(FIXNUM *sfid, FIXNUM *snca, const char *fattr,
+			     FIXNUM *snct, const char *ftype)
    {FIXNUM rv;
     char lattr[MAXLINE], ltype[MAXLINE];
     PDBfile *file;
@@ -1831,7 +1839,7 @@ FIXNUM FF_ID(pfdatt, PFDATT)(FIXNUM *sfid, FIXNUM *snca, char *fattr,
 
 /* PFRATT - FORTRAN interface routine to remove an attribute */
 
-FIXNUM FF_ID(pfratt, PFRATT)(FIXNUM *sfid, FIXNUM *snca, char *fattr)
+FIXNUM FF_ID(pfratt, PFRATT)(FIXNUM *sfid, FIXNUM *snca, const char *fattr)
    {FIXNUM rv;
     char lattr[MAXLINE];
     PDBfile *file;
@@ -1851,8 +1859,8 @@ FIXNUM FF_ID(pfratt, PFRATT)(FIXNUM *sfid, FIXNUM *snca, char *fattr)
  *        - a variable
  */
 
-FIXNUM FF_ID(pfsvat, PFSVAT)(FIXNUM *sfid, FIXNUM *sncv, char *fvar,
-			     FIXNUM *snca, char *fattr, void *vl)
+FIXNUM FF_ID(pfsvat, PFSVAT)(FIXNUM *sfid, FIXNUM *sncv, const char *fvar,
+			     FIXNUM *snca, const char *fattr, void *vl)
    {FIXNUM rv;
     char lattr[MAXLINE], lvar[MAXLINE], **lvl;
     PDBfile *file;
@@ -1882,8 +1890,8 @@ FIXNUM FF_ID(pfsvat, PFSVAT)(FIXNUM *sfid, FIXNUM *sncv, char *fvar,
  *        - a variable
  */
 
-FIXNUM FF_ID(pfgvat, PFGVAT)(FIXNUM *sfid, FIXNUM *sncv, char *fvar,
-			     FIXNUM *snca, char *fattr, void *vl)
+FIXNUM FF_ID(pfgvat, PFGVAT)(FIXNUM *sfid, FIXNUM *sncv, const char *fvar,
+			     FIXNUM *snca, const char *fattr, void *vl)
    {int nc;
     FIXNUM rv;
     char lvar[MAXLINE], lattr[MAXLINE];
@@ -1944,7 +1952,7 @@ FIXNUM FF_ID(pffami, PFFAMI)(FIXNUM *sfid, FIXNUM *sf)
 
 /* PFCD - FORTRAN interface routine to change currrent working directory */
 
-FIXNUM FF_ID(pfcd, PFCD)(FIXNUM *sfid, FIXNUM *sncd, char *dirname)
+FIXNUM FF_ID(pfcd, PFCD)(FIXNUM *sfid, FIXNUM *sncd, const char *dirname)
    {FIXNUM rv;
     char dir[MAXLINE+1];
     PDBfile *file;
@@ -1967,8 +1975,8 @@ FIXNUM FF_ID(pfcd, PFCD)(FIXNUM *sfid, FIXNUM *sncd, char *dirname)
 
 /* PFLN - FORTRAN interface routine to create a link to a variable */
 
-FIXNUM FF_ID(pfln, PFLN)(FIXNUM *sfid, FIXNUM *snco, char *oname,
-			 FIXNUM *sncn, char *nname)
+FIXNUM FF_ID(pfln, PFLN)(FIXNUM *sfid, FIXNUM *snco, const char *oname,
+			 FIXNUM *sncn, const char *nname)
    {FIXNUM rv;
     char oldname[MAXLINE+1], newname[MAXLINE+1];
     PDBfile *file;
@@ -1995,8 +2003,8 @@ FIXNUM FF_ID(pfln, PFLN)(FIXNUM *sfid, FIXNUM *snco, char *oname,
  *       - match the specified pattern and type. Previous lists are deleted.
  */
 
-FIXNUM FF_ID(pflst, PFLST)(FIXNUM *sfid, FIXNUM *sncp, char *path,
-			   FIXNUM *snct, char *type, FIXNUM *sn)
+FIXNUM FF_ID(pflst, PFLST)(FIXNUM *sfid, FIXNUM *sncp, const char *path,
+			   FIXNUM *snct, const char *type, FIXNUM *sn)
    {FIXNUM rv;
     char *ppath, *ptype;
     char lpath[MAXLINE+1], ltype[MAXLINE+1];
@@ -2098,7 +2106,7 @@ FIXNUM FF_ID(pfdls, PFDLS)(void)
 
 /* PFMKDR - FORTRAN interface routine to create a directory */
 
-FIXNUM FF_ID(pfmkdr, PFMKDR)(FIXNUM *sfid, FIXNUM *sncd, char *dirname)
+FIXNUM FF_ID(pfmkdr, PFMKDR)(FIXNUM *sfid, FIXNUM *sncd, const char *dirname)
    {FIXNUM rv;
     char dir[MAXLINE+1];
     PDBfile *file;
@@ -2120,7 +2128,7 @@ FIXNUM FF_ID(pfmkdr, PFMKDR)(FIXNUM *sfid, FIXNUM *sncd, char *dirname)
 
 /* PFISDR - FORTRAN interface routine to test for a directory */
 
-FIXNUM FF_ID(pfisdr, PFISDR)(FIXNUM *sfid, FIXNUM *sncd, char *dirname)
+FIXNUM FF_ID(pfisdr, PFISDR)(FIXNUM *sfid, FIXNUM *sncd, const char *dirname)
    {FIXNUM rv;
     char dir[MAXLINE+1];
     PDBfile *file;
@@ -2172,7 +2180,7 @@ FIXNUM FF_ID(pfpwd, PFPWD)(FIXNUM *sfid, FIXNUM *sncc, char *cwd)
 
 FIXNUM FF_ID(pfncin, PFNCIN)(void *out, void *in,
 			     FIXNUM *sni, FIXNUM *schrt,
-			     FIXNUM *snct, char *type)
+			     FIXNUM *snct, const char *type)
    {FIXNUM rv;
     char s[MAXLINE];
     hasharr *chrt;
@@ -2197,7 +2205,7 @@ FIXNUM FF_ID(pfncin, PFNCIN)(void *out, void *in,
 
 FIXNUM FF_ID(pfncot, PFNCOT)(void *out, void *in,
 			     FIXNUM *sni, FIXNUM *schrt,
-			     FIXNUM *snct, char *type)
+			     FIXNUM *snct, const char *type)
    {FIXNUM rv;
     char s[MAXLINE];
     hasharr *chrt;
@@ -2219,8 +2227,8 @@ FIXNUM FF_ID(pfncot, PFNCOT)(void *out, void *in,
  *
  */
 
-FIXNUM FF_ID(pfrdbt, PFRDBT)(FIXNUM *sfid, FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type, FIXNUM *sni,
+FIXNUM FF_ID(pfrdbt, PFRDBT)(FIXNUM *sfid, FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type, FIXNUM *sni,
 			     FIXNUM *ssgn, FIXNUM *snb, FIXNUM *sadsz,
 			     FIXNUM *sfpp, FIXNUM *soffs, FIXNUM *pan,
 			     void *pdata)
@@ -2341,7 +2349,7 @@ FIXNUM FF_ID(pfgfln, PFGFLN)(FIXNUM *sfid, FIXNUM *sln)
  *        - return FALSE if not a floating point type
  */
 
-FIXNUM FF_ID(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *snct, char *type,
+FIXNUM FF_ID(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *snct, const char *type,
 			     FIXNUM *sln, void *vr) 
    {PD_data_std_i is;
     long n;
@@ -2369,7 +2377,7 @@ FIXNUM FF_ID(pfdnrm, PFDNRM)(FIXNUM *istd, FIXNUM *snct, char *type,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pfrent, PFRENT)(FIXNUM *sfid, FIXNUM *sncn, char *name)
+FIXNUM FF_ID(pfrent, PFRENT)(FIXNUM *sfid, FIXNUM *sncn, const char *name)
    {FIXNUM rv;
     char lnam[MAXLINE];
     PDBfile *file;
@@ -2511,8 +2519,8 @@ FIXNUM FF_ID(pfmpss, PFMPSS)(FIXNUM *sfid, FIXNUM *sv)
  *        - return 0 otherwise
  */
 
-FIXNUM FF_ID(pfmpop, PFMPOP)(FIXNUM *sncn, char *name,
-			     char *mode, FIXNUM *scomm)
+FIXNUM FF_ID(pfmpop, PFMPOP)(FIXNUM *sncn, const char *name,
+			     const char *mode, FIXNUM *scomm)
    {FIXNUM rv;
     char s[MAXLINE], t[2];
     PDBfile *file;

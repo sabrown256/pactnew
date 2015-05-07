@@ -1519,7 +1519,7 @@ static int bind_module(bindes *bd)
 	    for (iw = 0; fwr[iw] != NULL; iw++)
 	        {sb = fwr[iw];
 		 if (blank_line(sb) == FALSE)
-		    {nstrncpy(t, BFLRG, sb, -1);
+		    {nstrncpy(t, BFLRG, subst(sb, "const ", "", -1), -1);
 		     ta = tokenize(t, " \t", 0);
 		     module_pre_wrap_full(fp, sb, ta, pck);
 		     free_strings(ta);};};};

@@ -403,7 +403,7 @@ extern char
  *PS_fill_string(char *s, int n),
  *PS_strclean(char *d, size_t nd, const char *s, size_t ns),
  *PS_strstri(char *string1, char *string2),
- *PS_subst(char *s, const char *a, const char *b, size_t n),
+ *PS_subst(const char *s, const char *a, const char *b, size_t n),
  *PS_path_tail(char *s),
  *PS_path_head(char *s),
  *PS_path_base(char *s),

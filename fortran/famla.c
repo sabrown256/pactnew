@@ -113,8 +113,8 @@ FIXNUM FF_ID(pmcfft, PMCFFT)(double *aoutyr, double *aoutyi, double *aoutx,
 
 /* PMBSET - begin making a set */
 
-FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, char *fname,
-			     FIXNUM *snct, char *ftype,
+FIXNUM FF_ID(pmbset, PMBSET)(FIXNUM *sncn, const char *fname,
+			     FIXNUM *snct, const char *ftype,
 			     FIXNUM *scp, FIXNUM *snd,
 			     FIXNUM *snde, FIXNUM *amx, FIXNUM *stp,
 			     FIXNUM *sinxt)

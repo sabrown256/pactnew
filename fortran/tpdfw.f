@@ -722,7 +722,7 @@
          a(i+40+93) = 2*(float(i) + 1000.0)
       enddo
 
-      do i = 1, 73
+      do i = 1, 2
          a2(i) = 0.
       enddo
 

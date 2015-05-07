@@ -609,12 +609,13 @@ FIXNUM FF_ID(pgaxis, PGAXIS)(FIXNUM *sdid, FIXNUM *saxt)
  */
 
 FIXNUM FF_ID(pgsaxa, PGSAXA)(FIXNUM *sdid, FIXNUM *sn,
-			     double *aat, char *patc)
+			     double *aat, const char *patc)
    {int i, nc, nn, type, lnclr, txclr, prec;
     double *attr;
     double chsp;
     double chup[PG_SPACEDM], chpth[PG_SPACEDM];
-    char *pc, bf[MAXLINE];
+    char bf[MAXLINE];
+    const char *pc;
     PG_device *dev;
 
     dev = SC_GET_POINTER(PG_device, *sdid);
@@ -922,7 +923,7 @@ FIXNUM FF_ID(pgdrax, PGDRAX)(FIXNUM *sdid, double *sxl, double *syl,
 			     double *sxr, double *syr,
 			     double *st1, double *st2,
 			     double *sv1, double *sv2, double *ssc,
-			     FIXNUM *sncf, char *format,
+			     FIXNUM *sncf, const char *format,
 			     FIXNUM *std, FIXNUM *stt, FIXNUM *slt)
    {int td;
     FIXNUM rv;
@@ -1281,7 +1282,7 @@ FIXNUM FF_ID(pggtxf, PGGTXF)(FIXNUM *sdid,
 /* PGGTEX - get the text extent in CS */
 
 FIXNUM FF_ID(pggtex, PGGTEX)(FIXNUM *sdid, FIXNUM *snd, FIXNUM *sc,
-			     FIXNUM *sncs, char *s,
+			     FIXNUM *sncs, const char *s,
 			     double *sdx, double *sdy)
    {FIXNUM rv;
     double p[PG_SPACEDM];
@@ -1375,9 +1376,9 @@ FIXNUM FF_ID(pgmdvc, PGMDVC)(FIXNUM *sdid)
  *        - return -1 otherwise
  */
 
-FIXNUM FF_ID(pgmkdv, PGMKDV)(FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type,
-			     FIXNUM *sncl, char *title)
+FIXNUM FF_ID(pgmkdv, PGMKDV)(FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type,
+			     FIXNUM *sncl, const char *title)
    {FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE], ltitle[MAXLINE];
     PG_device *dev;
@@ -1535,7 +1536,7 @@ FIXNUM FF_ID(pgptos, PGPTOS)(FIXNUM *sdid, FIXNUM *six, FIXNUM *siy,
 
 /* PGRDIF - read an interface description file */
 
-FIXNUM FF_ID(pgrdif, PGRDIF)(FIXNUM *sdid, FIXNUM *sncn, char *name)
+FIXNUM FF_ID(pgrdif, PGRDIF)(FIXNUM *sdid, FIXNUM *sncn, const char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     PG_device *dev;
@@ -1569,7 +1570,7 @@ FIXNUM FF_ID(pgrdvc, PGRDVC)(FIXNUM *sdid)
 
 /* PGRGDV - register a device */
 
-FIXNUM FF_ID(pgrgdv, PGRGDV)(FIXNUM *sncn, char *name)
+FIXNUM FF_ID(pgrgdv, PGRGDV)(FIXNUM *sncn, const char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     
@@ -1596,7 +1597,7 @@ FIXNUM FF_ID(pgrgdv, PGRGDV)(FIXNUM *sncn, char *name)
 
 /* PGRGFN - register a call back function with the device */
 
-FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *sncn, char *name, PFEvCallback fnc)
+FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *sncn, const char *name, PFEvCallback fnc)
    {FIXNUM rv;
     char lname[MAXLINE];
 
@@ -1612,8 +1613,8 @@ FIXNUM FF_ID(pgrgfn, PGRGFN)(FIXNUM *sncn, char *name, PFEvCallback fnc)
 
 /* PGRGVR - register a variable with the device */
 
-FIXNUM FF_ID(pgrgvr, PGRGVR)(FIXNUM *sncn, char *name,
-			     FIXNUM *snct, char *type,
+FIXNUM FF_ID(pgrgvr, PGRGVR)(FIXNUM *sncn, const char *name,
+			     FIXNUM *snct, const char *type,
 			     void *vr, void *vn, void *vx)
    {FIXNUM rv;
     char lname[MAXLINE], ltype[MAXLINE];
@@ -1746,7 +1747,7 @@ FIXNUM FF_ID(pgsfin, PGSFIN)(FIXNUM *sdid, FIXNUM *sc)
 
 /* PGSPAL - set the current palette */
 
-FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *sdid, FIXNUM *sncn, char *pname)
+FIXNUM FF_ID(pgspal, PGSPAL)(FIXNUM *sdid, FIXNUM *sncn, const char *pname)
    {FIXNUM rv;
     PG_device *dev;
     char lname[MAXLINE];
@@ -1808,8 +1809,8 @@ FIXNUM FF_ID(pgstow, PGSTOW)(FIXNUM *sdid, double *sx, double *sy)
 
 /* PGSTXF - set the font */
 
-FIXNUM FF_ID(pgstxf, PGSTXF)(FIXNUM *sdid, FIXNUM *sncf, char *face,
-			     FIXNUM *sncs, char *style, FIXNUM *ssz)
+FIXNUM FF_ID(pgstxf, PGSTXF)(FIXNUM *sdid, FIXNUM *sncf, const char *face,
+			     FIXNUM *sncs, const char *style, FIXNUM *ssz)
    {FIXNUM rv;
     PG_device *dev;
     char lface[MAXLINE], lstyle[MAXLINE];
@@ -1961,7 +1962,7 @@ FIXNUM FF_ID(pgupvs, PGUPVS)(FIXNUM *sdid)
 /* PGWRCL - write label centered wrt x */
 
 FIXNUM FF_ID(pgwrcl, PGWRCL)(FIXNUM *sdid, double *ssy,
-			     FIXNUM *sncl, char *label)
+			     FIXNUM *sncl, const char *label)
    {FIXNUM rv;
     char llabel[MAXLINE];
     PG_device *dev;
@@ -1981,7 +1982,7 @@ FIXNUM FF_ID(pgwrcl, PGWRCL)(FIXNUM *sdid, double *ssy,
 
 /* PGWRIF - write an interface description file */
 
-FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *sdid, FIXNUM *sncn, char *name)
+FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *sdid, FIXNUM *sncn, const char *name)
    {FIXNUM rv;
     char lname[MAXLINE];
     PG_device *dev;
@@ -2002,7 +2003,7 @@ FIXNUM FF_ID(pgwrif, PGWRIF)(FIXNUM *sdid, FIXNUM *sncn, char *name)
  */
 
 FIXNUM FF_ID(pgwrta, PGWRTA)(FIXNUM *sdid, double *sx, double *sy,
-			     FIXNUM *sncm, char *msg)
+			     FIXNUM *sncm, const char *msg)
    {FIXNUM rv;
     double x[PG_SPACEDM];
     char lmsg[MAXLINE];

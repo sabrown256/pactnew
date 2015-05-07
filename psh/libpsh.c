@@ -1191,7 +1191,7 @@ char *strstri(char *string1, char *string2)
  *       - GOTCHA: make the internal buffers dynamic
  */
 
-char *subst(char *s, const char *a, const char *b, size_t n)
+char *subst(const char *s, const char *a, const char *b, size_t n)
    {size_t i, o, nc;
     char *p, *pr, *ps, *pa, *pb, *r;
     static char bfa[4*BFMG], bfb[4*BFMG];

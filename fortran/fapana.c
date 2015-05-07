@@ -58,7 +58,7 @@ FIXNUM FF_ID(pamcon, PAMCON)(FIXNUM *anc, char **avn, void **ap, FIXNUM *sn)
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(pantrn, PANTRN)(void *av, FIXNUM *sncn, char *vname)
+FIXNUM FF_ID(pantrn, PANTRN)(void *av, FIXNUM *sncn, const char *vname)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, vname, *sncn);
@@ -74,7 +74,7 @@ FIXNUM FF_ID(pantrn, PANTRN)(void *av, FIXNUM *sncn, char *vname)
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(paconn, PACONN)(void **av, FIXNUM *sncn, char *vname,
+FIXNUM FF_ID(paconn, PACONN)(void **av, FIXNUM *sncn, const char *vname,
 			     FIXNUM *sf)
    {char t[MAXLINE];
 
@@ -91,7 +91,7 @@ FIXNUM FF_ID(paconn, PACONN)(void **av, FIXNUM *sncn, char *vname,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(padcon, PADCON)(void **av, FIXNUM *sncn, char *vname)
+FIXNUM FF_ID(padcon, PADCON)(void **av, FIXNUM *sncn, const char *vname)
    {char t[MAXLINE], s[MAXLINE];
 
     SC_FORTRAN_STR_C(t, vname, *sncn);
@@ -134,7 +134,7 @@ FIXNUM FF_ID(paloca, PALOCA)(void **av, FIXNUM *sbpi, FIXNUM *sn, ...)
  */
 
 FIXNUM FF_ID(palloc, PALLOC)(void **av, FIXNUM *sncn,
-			     char *vname, FIXNUM *sf, ...)
+			     const char *vname, FIXNUM *sf, ...)
    {char s[MAXLINE];
     int *pdima;
     PA_variable *pp;
@@ -204,7 +204,7 @@ FIXNUM FF_ID(palloc, PALLOC)(void **av, FIXNUM *sncn,
  *        - return TRUE iff successful
  */
 
-FIXNUM FF_ID(paspck, PASPCK)(FIXNUM *sncn, char *pname)
+FIXNUM FF_ID(paspck, PASPCK)(FIXNUM *sncn, const char *pname)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, pname, *sncn);
@@ -218,7 +218,7 @@ FIXNUM FF_ID(paspck, PASPCK)(FIXNUM *sncn, char *pname)
 
 /* PAERR - handle errors */
 
-void FF_ID(paerr, PAERR)(FIXNUM *sncn, char *pname)
+void FF_ID(paerr, PAERR)(FIXNUM *sncn, const char *pname)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, pname, *sncn);
@@ -254,7 +254,7 @@ void FF_ID(pasdof, PASDOF)(FIXNUM *sd)
 
 /* PASEQV - set an equivalenced value */
 
-void FF_ID(paseqv, PASEQV)(FIXNUM *sncn, char *name, void *avl)
+void FF_ID(paseqv, PASEQV)(FIXNUM *sncn, const char *name, void *avl)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, name, *sncn);
@@ -268,7 +268,7 @@ void FF_ID(paseqv, PASEQV)(FIXNUM *sncn, char *name, void *avl)
 
 /* PADEQV - define an equivalence */
 
-void FF_ID(padeqv, PADEQV)(void *avr, FIXNUM *sncn, char *name)
+void FF_ID(padeqv, PADEQV)(void *avr, FIXNUM *sncn, const char *name)
    {char t[MAXLINE];
 
     SC_FORTRAN_STR_C(t, name, *sncn);
@@ -285,11 +285,13 @@ void FF_ID(padeqv, PADEQV)(void *avr, FIXNUM *sncn, char *name)
 
 /* PATHOP - open a time history file */
 
-FIXNUM FF_ID(pathop, PATHOP)(FIXNUM *sncn, char *fname, char *fmode,
-			     FIXNUM *ssz, FIXNUM *sncp, char *fprev)
+FIXNUM FF_ID(pathop, PATHOP)(FIXNUM *sncn, const char *fname,
+			     const char *fmode,
+			     FIXNUM *ssz, FIXNUM *sncp, const char *fprev)
    {int np;
     FIXNUM rv;
-    char s[MAXLINE], t[2], u[MAXLINE], *lmode;
+    char s[MAXLINE], t[2], u[MAXLINE];
+    const char *lmode;
     PDBfile *file;
 
     SC_FORTRAN_STR_C(s, fname, *sncn);
@@ -349,9 +351,9 @@ FIXNUM FF_ID(pathfm, PATHFM)(FIXNUM *sfid)
 
 /* PABREC - begin a time domain struct definition */
 
-FIXNUM FF_ID(pabrec, PABREC)(FIXNUM *sfid, FIXNUM *sncn, char *fname,
-			     FIXNUM *snct, char *ftype,
-			     FIXNUM *sncm, char *ftime)
+FIXNUM FF_ID(pabrec, PABREC)(FIXNUM *sfid, FIXNUM *sncn, const char *fname,
+			     FIXNUM *snct, const char *ftype,
+			     FIXNUM *sncm, const char *ftime)
    {FIXNUM rv;
     char ltype[MAXLINE], lname[MAXLINE], ltime[MAXLINE];
     ff_th_record *fth;
@@ -427,8 +429,8 @@ FIXNUM FF_ID(pagrid, PAGRID)(FIXNUM *sfid, FIXNUM *sind,
 /* PAAREC - add a member to a time domain struct definition */
 
 FIXNUM FF_ID(paarec, PAAREC)(FIXNUM *sfid, FIXNUM *srid,
-			     FIXNUM *sncm, char *fmemb,
-			     FIXNUM *sncl, char *flabl)
+			     FIXNUM *sncm, const char *fmemb,
+			     FIXNUM *sncl, const char *flabl)
    {int nc;
     FIXNUM rv;
     char lmemb[MAXLINE], llabl[MAXLINE], *s;
@@ -512,7 +514,7 @@ FIXNUM FF_ID(pawrec, PAWREC)(FIXNUM *sfid, FIXNUM *srid,
 /* PAWMEM - write a time domain record member */
 
 FIXNUM FF_ID(pawmem, PAWMEM)(FIXNUM *sfid, FIXNUM *srid,
-			     FIXNUM *sncm, char *mbr,
+			     FIXNUM *sncm, const char *mbr,
 			     FIXNUM *sinst, FIXNUM *snr, void *avr)
    {FIXNUM ret;
     char memb[MAXLINE];
@@ -534,8 +536,8 @@ FIXNUM FF_ID(pawmem, PAWMEM)(FIXNUM *sfid, FIXNUM *srid,
 
 /* PAWRIA - write a time domain record instance attribute */
 
-FIXNUM FF_ID(pawria, PAWRIA)(FIXNUM *sfid, FIXNUM *sncv, char *fvar,
-			     FIXNUM *sinst, FIXNUM *snca, char *fattr,
+FIXNUM FF_ID(pawria, PAWRIA)(FIXNUM *sfid, FIXNUM *sncv, const char *fvar,
+			     FIXNUM *sinst, FIXNUM *snca, const char *fattr,
 			     void *avl)
    {FIXNUM ret;
     char lvar[MAXLINE], lattr[MAXLINE];
@@ -557,7 +559,7 @@ FIXNUM FF_ID(pawria, PAWRIA)(FIXNUM *sfid, FIXNUM *sncv, char *fvar,
  *        - return 1 if successful and 0 otherwise.
  */
 
-FIXNUM FF_ID(patrnf, PATRNF)(FIXNUM *sncn, char *fname, FIXNUM *sord,
+FIXNUM FF_ID(patrnf, PATRNF)(FIXNUM *sncn, const char *fname, FIXNUM *sord,
 			     FIXNUM *sncpf)
    {FIXNUM ret;
     char s[MAXLINE];
@@ -575,7 +577,7 @@ FIXNUM FF_ID(patrnf, PATRNF)(FIXNUM *sncn, char *fname, FIXNUM *sord,
  *        - return 1 if successful and 0 otherwise.
  */
 
-FIXNUM FF_ID(patrnn, PATRNN)(FIXNUM *sncc, char *chrs,
+FIXNUM FF_ID(patrnn, PATRNN)(FIXNUM *sncc, const char *chrs,
 			     FIXNUM *sord, FIXNUM *sncpf)
    {int n;
     FIXNUM ret;
@@ -605,7 +607,7 @@ FIXNUM FF_ID(patrnn, PATRNN)(FIXNUM *sncc, char *chrs,
  *        - return 1 if successful and 0 otherwise.
  */
 
-FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *sncc, char *chrs,
+FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *sncc, const char *chrs,
 			     FIXNUM *sord, FIXNUM *sncpf)
    {int n;
     FIXNUM ret;
@@ -641,8 +643,8 @@ FIXNUM FF_ID(patrnl, PATRNL)(FIXNUM *sncc, char *chrs,
  *        - SNCPF   number of curves per target file
  */
 
-FIXNUM FF_ID(pamrgf, PAMRGF)(FIXNUM *sncb, char *base,
-			     FIXNUM *sncf, char *family, FIXNUM *sncpf)
+FIXNUM FF_ID(pamrgf, PAMRGF)(FIXNUM *sncb, const char *base,
+			     FIXNUM *sncf, const char *family, FIXNUM *sncpf)
    {FIXNUM ret;
     char s[MAXLINE];
     char t[MAXLINE];
@@ -667,8 +669,8 @@ FIXNUM FF_ID(pamrgf, PAMRGF)(FIXNUM *sncb, char *base,
  *        - SNCPF   number of curves per target file
  */
 
-FIXNUM FF_ID(pamrgn, PAMRGN)(FIXNUM *sncb, char *base,
-			     FIXNUM *sncc, char *chrs, FIXNUM *sncpf)
+FIXNUM FF_ID(pamrgn, PAMRGN)(FIXNUM *sncb, const char *base,
+			     FIXNUM *sncc, const char *chrs, FIXNUM *sncpf)
    {int n;
     FIXNUM ret;
     char **files, *pc, s[MAXLINE];
@@ -722,7 +724,7 @@ FIXNUM FF_ID(pafrec, PAFREC)(FIXNUM *srid)
  *        - USE PATRNF INSTEAD
  */
 
-FIXNUM FF_ID(pathtr, PATHTR)(FIXNUM *sncn, char *fname, FIXNUM *sncpf)
+FIXNUM FF_ID(pathtr, PATHTR)(FIXNUM *sncn, const char *fname, FIXNUM *sncpf)
    {FIXNUM ret;
     char s[MAXLINE];
 
@@ -740,10 +742,11 @@ FIXNUM FF_ID(pathtr, PATHTR)(FIXNUM *sncn, char *fname, FIXNUM *sncpf)
  *        - USE PATRNN INSTEAD
  */
 
-FIXNUM FF_ID(pathtn, PATHTN)(char *chrs, FIXNUM *sord, FIXNUM *sncpf)
+FIXNUM FF_ID(pathtn, PATHTN)(const char *chrs, FIXNUM *sord, FIXNUM *sncpf)
    {int n;
     FIXNUM ret;
-    char *pc, **names;
+    char **names;
+    const char *pc;
 
     ret   = FALSE;
     pc    = chrs;
@@ -765,10 +768,11 @@ FIXNUM FF_ID(pathtn, PATHTN)(char *chrs, FIXNUM *sord, FIXNUM *sncpf)
  *        - USE PATRNL INSTEAD
  */
 
-FIXNUM FF_ID(pathtl, PATHTL)(char *chrs, FIXNUM *sord, FIXNUM *sncpf)
+FIXNUM FF_ID(pathtl, PATHTL)(const char *chrs, FIXNUM *sord, FIXNUM *sncpf)
    {int n;
     FIXNUM ret;
-    char **names, *pc;
+    char **names;
+    const char *pc;
 
     ret   = FALSE;
     pc    = chrs;
