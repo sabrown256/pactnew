@@ -12,7 +12,7 @@
 
 static void
  _SX_gc_data(SS_psides *si, PDBfile *file,
-	     void *vr, long ni, char *type);
+	     void *vr, long ni, const char *type);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -22,7 +22,7 @@ static void
  */
 
 static void _SX_gc_indirection(SS_psides *si, PDBfile *file,
-			       char **vr, long ni, char *type)
+			       char **vr, long ni, const char *type)
    {long i, ditems;
     char *dtype, *bf;
 
@@ -59,7 +59,7 @@ static void _SX_gc_indirection(SS_psides *si, PDBfile *file,
 /* _SX_GC_LEAF - GC indirect members of leaf */
 
 static void _SX_gc_leaf(SS_psides *si, PDBfile *file,
-			char *vr, long ni, char *type)
+			char *vr, long ni, const char *type)
    {long ii, sz;
     char *svr;
     defstr *defp;
@@ -94,7 +94,7 @@ static void _SX_gc_leaf(SS_psides *si, PDBfile *file,
 /* _SX_GC_DATA - garbage collect a variable */
 
 static void _SX_gc_data(SS_psides *si, PDBfile *file,
-			void *vr, long ni, char *type)
+			void *vr, long ni, const char *type)
    {
 
 /* if the type is an indirection, follow the pointer */

@@ -70,7 +70,7 @@ int CC_get_ch(FILE *fp, int ign_ws)
 
 /* CC_INPUT_C - get the next character from the stream for the lexer */
 
-int CC_input_c(char *ltxt)
+int CC_input_c(const char *ltxt)
    {int c, eof;
     
     eof = (int) EOF;
@@ -79,7 +79,7 @@ int CC_input_c(char *ltxt)
        c = eof;
 
     else
-       {_CC.lex_text = ltxt;
+       {_CC.lex_text = (char *) ltxt;
 
 	c = CC_get_ch(_CC.fp, FALSE);
 
@@ -233,7 +233,7 @@ expr *CC_mk_string_c(char *s)
 
 /* _CC_DIAGNOSTIC_C - print diagnostics to monitor and debug the parser */
 
-void _CC_diagnostic_c(expr *e, char *msg, int diag)
+void _CC_diagnostic_c(expr *e, const char *msg, int diag)
    {char s[MAXLINE];
 
     if (diag)
@@ -248,7 +248,7 @@ void _CC_diagnostic_c(expr *e, char *msg, int diag)
 
 /* _CC_DIAGNOSE_RETURN_C - print diagnostics for returns */
 
-int _CC_diagnose_return_c(int x, char *y, PFPInt fnc)
+int _CC_diagnose_return_c(int x, const char *y, PFPInt fnc)
    {int dbg, *pdbg;
 
     pdbg = (*fnc)();
@@ -264,7 +264,7 @@ int _CC_diagnose_return_c(int x, char *y, PFPInt fnc)
 
 /* _CC_ERROR - put string S back onto the stream for the lexer */
 
-static void _CC_error(char *s, char *e)
+static void _CC_error(const char *s, char *e)
    {
 
     fprintf(stdout, "%s\n", s);
@@ -278,7 +278,7 @@ static void _CC_error(char *s, char *e)
 
 /* _CC_UNSUPPORTED_C - barf on unsupported syntax */
 
-void _CC_unsupported_c(char *msg)
+void _CC_unsupported_c(const char *msg)
    {char s[MAXLINE];
 
     snprintf(s, MAXLINE, "UNSUPPORTED(%d/%d):  %s",
@@ -292,7 +292,7 @@ void _CC_unsupported_c(char *msg)
 
 /* CC_PARSE_ERROR_C - error handler for parser */
 
-int CC_parse_error_c(char *s, PFPExpr fnc)
+int CC_parse_error_c(const char *s, PFPExpr fnc)
    {int n;
     char msg[MAXLINE];
     char *t;

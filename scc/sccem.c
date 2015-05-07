@@ -15,10 +15,10 @@
 
 /* CC_PREPROCESS - preproccess file S using compiler CMP and flags V */
 
-int CC_preprocess(char *s, char *cmp, char **v)
+int CC_preprocess(const char *s, const char *cmp, char **v)
    {int i, nc, st, rv;
     char cmd[MAXLINE], inm[MAXLINE];
-    char *p;
+    const char *p;
     file_loc *fl;
 
     p = strrchr(s, '/');
@@ -60,7 +60,7 @@ int CC_preprocess(char *s, char *cmp, char **v)
 
 /* CC_COMPILE - compile file S using compiler CMP and flags V */
 
-int CC_compile(char *s, char *cmp, char **v)
+int CC_compile(const char *s, const char *cmp, char **v)
    {int i, st, rv;
     char cmd[MAXLINE];
 
@@ -179,7 +179,7 @@ static void _CC_emit_fnc_decl(FILE *fp, decl *pd)
 
 /* _CC_EMIT_VARDEF - emit variable definitions */
 
-static int _CC_emit_vardef(char *cmp, char **v, int cfl)
+static int _CC_emit_vardef(const char *cmp, char **v, int cfl)
    {int i, n, rv;
     char nm[MAXLINE];
     decl *pd;
@@ -212,7 +212,7 @@ static int _CC_emit_vardef(char *cmp, char **v, int cfl)
 
 /* _CC_EMIT_FNC - emit code for Ith decl which is the Jth function */
 
-static int _CC_emit_fnc(int i, int j, char *cmp, char **v, int cfl)
+static int _CC_emit_fnc(int i, int j, const char *cmp, char **v, int cfl)
    {int nl, rv;
     int *dl;
     char nm[MAXLINE];
@@ -257,7 +257,7 @@ static int _CC_emit_fnc(int i, int j, char *cmp, char **v, int cfl)
 
 /* CC_EMIT - emit code files for CC */
 
-int CC_emit(char *cmp, char **v, int cfl)
+int CC_emit(const char *cmp, char **v, int cfl)
    {int i, j, n, rv;
     decl *pd;
 

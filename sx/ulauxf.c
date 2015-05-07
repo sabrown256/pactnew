@@ -19,7 +19,7 @@
 /* _UL_FFT - work horse for complex FFT's in ULTRA */
 
 static object *_UL_fft(SS_psides *si, object *argl,
-		       char *type, int no, int flag, int ordr)
+		       const char *type, int no, int flag, int ordr)
    {int n, i, jr, ji, n0;
     double xmn, xmx;
     double *x[PG_SPACEDM], *ypr, *ypi;

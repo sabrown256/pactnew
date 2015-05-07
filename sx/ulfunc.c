@@ -58,8 +58,8 @@ static object *UL_select(SS_psides *si, object *s)
  *                 - see print_curve_labels
  */
 
-static void _UL_print_label(int i, int j, int md, char *s, int id_flag,
-			    FILE *fp, char f[], int id)
+static void _UL_print_label(int i, int j, int md, char *s,
+			    int id_flag, FILE *fp, char f[], int id)
    {int k, sqzlab, ndi, labln;
     char label[MAXLINE];
 
@@ -782,8 +782,8 @@ static object *_ULI_quit(SS_psides *si, object *arg)
  */
 
 static object *UL_print_labels(SS_psides *si, int *indx, int nc,
-			       char *regx, char *file, int id_flag,
-			       char *name, int silent)
+			       const char *regx, const char *file,
+			       int id_flag, const char *name, int silent)
    {int i, j, np, id, md, nmore, nlp;
     char bf[10];
     char f[MAXLINE], *s;

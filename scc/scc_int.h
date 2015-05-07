@@ -173,15 +173,15 @@ extern expr
 /* SCCHK.C declarations */
 
 extern int
- CC_check(char *cmp, char **v);
+ CC_check(const char *cmp, char **v);
 
 
 /* SCCEM.C declarations */
 
 extern int
- CC_preprocess(char *s, char *cmp, char **v),
- CC_compile(char *s, char *cmp, char **v),
- CC_emit(char *cmp, char **v, int cfl);
+ CC_preprocess(const char *s, const char *cmp, char **v),
+ CC_compile(const char *s, const char *cmp, char **v),
+ CC_emit(const char *cmp, char **v, int cfl);
 
 
 /* SHGRC.Y declarations */
@@ -197,10 +197,10 @@ extern int
 
 extern int
  _CC_var_def(expr *e, int d),
- CC_compile_file(char *name, char *cmp, char **v);
+ CC_compile_file(const char *name, const char *cmp, char **v);
 
 extern void
- _CC_rem_varc(char *name),
+ _CC_rem_varc(const char *name),
  _CC_def_type(expr *e),
  _CC_obj_decl(expr *e, int force),
  _CC_do_decl(expr *e),
@@ -208,7 +208,7 @@ extern void
  CC_expr_str(char *s, int nc, expr *e);
 
 extern char
- *_CC_clean_text(char *t),
+ *_CC_clean_text(const char *t),
  *CC_variable_name(expr *e);
 
 extern expr
@@ -221,15 +221,15 @@ extern expr
  *_CC_fnc_decl(expr *e),
  *_CC_stor_decl(expr *e),
  *_CC_qual_decl(expr *e),
- *CC_add_depend(char *name, qtype t),
- *CC_add_type(char *name, qtype t),
+ *CC_add_depend(const char *name, qtype t),
+ *CC_add_type(const char *name, qtype t),
  *CC_add_const(expr *e),
- *CC_lookup_variable(char *txt, qtype q, int verbose),
+ *CC_lookup_variable(const char *txt, qtype q, int verbose),
  *CC_copy_expr(expr *e),
- *CC_mk_char(char *s),
- *CC_mk_string(char *s),
- *CC_mk_type(char *t),
- *CC_mk_variable(char *type, char *name, qtype declared),
+ *CC_mk_char(const char *s),
+ *CC_mk_string(const char *s),
+ *CC_mk_type(const char *t),
+ *CC_mk_variable(const char *type, const char *name, qtype declared),
  *CC_mk_integer(int64_t l),
  *CC_mk_float(double d);
 
@@ -257,7 +257,7 @@ extern expr
  *CC_mk_string_c(char *s);
 
 extern int
- CC_input_c(char *ltxt);
+ CC_input_c(const char *ltxt);
 
 extern void
  CC_unput_c(int c),

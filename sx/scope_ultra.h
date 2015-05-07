@@ -82,7 +82,8 @@ extern UL_scope_private
 /* ULCMD.C declarations */
 
 extern SS_psides
- *UL_init(char *code, char *vers, int c, char **v, char **env);
+ *UL_init(const char *code, const char *vers,
+	  int c, char **v, char **env);
 
 extern void
  UL_init_curves(SS_psides *si),

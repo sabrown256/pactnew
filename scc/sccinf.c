@@ -18,7 +18,7 @@ CC_scope_public
 
 /* CC_VAR_TYPE - find the type associated with a variable name */
 
-char *CC_var_type(char *name)
+char *CC_var_type(const char *name)
    {int id, nd;
     char *type, *nm;
     decl *pd;
@@ -64,7 +64,7 @@ static void _CC_primitives(void)
 
 /* CC_ADD_TYPE - add a new data type */
 
-expr *CC_add_type(char *name, qtype k)
+expr *CC_add_type(const char *name, qtype k)
    {expr *t;
 
     if (_CC.types == NULL)
@@ -104,7 +104,7 @@ expr *CC_add_const(expr *e)
 
 /* CC_ADD_DEPEND - add an object to the depend table at parse time */
 
-expr *CC_add_depend(char *name, qtype t)
+expr *CC_add_depend(const char *name, qtype t)
    {char s[MAXLINE];
     expr *v;
 
@@ -142,7 +142,7 @@ expr *CC_add_depend(char *name, qtype t)
 
 /* _CC_REM_VARC - remove the specified variable */
 
-void _CC_rem_varc(char *name)
+void _CC_rem_varc(const char *name)
    {
 
     SC_hasharr_remove(_CC.depend, name);
@@ -154,7 +154,7 @@ void _CC_rem_varc(char *name)
 
 /* CC_LOOKUP_VARIABLE - lookup a variable for LEX */
 
-expr *CC_lookup_variable(char *txt, qtype q, int verbose)
+expr *CC_lookup_variable(const char *txt, qtype q, int verbose)
    {expr *e;
 
     e = NULL;
@@ -170,7 +170,7 @@ expr *CC_lookup_variable(char *txt, qtype q, int verbose)
 
 /* CC_LOOKUP_IDENTIFIER_C - lookup an identifier for LEX */
 
-int CC_lookup_identifier_c(char *txt, expr **lval)
+int CC_lookup_identifier_c(const char *txt, expr **lval)
    {int type;
     expr *e;
     decl *pd;
@@ -217,7 +217,7 @@ expr *CC_copy_expr(expr *e)
 
 /* CC_MK_TYPE - wrap a type T */
 
-expr *CC_mk_type(char *t)
+expr *CC_mk_type(const char *t)
    {char s[MAXLINE];
     expr *e;
 
@@ -239,7 +239,7 @@ expr *CC_mk_type(char *t)
 
 /* CC_MK_VARIABLE - make a variable with NAME and TYPE */
 
-expr *CC_mk_variable(char *type, char *name, qtype declared)
+expr *CC_mk_variable(const char *type, const char *name, qtype declared)
    {expr *e;
 
     e = CMAKE(expr);
@@ -257,7 +257,7 @@ expr *CC_mk_variable(char *type, char *name, qtype declared)
 
 /* CC_MK_CHAR - wrap a character const S */
 
-expr *CC_mk_char(char *s)
+expr *CC_mk_char(const char *s)
    {expr *e;
 
     e = CMAKE(expr);
@@ -277,7 +277,7 @@ expr *CC_mk_char(char *s)
 
 /* CC_MK_STRING - wrap a string S */
 
-expr *CC_mk_string(char *s)
+expr *CC_mk_string(const char *s)
    {expr *e;
 
     e = CMAKE(expr);
@@ -359,7 +359,7 @@ char *CC_variable_name(expr *e)
 
 /* CC_COMPILE_FILE - compile a single file */
 
-int CC_compile_file(char *name, char *cmp, char **v)
+int CC_compile_file(const char *name, const char *cmp, char **v)
    {int rv;
     char inm[MAXLINE];
     FILE *fp;
@@ -706,9 +706,10 @@ expr *_CC_fnc_decl(expr *e)
 
 /* _CC_CLEAN_TEXT - cleanup text in front of variable declaration */
 
-char *_CC_clean_text(char *t)
+char *_CC_clean_text(const char *t)
    {int nw, more;
-    char *p, *ts;
+    char *p, *rv;
+    const char *ts;
 
     for (more = TRUE; more == TRUE; )
         {ts = t;
@@ -725,7 +726,9 @@ char *_CC_clean_text(char *t)
 
 	 more = (t != ts);};
 
-    return(t);}
+    rv = (char *) t;
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -774,7 +777,7 @@ static void _CC_clean_var(decl *pd)
 
 /* _CC_GET_TYPE_DECL - return the declaration of type T */
 
-static int _CC_get_type_decl(char *t, int nl, int *dl)
+static int _CC_get_type_decl(const char *t, int nl, int *dl)
    {int id, nd, il, ok;
     char *td;
     decl *pd;
@@ -1128,7 +1131,7 @@ void dprex(expr *e)
 
 /* DPRDC - print decl with name */
 
-void dprdc(char *name)
+void dprdc(const char *name)
    {int id, nd;
     char *nm;
     decl *pd;

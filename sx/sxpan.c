@@ -335,7 +335,7 @@ static object *_SXI_advance_time(SS_psides *si, object *argl)
  *               - also return NULL on error
  */
 
-static int *_SX_index_ptr(SS_psides *si, object **pargl, char *msg)
+static int *_SX_index_ptr(SS_psides *si, object **pargl, const char *msg)
    {int *rv;
     char *ds;
     object *obj;

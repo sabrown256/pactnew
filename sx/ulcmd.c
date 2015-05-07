@@ -22,7 +22,8 @@ UL_scope_private
 
 /* UL_INIT - initialize ULTRA */
 
-SS_psides *UL_init(char *code, char *vers, int c, char **v, char **env)
+SS_psides *UL_init(const char *code, const char *vers,
+		   int c, char **v, char **env)
    {SS_psides *si;
 
     SC_init_path(1, "ULTRA");
@@ -445,7 +446,7 @@ object *_ULI_set_id(SS_psides *si, object *argl)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-char *_UL_next_dataid(char *id, int inc)
+char *_UL_next_dataid(const char *id, int inc)
    {static char ret[MAXLINE];
     int temp;
 
@@ -459,8 +460,10 @@ char *_UL_next_dataid(char *id, int inc)
         SC_strncpy(ret, MAXLINE, "@27", -1);
 
     else if (!((id[0] == 'A') && (inc < 0)))
-       {int ic = (int)id[0];
-        ret[0] = (char)(ic + 1);
+       {int ic;
+
+	ic = (int) id[0];
+        ret[0] = (char) (ic + 1);
         ret[1] = '\0';}
 
     return(ret);}
@@ -470,7 +473,7 @@ char *_UL_next_dataid(char *id, int inc)
 
 /* _UL_DATAID_SEQ - sequence the dataids */
 
-object *_UL_dataid_seq(SS_psides *si, char *first, char *last)
+object *_UL_dataid_seq(SS_psides *si, const char *first, const char *last)
    {object *ret = SS_null;
     int i, ifirst, ilast, icur, num, inc;
     char next[MAXLINE], prev[MAXLINE];

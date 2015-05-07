@@ -260,7 +260,7 @@ static int _CC_check_fnc(decl *pd, int n)
 
 /* CC_CHECK - check code files for CC */
 
-int CC_check(char *cmp, char **v)
+int CC_check(const char *cmp, char **v)
    {int i, n, rv;
     decl *pd;
 

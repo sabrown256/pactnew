@@ -1065,7 +1065,7 @@ extern int
 
 extern void
  SS_unput_synt(SS_psides *si, int c),
- SS_name_map_synt(SS_psides *si, char *d, int nd, const const char *s);
+ SS_name_map_synt(SS_psides *si, char *d, int nd, const char *s);
 
 extern object
  *SS_lookup_variable(SS_psides *si, const char *txt, int verbose),

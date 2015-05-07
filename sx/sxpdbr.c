@@ -251,8 +251,7 @@ object *_SXI_read_numeric_data(SS_psides *si, object *argl)
 /* _SX_RD_DATA - grab some data from the specified file */
 
 syment *_SX_rd_data(SS_psides *si, PDBfile *file, const char *name,
-		    syment *ep,
-		    SC_address *addr, object *name_obj)
+		    syment *ep, SC_address *addr, object *name_obj)
    {inti n;
     char *type, *dtype;
     defstr *dpf, *odp;

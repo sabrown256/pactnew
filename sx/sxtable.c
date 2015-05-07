@@ -85,7 +85,7 @@ static int _SX_get_line_length(FILE *fp)
  *                   - to be a comment character and disregarded
  */                    
 
-static int _SX_setup_clabels(char *label, int nc, int linelen)  
+static int _SX_setup_clabels(const char *label, int nc, int linelen)  
    {int ntokens, i, rv;
 
     rv = FALSE;
@@ -493,7 +493,7 @@ static void _SX_cnormalize_table(PM_matrix *a)
  *                  - for use in a zone-centered mapping
  */
 
-static PM_set *_SX_lr_zc_domain(char *name)
+static PM_set *_SX_lr_zc_domain(const char *name)
    {int nd, *maxes;
     PM_set *set;
     void **elements;

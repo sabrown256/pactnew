@@ -124,8 +124,8 @@ static int _SX_termdata(SS_psides *si, int *aryptr,
  *                   - return TRUE if successful and FALSE otherwise
  */
 
-static int SX_read_pdb_curve(PDBfile *fp, char *fname, char *cname,
-			     curve *crv, PD_curve_io flag)
+static int SX_read_pdb_curve(PDBfile *fp, const char *fname,
+			     const char *cname, curve *crv, PD_curve_io flag)
    {int n, rv;
     double wc[PG_BOXSZ];
     double *x[PG_SPACEDM];
@@ -253,7 +253,8 @@ static int SX_ultra_binary_filep(FILE *fp)
  *                      - its pointer moved around
  */
 
-static FILE *_SX_open_for_reading(SS_psides *si, char *str, char *mode)
+static FILE *_SX_open_for_reading(SS_psides *si, const char *str,
+				  const char *mode)
    {FILE *fp;
 
     fp = io_open(str, mode);
@@ -337,7 +338,7 @@ object *_SXI_valid_ultra_filep(SS_psides *si, object *obj)
 
 /* _SX_READ_BIN - read a binary file */
 
-static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
+static void _SX_read_bin(SS_psides *si, FILE *fp, const char *fname)
    {int n, nc, nr, len, j, i, icurve;
     double wc[PG_BOXSZ];
     char c, bf[MAXLINE];
@@ -417,7 +418,7 @@ static void _SX_read_bin(SS_psides *si, FILE *fp, char *fname)
 
 /* _SX_READ_TEXT - read an ASCII input file */
 
-static void _SX_read_text(SS_psides *si, FILE *fp, char *fname)
+static void _SX_read_text(SS_psides *si, FILE *fp, const char *fname)
    {int j, c, nb, icurve;
     unsigned int csz;                        /* current size of buffer */
     char *pin, *text, *s, *bf;
@@ -564,7 +565,7 @@ object *SX_read_ver1(SS_psides *si, object *obj)
 
 /* _SX_READ_PDB - read the curves from a PDB file */
 
-static void _SX_read_pdb(SS_psides *si, PDBfile *fp, char *fname)
+static void _SX_read_pdb(SS_psides *si, PDBfile *fp, const char *fname)
    {int i, j, k, ne, icurve;
     char **names;
     pdb_info *ppi;

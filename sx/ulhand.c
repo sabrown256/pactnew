@@ -15,7 +15,7 @@ typedef object *(*PFSargsI)(SS_psides *si, int j);
 typedef double (*PFDoubleR)(double x);
 typedef double (*PFDoubleRR)(double x, double y);
 typedef double (*PFDoubleRi)(double x, int i);
-typedef void (*PFVoidis)(int j, char *s);
+typedef void (*PFVoidis)(int j, const char *s);
 typedef object *(*PFPObjectidd)(SS_psides *si, int j, double d1, double d2);
 typedef object *(*PFPObjectio)(SS_psides *si, int j, object *argl);
 typedef object *(*PFPObjectoo)(SS_psides *si, object *s, object *tok);
