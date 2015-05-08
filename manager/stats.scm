@@ -62,13 +62,11 @@
     (list '(spl test_total_o -s>) '(spl+ test_total_o -t>) '(stitle "Test - Optimized"))
     (list '(spl test _score>) '(stitle "Test score"))
     (list '(spl test _pml>) '(stitle "Test pml"))
-    (list '(spl test _ppc>) '(stitle "Test ppc"))
     (list '(spl test _pdb>) '(stitle "Test pdb"))
     (list '(spl test _pgs>) '(stitle "Test pgs"))
     (list '(spl test _panacea>) '(stitle "Test panacea"))
     (list '(spl test _scheme>) '(stitle "Test scheme"))
     (list '(spl test _sx>) '(stitle "Test sx"))
-    (list '(spl test _ultra>) '(stitle "Test ultra"))
     ))
 
 (load "slib.scm")

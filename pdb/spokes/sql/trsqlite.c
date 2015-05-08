@@ -65,7 +65,7 @@ struct s_indbt
 
 /* _SQLITE_ERROR - handle SQLITE errors */
 
-static void _SQLITE_error(int errn, char *msg)
+static void _SQLITE_error(int errn, const char *msg)
    {
 
     printf("SQLITE %s failed - %d\n", msg, errn);
@@ -93,10 +93,10 @@ static int _SQLITE_db_close(FILE *fp)
 
 /* _SQLITE_SPLIT_ROW - split line S at newlines and add them to OUT */
 
-static void _SQLITE_split_row(SC_array *out, char *s)
+static void _SQLITE_split_row(SC_array *out, const char *s)
    {char *p, *u, *l;
 
-    for (p = s; TRUE; p = NULL)
+    for (p = (char *) s; TRUE; p = NULL)
         {l = SC_strtok(p, "\n", u);
 	 if (l != NULL)
 	    SC_array_string_add_copy(out, l);
@@ -135,7 +135,7 @@ static void _SQLITE_gather_row(SC_array *out, char **in,
 
 /* _SQLITE_OPER - do the specified SQL command */
 
-int _SQLITE_oper(FILE *fp, char *sql)
+int _SQLITE_oper(FILE *fp, const char *sql)
    {int ok, rv;
     char *err;
     sqlite3 *conn;
@@ -156,7 +156,8 @@ int _SQLITE_oper(FILE *fp, char *sql)
 
 /* _SQLITE_QUERY - do the specified SQL command */
 
-sql_table *_SQLITE_query(FILE *fp, char *sql, char *delim, int add)
+sql_table *_SQLITE_query(FILE *fp, const char *sql,
+			 const char *delim, int add)
    {int ir, nf, nr, ok;
     char **res, *err;
     SC_array *arr;
@@ -206,7 +207,7 @@ static sql_table *_SQLITE_tables(FILE *fp)
 
 /* _SQLITE_DESC - describe a type for SQLITE */
 
-static sql_table *_SQLITE_desc(FILE *fp, char *s)
+static sql_table *_SQLITE_desc(FILE *fp, const char *s)
    {char cmd[MAXLINE];
     sql_table *tab;
 
@@ -221,7 +222,7 @@ static sql_table *_SQLITE_desc(FILE *fp, char *s)
 
 /* _SQLITE_NI - return the number of rows in table S */
 
-static int _SQLITE_ni(FILE *fp, char *s)
+static int _SQLITE_ni(FILE *fp, const char *s)
    {int nr;
     char cmd[MAXLINE];
     sql_table *tab;
@@ -240,7 +241,7 @@ static int _SQLITE_ni(FILE *fp, char *s)
 
 /* _SQLITE_SELECT - do a select for SQLITE */
 
-static sql_table *_SQLITE_select(FILE *fp, char *s)
+static sql_table *_SQLITE_select(FILE *fp, const char *s)
    {char cmd[MAXLINE];
     sql_table *tab;
 
@@ -282,7 +283,7 @@ FILE *_SQLITE_file(sql_file *fs)
 
 /* _SQLITE_OPEN - open an SQLITE database */
 
-FILE *_SQLITE_open(PDBfile *file, char *name, char *mode)
+FILE *_SQLITE_open(PDBfile *file, const char *name, const char *mode)
    {int ok;
     char *path;
     FILE *fp;

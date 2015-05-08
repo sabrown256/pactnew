@@ -42,10 +42,10 @@ struct s_sql_table
 
 struct s_sql_cmd
    {sql_table *(*tables)(FILE *fp);
-    sql_table *(*describe)(FILE *fp, char *s);
-    int (*nitems)(FILE *fp, char *s);
-    sql_table *(*select)(FILE *fp, char *s);
-    int (*oper)(FILE *fp, char *sql);};
+    sql_table *(*describe)(FILE *fp, const char *s);
+    int (*nitems)(FILE *fp, const char *s);
+    sql_table *(*select)(FILE *fp, const char *s);
+    int (*oper)(FILE *fp, const char *sql);};
 
 struct s_sql_file
    {FILE *conn;
@@ -70,13 +70,13 @@ extern char
 /* TRSQLITE.C declarations */
 
 extern FILE
- *_SQLITE_open(PDBfile *file, char *name, char *mode);
+ *_SQLITE_open(PDBfile *file, const char *name, const char *mode);
 
 
 /* TRMYSQL.C declarations */
 
 extern FILE
- *_MYSQL_open(PDBfile *file, char *name, char *mode);
+ *_MYSQL_open(PDBfile *file, const char *name, const char *mode);
 
 
 /* TRSQLG.C declarations */
@@ -89,10 +89,11 @@ extern void
 
 extern int
  _SQL_sym_chart(PDBfile *fp),
- _SQL_read(PDBfile *fp, char *name, long ni, dimind *dim, void *vr);
+ _SQL_read(PDBfile *fp, const char *name,
+	   long ni, dimind *dim, void *vr);
 
 extern syment
- *_SQL_write(PDBfile *file, char *tab, int ni, void *vr);
+ *_SQL_write(PDBfile *file, const char *tab, int ni, void *vr);
 
 #endif
 

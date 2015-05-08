@@ -110,7 +110,7 @@ typedef int64_t inti;
 /* intb to be used for quantities that are bytes per item long */
 typedef int32_t intb;
 
-typedef int (*PFBinType)(char *type);
+typedef int (*PFBinType)(const char *type);
 typedef PDBfile *(*PFBinCreate)(tr_layer *tr, SC_udl *pu,
 				const char *name, const char *mode, void *a);
 typedef PDBfile *(*PFBinOpen)(tr_layer *tr, SC_udl *pu,
@@ -609,13 +609,13 @@ extern int
 /* PDSHAR.C declarations */
 
 extern int
- _PD_register(char *type, const char *fmt, PFBinType hook,
+ _PD_register(const char *type, const char *fmt, PFBinType hook,
 	      PFBinCreate creat, PFBinOpen open, PFBinClose close,
 	      PFBinWrite write, PFBinRead read),
- _PD_pdbfilep(char *type);
+ _PD_pdbfilep(const char *type);
 
 extern tr_layer
- *_PD_lookup(char *type),
+ *_PD_lookup(const char *type),
  *_PD_lookup_fmt(const char *fmt),
  *_PD_lookup_fn(const char *fn);
 
@@ -632,9 +632,9 @@ extern inti
 
 extern int
  _PD_close_bin(PDBfile *file),
- _PD_spokep(char *type);
+ _PD_spokep(const char *type);
 
-extern char
+extern const char
  *_PD_file_type(PDBfile *file);
 
 

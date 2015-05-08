@@ -75,7 +75,7 @@ static vld_header *LLF_parse_vld(PDBfile *file, fdir_header filehdr,
 
 /* _LLF_FILEP - return TRUE iff TYPE is an LLF file */
 
-static int _LLF_filep(char *type)
+static int _LLF_filep(const char *type)
    {int rv;
 
     rv = (strcmp(type, LLFILE_S) == 0);
@@ -116,7 +116,8 @@ static int _LLF_close(PDBfile *file)
 
 /* _LLF_OPEN - open an existing LLFile */
 
-static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
+static PDBfile *_LLF_open(tr_layer *tr, SC_udl *pu,
+			  const char *name, const char *mode)
    {int i;
     size_t ni;
     unsigned char signature[5] = "link";

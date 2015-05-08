@@ -18,7 +18,7 @@ char
 
 /* _XML_FILEP - return TRUE iff TYPE is XML file */
 
-static int _XML_filep(char *type)
+static int _XML_filep(const char *type)
    {int rv;
 
     rv = (strcmp(type, XML_S) == 0);
@@ -59,7 +59,8 @@ static int _XML_close(PDBfile *file)
 
 /* _XML_OPEN - open an existing XML File */
 
-static PDBfile *_XML_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
+static PDBfile *_XML_open(tr_layer *tr, SC_udl *pu,
+			  const char *name, const char *mode)
    {char str[MAXLINE];
     FILE *fp;
     PDBfile *file;

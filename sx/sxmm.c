@@ -96,7 +96,8 @@ object *_SX_mk_gpdbdata(SS_psides *si, const char *name,
 /* _SX_WR_GFILE - print a SX_file */
 
 static void _SX_wr_gfile(SS_psides *si, object *obj, object *strm)
-   {char *tya, *tyw, *nm;
+   {char *tyw, *nm;
+    const char *tya;
     PDBfile *file;
     SX_file *po;
 

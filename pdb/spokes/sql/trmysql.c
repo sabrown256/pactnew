@@ -257,7 +257,7 @@ FILE *_MYSQL_file(sql_file *fs)
 
 /* _MYSQL_OPEN - open an Mysql database */
 
-FILE *_MYSQL_open(PDBfile *file, char *name, char *mode)
+FILE *_MYSQL_open(PDBfile *file, const char *name, const char *mode)
    {int st;
     char s[MAXLINE];
     char *hst, *usr, *pwd, *db, *p;

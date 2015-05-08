@@ -20,7 +20,7 @@ char
 
 /* _SQL_DATABASEP - return TRUE iff TYPE is SQL database */
 
-static int _SQL_databasep(char *type)
+static int _SQL_databasep(const char *type)
    {int rv;
 
     rv = (strcmp(type, SQL_DATABASE_S) == 0);
@@ -75,7 +75,8 @@ static int _SQL_close(PDBfile *file)
 
 /* _SQL_CREATE - create an existing SQL File */
 
-static PDBfile *_SQL_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
+static PDBfile *_SQL_create(tr_layer *tr, SC_udl *pu,
+			    const char *name, void *a)
    {char *lname;
     PDBfile *file;
     FILE *fp;
@@ -125,7 +126,8 @@ static PDBfile *_SQL_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
 
 /* _SQL_OPEN - open an existing SQL File */
 
-static PDBfile *_SQL_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
+static PDBfile *_SQL_open(tr_layer *tr, SC_udl *pu,
+			  const char *name, const char *mode)
    {unsigned char str[MAXLINE];
     char id[MAXLINE];
     char *lname;
@@ -193,7 +195,8 @@ static PDBfile *_SQL_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 /* _SQL_READ_ENTRY - read entry method for SQL spoke */
 
-int _SQL_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr)
+int _SQL_read_entry(PDBfile *fp, const char *path,
+		    const char *ty, syment *ep, void *vr)
    {int rv;
     long bs, be, bd, doff, ni;
     char s[MAXLINE];
@@ -240,7 +243,8 @@ int _SQL_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr)
 
 /* _SQL_WRITE_ENTRY - write entry method for SQL spoke */
 
-syment *_SQL_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
+syment *_SQL_write_entry(PDBfile *fp, const char *path,
+			 const char *inty, const char *outty,
 			 void *vr, dimdes *dims)
    {long ni;
     syment *ep;

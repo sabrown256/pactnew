@@ -23,7 +23,7 @@ extern int
  *              - return the index of the new tr_layer
  */
 
-int _PD_register(char *type, const char *fmt, PFBinType hook,
+int _PD_register(const char *type, const char *fmt, PFBinType hook,
 		 PFBinCreate crt, PFBinOpen opn, PFBinClose cls,
 		 PFBinWrite wrt, PFBinRead rd)
    {int n;
@@ -57,7 +57,7 @@ int _PD_register(char *type, const char *fmt, PFBinType hook,
 
 /* _PD_LOOKUP - lookup and return a translation layer named by TYPE */
 
-tr_layer *_PD_lookup(char *type)
+tr_layer *_PD_lookup(const char *type)
    {int i, n;
     tr_layer *tr, *ptr;
 		 
@@ -205,8 +205,8 @@ inti PD_read_bin(PDBfile *file)
 
 /* _PD_FILE_TYPE - return a string containing the file type name */
 
-char *_PD_file_type(PDBfile *file)
-   {char *ty;
+const char *_PD_file_type(PDBfile *file)
+   {const char *ty;
 
     ty = (file == NULL) ? NULL : file->tr->type;
 
@@ -217,7 +217,7 @@ char *_PD_file_type(PDBfile *file)
 
 /* _PD_SPOKEP - return TRUE iff the named spoke is present */
 
-int _PD_spokep(char *type)
+int _PD_spokep(const char *type)
    {int rv;
 
     rv = (_PD_lookup(type) != NULL);
@@ -229,7 +229,7 @@ int _PD_spokep(char *type)
 
 /* _PD_PDBFILEP - return TRUE iff TYPE is PDBfile */
 
-int _PD_pdbfilep(char *type)
+int _PD_pdbfilep(const char *type)
    {int rv;
 
     rv = (strcmp(type, G_PDBFILE_S) == 0);
@@ -300,8 +300,8 @@ static PDBfile *_PD_open_bin_aux(SC_udl *pu, const char *name,
 
 PDBfile *_PD_open_bin(const char *name, const char *mode, void *a)
    {int i, n, ok;
-    char *md, *type, *rfmt;
-    const char *tfmt;
+    char *md, *rfmt;
+    const char *tfmt, *type;
     SC_udl *pu;
     tr_layer *tr;
     PDBfile *file;

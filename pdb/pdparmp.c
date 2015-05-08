@@ -412,10 +412,12 @@ static u_int64_t _PD_mpread(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
 /* _PD_MPWRITE - do an fwrite on the parallel file */
 
-static u_int64_t _PD_mpwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
+static u_int64_t _PD_mpwrite(const void *s, size_t nbi,
+			     u_int64_t ni, FILE *stream)
    {int nwritten, fstatus;
     long nbw;
     size_t fail;
+    void *d;
     PD_Pfile *pf;
     MPI_Offset offs;
     MPI_File *fh;
@@ -438,7 +440,8 @@ static u_int64_t _PD_mpwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
             fh   = (MPI_File *) pf->stream;
             offs = DISK(tid, pf);
-            MPI_File_write_at(*fh, offs, s, nbi*ni, MPI_BYTE, &status);
+	    d    = (void *) s;
+            MPI_File_write_at(*fh, offs, d, nbi*ni, MPI_BYTE, &status);
             MPI_Get_count(&status, MPI_BYTE, &nwritten);
             nbw = ni;
 
@@ -469,10 +472,12 @@ static u_int64_t _PD_mpwrite(void *s, size_t nbi, u_int64_t ni, FILE *stream)
  *              - this used the collective MPI-IO call
  */
 
-static u_int64_t _PD_mpwritec(void *s, size_t nbi, u_int64_t ni, FILE *stream)
+static u_int64_t _PD_mpwritec(const void *s, size_t nbi,
+			      u_int64_t ni, FILE *stream)
    {int nwritten, fstatus;
     long nbw;
     size_t fail;
+    void *d;
     PD_Pfile *pf;
     MPI_Offset offs;
     MPI_File *fh;
@@ -495,8 +500,9 @@ static u_int64_t _PD_mpwritec(void *s, size_t nbi, u_int64_t ni, FILE *stream)
 
             fh   = (MPI_File *) pf->stream;
             offs = DISK(tid, pf);
+	    d    = (void *) s;
             MPI_File_seek(*fh, offs, MPI_SEEK_SET);
-            MPI_File_write_all(*fh, s, nbi*ni, MPI_BYTE, &status);
+            MPI_File_write_all(*fh, d, nbi*ni, MPI_BYTE, &status);
             MPI_Get_count(&status, MPI_BYTE, &nwritten);
             nbw = ni;
 
@@ -739,8 +745,9 @@ static int _PD_mpungetc(int c, FILE *stream)
  *            - the standard PFfopen signature
  */
 
-static FILE *_PD_mpopen(char *name, char *mode)
+static FILE *_PD_mpopen(const char *name, const char *mode)
    {int i, mpi_mode, err;
+    char *nm;
     PD_Pfile *pf;
     PD_smp_state *pa;
     SC_address *fa;
@@ -792,9 +799,10 @@ static FILE *_PD_mpopen(char *name, char *mode)
  * handler rather than returning.  Need to provide our version.
  */
             fh  = CMAKE(MPI_File);
-            err = MPI_File_open(mcomm, name, mpi_mode, MPI_INFO_NULL, fh);
+	    nm  = (char *) name;
+            err = MPI_File_open(mcomm, nm, mpi_mode, MPI_INFO_NULL, fh);
             if (err != 0)
-               {CFREE(fh);};
+               CFREE(fh);
     
             file_comm = (SC_communicator) mcomm;}
 

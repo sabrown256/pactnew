@@ -487,9 +487,9 @@ struct s_data_standard
     PDBfile *file;};
 
 struct s_tr_layer
-   {char *type;                       /* file type - e.g. PDBfile*/
+   {const char *type;                 /* file type - e.g. PDBfile*/
     const char *fmt;                  /* format name - e.g. pdb */
-    int (*gettype)(char *type);
+    int (*gettype)(const char *type);
     PDBfile *(*create)(tr_layer *tr, SC_udl *pu,
                        const char *name, const char *mode, void *a);
     PDBfile *(*open)(tr_layer *tr, SC_udl *pu,

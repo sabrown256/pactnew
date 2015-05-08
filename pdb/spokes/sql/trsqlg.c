@@ -179,7 +179,7 @@ memdes *_SQL_mk_descriptor(PDBfile *file, char *member, int defoff)
 
 /* _SQL_WR_DEFSTR - make the defstr from TYPE for FILE */
 
-static int _SQL_wr_defstr(PDBfile *file, char *type)
+static int _SQL_wr_defstr(PDBfile *file, const char *type)
    {int ok, rv, id;
     char mbr[MAXLINE], qu[MAX_BFSZ];
     memdes *desc;
@@ -258,7 +258,7 @@ static int _SQL_wr_defstr(PDBfile *file, char *type)
 
 /* _SQL_RD_DEFSTR - make the defstr from TYPE for FILE */
 
-static defstr *_SQL_rd_defstr(PDBfile *file, char *type)
+static defstr *_SQL_rd_defstr(PDBfile *file, const char *type)
    {int doffs;
     char *s;
     char **sa, **ml, *ptype;
@@ -332,7 +332,7 @@ static defstr *_SQL_rd_defstr(PDBfile *file, char *type)
 
 /* _SQL_MK_ENTRY - make the entry from NAME for FP */
 
-static void _SQL_mk_entry(PDBfile *file, char *name, defstr *dp)
+static void _SQL_mk_entry(PDBfile *file, const char *name, defstr *dp)
    {long ni;
     syment *ep;
     dimdes *dm;
@@ -393,7 +393,7 @@ int _SQL_sym_chart(PDBfile *file)
 
 /* _SQL_READ - read an entry */
 
-int _SQL_read(PDBfile *file, char *name, long ni, dimind *dim, void *vr)
+int _SQL_read(PDBfile *file, const char *name, long ni, dimind *dim, void *vr)
    {int rv;
     long i, ne, start, stop, step;
     char qu[MAXLINE];
@@ -446,7 +446,8 @@ int _SQL_read(PDBfile *file, char *name, long ni, dimind *dim, void *vr)
 
 /* _SQL_WR_ENTRY - write an entry */
 
-static syment *_SQL_wr_entry(PDBfile *file, char *tab, int ni, void *vr)
+static syment *_SQL_wr_entry(PDBfile *file, const char *tab,
+			     int ni, void *vr)
    {int ok;
     char bf[MAX_BFSZ], qu[MAX_BFSZ];
     char *out, *in;
@@ -488,7 +489,7 @@ static syment *_SQL_wr_entry(PDBfile *file, char *tab, int ni, void *vr)
 
 /* _SQL_WRITE - write an entry */
 
-syment *_SQL_write(PDBfile *file, char *tab, int ni, void *vr)
+syment *_SQL_write(PDBfile *file, const char *tab, int ni, void *vr)
    {int ok;
     syment *ep;
 

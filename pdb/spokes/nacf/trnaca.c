@@ -444,7 +444,7 @@ static void _NAC_build_name_table(PDBfile *file, char *names,
 
 /* _NAC_FILEP - return TRUE iff TYPE is NAC file */
 
-static int _NAC_filep(char *type)
+static int _NAC_filep(const char *type)
    {int rv;
 
     rv = (strcmp(type, NACFILE_S) == 0);
@@ -485,7 +485,8 @@ static int _NAC_close(PDBfile *file)
 
 /* _NAC_OPEN - open an existing NAC File */
 
-static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
+static PDBfile *_NAC_open(tr_layer *tr, SC_udl *pu,
+			  const char *name, const char *mode)
    {int nr, numdir, numatt, numdim;
     long tptlen, tptaddr, dftaddr, dftlen, ntaddr, ntlen;
     long dtaddr, dtlen, aftaddr, aftlen, ataddr, atlen;

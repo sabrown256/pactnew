@@ -168,7 +168,8 @@ static char *_XML_read_next(parse_state *st)
 
 /* _XML_ENTRY_UNIQ - add NAME to PATH making a unique path name */
 
-static char *_XML_entry_uniq(parse_state *st, char *path, char *name, int lev)
+static char *_XML_entry_uniq(parse_state *st, char *path,
+			     const char *name, int lev)
    {int nr, ok;
     long i;
     char s[MAXLINE];
@@ -290,7 +291,7 @@ static void _XML_entry_info(char *s, char **ptype, long *pni)
 
 /* _XML_PUSH_VALUE - push a value into the parse state */
 
-static void _XML_push_value(parse_state *st, char *t, int ts, int te)
+static void _XML_push_value(parse_state *st, const char *t, int ts, int te)
    {int nc;
     char *s;
 
@@ -311,7 +312,7 @@ static void _XML_push_value(parse_state *st, char *t, int ts, int te)
  *              - and complete the processing of the element
  */
 
-static void _XML_end_tag(parse_state *st, char *t)
+static void _XML_end_tag(parse_state *st, const char *t)
    {int nb;
     long ni, addr;
     char s[MAXLINE];
@@ -361,7 +362,7 @@ static void _XML_end_tag(parse_state *st, char *t)
  *                - and begin the processing of an element
  */
 
-static void _XML_start_tag(parse_state *st, char *t)
+static void _XML_start_tag(parse_state *st, const char *t)
    {char s[MAXLINE];
     char *p, *u;
 
@@ -444,7 +445,7 @@ static void _XML_fix_entries(PDBfile *file)
 
 /* _XML_PARSE_XML - parse an XML file */
 
-PDBfile *_XML_parse_xml(SC_udl *pu, char *mode)
+PDBfile *_XML_parse_xml(SC_udl *pu, const char *mode)
    {PDBfile *file;
 
     file = _PD_mk_pdb(pu, NULL, NULL, TRUE, NULL, NULL);

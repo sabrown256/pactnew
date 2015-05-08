@@ -15,7 +15,7 @@ include no-opengl
 Group TEST {
    ADVISORY = ${TEST_ADVISORY}:score_mpi:score_mk_async
    ADVISORY = ${TEST_ADVISORY}:pml_perf
-   ADVISORY = ${TEST_ADVISORY}:ppc_pty_interrupt
+   ADVISORY = ${TEST_ADVISORY}:pdb_pty_interrupt
    ADVISORY = ${TEST_ADVISORY}:sx_hdf
 }
 

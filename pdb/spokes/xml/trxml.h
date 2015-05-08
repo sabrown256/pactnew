@@ -65,7 +65,7 @@ extern void
 /* TRXMLP.C declarations */
 
 extern PDBfile
- *_XML_parse_xml(SC_udl *pu, char *mode);
+ *_XML_parse_xml(SC_udl *pu, const char *mode);
 
 
 /* TRXMLXSD.C declarations */

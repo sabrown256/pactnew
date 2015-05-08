@@ -70,9 +70,9 @@ static char
  *_H5_dec_compound(PDBfile *file, hid_t htyp);
 
 static int64_t
- _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr),
- _H5_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
-	       char *intype, char *outtype);
+ _H5_rd_syment(PDBfile *file, syment *ep, const char *outtype, void *vr),
+ _H5_wr_syment(PDBfile *file, const char *name, char *vr, int64_t ni,
+	       const char *intype, const char *outtype);
 
 static sys_layer
  _H5_sys = {_H5_rd_syment, _H5_wr_syment};
@@ -153,7 +153,7 @@ static char *_H5_is_registered(PDBfile *file, hid_t dtid)
  *              - TYPE null-terminated string naming the type
  */
 
-static void _H5_register(PDBfile *file, hid_t hfp, char *type)
+static void _H5_register(PDBfile *file, hid_t hfp, const char *type)
    {int i;
     char *verdict, *mname;
     compound_desc *iter, *prev;
@@ -213,7 +213,7 @@ static void _H5_register(PDBfile *file, hid_t hfp, char *type)
 
 /* _H5_GET_ALIGNMENT - return the alignment for type TYPE */
 
-static int _H5_get_alignment(PDBfile *file, char *type)
+static int _H5_get_alignment(PDBfile *file, const char *type)
    {int id, result;
     static int algn[N_PRIMITIVES] = { 0, 0, 0, 0,
                                       2, 4, 4, 4,  /* fixed point types (ok) */
@@ -240,7 +240,7 @@ static int _H5_get_alignment(PDBfile *file, char *type)
  *              - PTYP name of type
  */
 
-static hid_t _H5_enc_type(PDBfile *file, char *ptyp)
+static hid_t _H5_enc_type(PDBfile *file, const char *ptyp)
    {int tid;
     intb nb;
     hid_t htyp;
@@ -431,7 +431,7 @@ static hsize_t *_H5_enc_dims(PDBfile *file, int *pnd,
  *                - return TRUE iff successful
  */
 
-int _H5_write_data(hid_t fid, char *fullpath,
+int _H5_write_data(hid_t fid, const char *fullpath,
 		   int nd, hsize_t *dims,
 		   hid_t htyp, void *vr)
    {int rv, st;
@@ -466,7 +466,8 @@ int _H5_write_data(hid_t fid, char *fullpath,
 
 /* _H5_WRITE_ENTRY - write entry method for HDF5 spoke */
 
-syment *_H5_write_entry(PDBfile *fp, char *path, char *inty, char *outty,
+syment *_H5_write_entry(PDBfile *fp, const char *path,
+			const char *inty, const char *outty,
 			void *vr, dimdes *pdims)
    {int rv, nd, ptr;
     inti ni;
@@ -1421,7 +1422,7 @@ static herr_t H5_read_group_node(hid_t hgr, const char *mname, void *a)
 
 /* _H5_FILEP - return TRUE iff TYPE is an HDF5 file */
 
-static int _H5_filep(char *type)
+static int _H5_filep(const char *type)
    {int rv;
 
     rv = (strcmp(type, H5FILE_S) == 0);
@@ -1465,7 +1466,8 @@ static int _H5_close(PDBfile *file)
  *            - NAME the absolute pathname of the HDF5 file to create
  */
 
-static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
+static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu,
+			   const char *name, void *a)
    {int mode, status;
     char lname[MAXLINE];
     char *pname;
@@ -1580,7 +1582,8 @@ static PDBfile *_H5_create(tr_layer *tr, SC_udl *pu, char *name, void *a)
  *          - NAME the absolute pathname of the HDF5 file to open
  */
 
-static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
+static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu,
+			 const char *name, const char *mode)
    {int status;
     hid_t hdf_root_group;
     syment *ep;
@@ -1693,7 +1696,7 @@ static PDBfile *_H5_open(tr_layer *tr, SC_udl *pu, char *name, char *mode)
 
 /* _H5_RD_SYMENT - read syment method for HDF5 spoke */
 
-int64_t _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
+int64_t _H5_rd_syment(PDBfile *file, syment *ep, const char *outtype, void *vr)
    {int64_t rv;
 
     rv = _PD_rd_syment(file, ep, outtype, vr);
@@ -1705,8 +1708,8 @@ int64_t _H5_rd_syment(PDBfile *file, syment *ep, char *outtype, void *vr)
 
 /* _H5_WR_SYMENT - read syment method for HDF5 spoke */
 
-int64_t _H5_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
-		      char *intype, char *outtype)
+int64_t _H5_wr_syment(PDBfile *file, const char *name, char *vr, int64_t ni,
+		      const char *intype, const char *outtype)
    {int64_t rv;
 
     rv = _PD_wr_syment(file, name, vr, ni, intype, outtype);
@@ -1718,7 +1721,8 @@ int64_t _H5_wr_syment(PDBfile *file, char *name, char *vr, int64_t ni,
 
 /* _H5_READ_ENTRY - read entry method for HDF5 spoke */
 
-int _H5_read_entry(PDBfile *fp, char *path, char *ty, syment *ep, void *vr)
+int _H5_read_entry(PDBfile *fp, const char *path, const char *ty,
+		   syment *ep, void *vr)
    {int rv;
 
     rv = _PD_hyper_read(fp, path, ty, ep, vr);

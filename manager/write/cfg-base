@@ -287,7 +287,7 @@ endif
               set ladv = ""
               set ladv = ${ladv}:score_mpi:score_mk_async
               set ladv = ${ladv}:pml_perf
-              set ladv = ${ladv}:ppc_pty_interrupt
+              set ladv = ${ladv}:pdb_pty_interrupt
               set ladv = ${ladv}:sx_hdf
               echo "Group TEST {" >>& $pf
               echo "   ADVISORY = "'${TEST_ADVISORY}'"$ladv" >>& $pf
