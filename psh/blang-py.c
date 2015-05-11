@@ -64,7 +64,7 @@ static void python_type_name_list(tnp_list *na, tn_list *nc)
 
 /* PYTHON_PARSE_MEMBER - parse out MBR for python */
 
-static int python_parse_member(mbrdes *md, char *mbr,
+static int python_parse_member(mbrdes *md, const char *mbr,
 			       char *bty, char *aty, int nc)
    {int nind, nb, np;
     char *pb;
@@ -106,7 +106,7 @@ static int python_parse_member(mbrdes *md, char *mbr,
  *                       - types that have bindings
  */
 
-void python_add_bound_type(char *ty)
+void python_add_bound_type(const char *ty)
    {
 
     _py_bound_types = lst_push(_py_bound_types, ty);
@@ -120,7 +120,7 @@ void python_add_bound_type(char *ty)
  *                          - is a type that has bindings
  */
 
-int python_lookup_bound_type(char *mty)
+int python_lookup_bound_type(const char *mty)
    {int i, nc, ok;
     char *t;
 
@@ -137,7 +137,7 @@ int python_lookup_bound_type(char *mty)
 
 /* PY_FORMAT - convert <itype>, <var> pairs to Python parse format string */
 
-static void py_format(char *fmt, int nc, char *spec, char *name)
+static void py_format(char *fmt, int nc, const char *spec, const char *name)
    {int i;
     char t[BFLRG];
     char *ty, *pf, **ta;
@@ -196,7 +196,7 @@ static void py_format(char *fmt, int nc, char *spec, char *name)
 
 /* PY_ARG - convert <itype>, <var> pairs to Python call arg list string */
 
-static void py_arg(char *arg, int nc, char *spec)
+static void py_arg(char *arg, int nc, const char *spec)
    {int i, n;
     char t[BFLRG];
     char **ta;
@@ -222,8 +222,8 @@ static void py_arg(char *arg, int nc, char *spec)
 
 /* PYTHON_ENUM_DEFS - write the Python interface C enums TAG */
 
-static void python_enum_defs(bindes *bd, char *tag, der_list *el,
-			     int ie, int ni)
+static void python_enum_defs(bindes *bd, const char *tag,
+			     der_list *el, int ie, int ni)
    {char *pck;
     FILE *fc, **fpa;
     statedes *st;
@@ -331,8 +331,9 @@ static void python_hdr_struct_def(bindes *bd, der_list *sl)
  *                          - which cannot map between C and python
  */
 
-static void python_unmappable_member(FILE *fc, char *pm, char *mty, int fl,
-				     char *msg)
+static void python_unmappable_member(FILE *fc, const char *pm,
+				     const char *mty, int fl,
+				     const char *msg)
    {
 
 /* for get methods */
@@ -357,7 +358,8 @@ static void python_unmappable_member(FILE *fc, char *pm, char *mty, int fl,
  *                       - and 2 for set action
  */
 
-static void python_unknown_member(FILE *fc, char *pm, char *mty, int fl)
+static void python_unknown_member(FILE *fc, const char *pm,
+				  const char *mty, int fl)
    {
 
 /* for get methods */
@@ -698,8 +700,8 @@ static void python_c_struct_def(bindes *bd, der_list *sl)
 
 /* PYTHON_STRUCT_DEFS - write the Python interface C structs TAG */
 
-static void python_struct_defs(bindes *bd, char *tag, der_list *sl,
-			       int is, int ni)
+static void python_struct_defs(bindes *bd, const char *tag,
+			       der_list *sl, int is, int ni)
    {
 
     if (sl == NULL)
@@ -719,8 +721,8 @@ static void python_struct_defs(bindes *bd, char *tag, der_list *sl,
 
 /* PYTHON_OBJECT_DEFS - define local version of struct definitions */
 
-static void python_object_defs(bindes *bd, char *tag, der_list *sl,
-			       int is, int ni)
+static void python_object_defs(bindes *bd, const char *tag,
+			       der_list *sl, int is, int ni)
    {char *pck;
     FILE *fc, **fpa;
     tnp_list tl;
@@ -953,7 +955,7 @@ static void python_class_self(FILE *fc, fdecl *dcl)
 
 /* PYTHON_WRAP_LOCAL_DECL - local variable declarations */
 
-static void python_wrap_local_decl(FILE *fc, fdecl *dcl, char *kw)
+static void python_wrap_local_decl(FILE *fc, fdecl *dcl, const char *kw)
    {int i, na, voida, voidf;
     char t[BFLRG];
     char *rty;
@@ -1022,7 +1024,8 @@ static void python_wrap_local_assn_arg(char *a, int nc, farg *al)
 
 /* PYTHON_WRAP_LOCAL_ASSN - local variable assignments */
 
-static void python_wrap_local_assn(FILE *fc, fdecl *dcl, char *pfn, char *kw)
+static void python_wrap_local_assn(FILE *fc, fdecl *dcl,
+				   const char *pfn, const char *kw)
    {int i, na, voida;
     char a[BFLRG], dcn[BFLRG], fmt[BFLRG], arg[BFLRG];
     char *cfn;
@@ -1174,7 +1177,7 @@ static void python_wrap_local_return(FILE *fc, fdecl *dcl)
 /* PYTHON_METHOD_DEF - method definition wrapper */
 
 static void python_method_def(char *dfn, int nc, fdecl *dcl,
-			      char *pfn, int def)
+			      const char *pfn, int def)
    {int n, voida;
     char a[BFLRG], s[BFLRG], t[BFLRG];
     char fn[BFLRG];
@@ -1231,7 +1234,7 @@ static void python_method_def(char *dfn, int nc, fdecl *dcl,
  *             - using name PFN
  */
 
-static void python_wrap(FILE *fc, fdecl *dcl, char *pfn)
+static void python_wrap(FILE *fc, fdecl *dcl, const char *pfn)
    {char upn[BFLRG], kw[BFLRG];
     static int count = 0;
 
@@ -1472,7 +1475,7 @@ static void fin_python(bindes *bd)
  *                  - Python callable C wrapper
  */
 
-static void doc_proto_python(char *a, int nc, char *dcn, fdecl *dcl)
+static void doc_proto_python(char *a, int nc, const char *dcn, fdecl *dcl)
    {char t[BFLRG];
     farg *alc;
 

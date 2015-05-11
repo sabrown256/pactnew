@@ -85,8 +85,8 @@ static int cl_c(statedes *st, bindes *bd, int c, char **v)
 
 /* C_EMIT_TYPES_DEF - emit type related definitions into source file */
 
-static void c_emit_types_def(FILE *fc, der_list *sl, char *pck,
-			     int ni, int fl)
+static void c_emit_types_def(FILE *fc, der_list *sl,
+			     const char *pck, int ni, int fl)
    {
 
     if (fl == TRUE)
@@ -103,8 +103,8 @@ static void c_emit_types_def(FILE *fc, der_list *sl, char *pck,
 
 /* C_EMIT_TYPES_HDR - emit type related declarations and macros */
 
-static void c_emit_types_hdr(FILE *fh, der_list *sl, char *pck,
-			     int ni, int fl)
+static void c_emit_types_hdr(FILE *fh, der_list *sl,
+			     const char *pck, int ni, int fl)
    {int i, nc;
     char a[BFLRG];
     char *mbr, *p;
@@ -170,7 +170,8 @@ static void c_emit_types_hdr(FILE *fh, der_list *sl, char *pck,
 
 /* C_ENUM_DEFS - generate coding to define enums to PDBLib */
 
-static void c_enum_defs(bindes *bd, char *tag, der_list *el, int ie, int ni)
+static void c_enum_defs(bindes *bd, const char *tag,
+			der_list *el, int ie, int ni)
    {FILE *fh, **fpa;
     tn_list tl;
 
@@ -200,7 +201,8 @@ static void c_enum_defs(bindes *bd, char *tag, der_list *el, int ie, int ni)
  *               - and PDBLib PD_defstr call
  */
 
-static void c_object_defs(bindes *bd, char *tag, der_list *sl, int is, int ni)
+static void c_object_defs(bindes *bd, const char *tag,
+			  der_list *sl, int is, int ni)
    {char *pck;
     FILE *fc, *fh, **fpa;
 
@@ -228,7 +230,8 @@ static void c_object_defs(bindes *bd, char *tag, der_list *sl, int is, int ni)
 
 /* C_TYPE_REG - generate coding to register C types with SCORE type manager */
 
-static void c_type_reg(bindes *bd, char *tag, der_list *sl, int is, int ni)
+static void c_type_reg(bindes *bd, const char *tag,
+		       der_list *sl, int is, int ni)
    {FILE *fc, **fpa;
     tn_list *tl;
 

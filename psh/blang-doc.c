@@ -42,7 +42,7 @@ static void init_doc(statedes *st, bindes *bd)
  *                     - variable names only
  */
 
-void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm)
+void doc_proto_name_only(char *a, int nc, fdecl *dcl, const char *dlm)
    {int i, na;
     farg *al;
 
@@ -70,7 +70,7 @@ void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm)
  *              - documents CFN
  */
 
-static char **find_comment(char *cfn, int ndc, char **cdc)
+static char **find_comment(const char *cfn, int ndc, char **cdc)
    {int i;
     char *s, **com;
 
@@ -114,7 +114,8 @@ static void process_doc(char *t, int nc, char **com)
 
 /* HTML_WRAP - wrap C function DCL in HTML form */
 
-static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
+static void html_wrap(FILE *fp, fdecl *dcl, const char *sb, int ndc,
+		      char **cdc)
    {int ib;
     char upn[BFLRG], lfn[BFLRG];
     char fty[BFLRG], t[BFLRG];
@@ -167,7 +168,7 @@ static void html_wrap(FILE *fp, fdecl *dcl, char *sb, int ndc, char **cdc)
 /* MAN_WRAP - wrap C function DCL in MAN form */
 
 static void man_wrap(statedes *st, fdecl *dcl,
-		     char *sb, char *pck, int ndc, char **cdc)
+		     const char *sb, const char *pck, int ndc, char **cdc)
    {int ib, voidf;
     char fname[BFLRG], upk[BFLRG];
     char upn[BFLRG], lfn[BFLRG];

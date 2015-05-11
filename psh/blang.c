@@ -128,7 +128,7 @@ struct s_statedes
     int ndst;                        /* number of structs from hdrs */
     int ndun;                        /* number of unions from hdrs */
     int no[N_MODES];                 /* no generate flags */
-    char *pck;                       /* name of package */
+    const char *pck;                 /* name of package */
     char **sbi;
     char **cdc;
     char **cdv;
@@ -178,7 +178,7 @@ extern int
 
 /* BERR - report error for blang */
 
-static void berr(char *fmt, ...)
+static void berr(const char *fmt, ...)
    {char s[BFLRG];
     static int first = TRUE;
 
@@ -199,9 +199,10 @@ static void berr(char *fmt, ...)
 
 /* TYPE_NAME_LIST - make canonical variations of type name TYP */
 
-static void type_name_list(char *typ, tn_list *na)
+static void type_name_list(const char *typ, tn_list *na)
    {int nc;
-    char *p, *pat;
+    char *pat;
+    const char *p;
 
     pat = "struct s_";
     nc  = strlen(pat);
@@ -277,7 +278,7 @@ char *working_type(char *td, int nd, const char *ts, int *pic)
  *              - return the number of indirections of TY
  */
 
-int parse_member(mbrdes *md, char *mbr)
+int parse_member(mbrdes *md, const char *mbr)
    {int im, ns, hd;
     char s[BFLRG], ind[BFSML];
     char **sa, *pn, *pt, *ps;
@@ -387,7 +388,8 @@ void free_parse_struct(mbrdes *md)
 
 /* DERIVED_ENTRY - fill der_list entry DE from S */
 
-static void derived_entry(der_list *de, char *s, char *dlm, type_kind kind)
+static void derived_entry(der_list *de, const char *s, const char *dlm,
+			  type_kind kind)
    {char t[BFVLG];
     char **sa;
 
@@ -443,7 +445,7 @@ static der_list *push_derived(der_list *lst, int *pnl, der_list *de)
 
 /* IS_FIXED_POINT - return TRUE if T is a fixed point type */
 
-pboolean is_fixed_point(char *t)
+pboolean is_fixed_point(const char *t)
    {pboolean rv;
 
     rv =  ((strcmp(t, "short") == 0)     ||
@@ -462,7 +464,7 @@ pboolean is_fixed_point(char *t)
 
 /* IS_REAL - return TRUE if T is a real floating point type */
 
-pboolean is_real(char *t)
+pboolean is_real(const char *t)
    {pboolean rv;
 
     rv = ((strcmp(t, "float") == 0) ||
@@ -476,7 +478,7 @@ pboolean is_real(char *t)
 
 /* IS_COMPLEX - return TRUE if T is a complex floating point type */
 
-pboolean is_complex(char *t)
+pboolean is_complex(const char *t)
    {pboolean rv;
 
     rv = ((strcmp(t, "float _Complex") == 0) ||
@@ -490,7 +492,7 @@ pboolean is_complex(char *t)
 
 /* IS_BOOL - return TRUE if T is a boolean type */
 
-pboolean is_bool(char *t)
+pboolean is_bool(const char *t)
    {pboolean rv;
 
     rv = (strcmp(t, "bool") == 0);
@@ -502,7 +504,7 @@ pboolean is_bool(char *t)
 
 /* IS_CHAR - return TRUE if T is a char type */
 
-pboolean is_char(char *t)
+pboolean is_char(const char *t)
    {pboolean rv;
 
     rv = (strcmp(t, "char") == 0);
@@ -514,7 +516,7 @@ pboolean is_char(char *t)
 
 /* IS_STRING - return TRUE if T is a char * type */
 
-pboolean is_string(char *t)
+pboolean is_string(const char *t)
    {pboolean rv;
 
     rv = (strcmp(t, "char *") == 0);
@@ -526,7 +528,7 @@ pboolean is_string(char *t)
 
 /* IS_PTR - return TRUE if TYPE is a pointer */
 
-static pboolean is_ptr(char *type)
+static pboolean is_ptr(const char *type)
    {pboolean rv;
 
     rv = (strchr(type, '*') != NULL);
@@ -538,7 +540,7 @@ static pboolean is_ptr(char *type)
 
 /* IS_FUNC_PTR - return TRUE if TYPE is a function pointer */
 
-static pboolean is_func_ptr(char *type, int wh)
+static pboolean is_func_ptr(const char *type, int wh)
    {pboolean rv;
 
     rv  = B_F;
@@ -624,7 +626,7 @@ static void add_derived_types(int iref, char **sbi)
  *               - the space VL is NC long
  */
 
-static void get_def_value(char *lvl, int nc, char *sp, char *ty)
+static void get_def_value(char *lvl, int nc, const char *sp, const char *ty)
    {char lty[BFLRG];
     char *dv;
     type_desc *td;
@@ -687,7 +689,7 @@ static farg *get_class_arg(fdecl *dcl)
  *            - has a variable arg list
  */
 
-static int is_var_arg(char *pr)
+static int is_var_arg(const char *pr)
    {int rv;
 
     rv = (strstr(pr, "...") != NULL);
@@ -752,7 +754,8 @@ static char **split_args(char *args)
  *               - no defaults specified
  */
 
-static void id_no_default(idecl *ip, char *ty, char *lty, char *nm, char *val)
+static void id_no_default(idecl *ip, const char *ty,
+			  const char *lty, const char *nm, const char *val)
    {char lvl[BFLRG];
 
     get_def_value(lvl, BFLRG, val, ty);
@@ -772,7 +775,8 @@ static void id_no_default(idecl *ip, char *ty, char *lty, char *nm, char *val)
  *           - of output arguments
  */
 
-static void id_fd_out(idecl *ip, char *ty, char *nm, int nvl, char **vls)
+static void id_fd_out(idecl *ip, const char *ty, const char *nm,
+		      int nvl, char **vls)
    {int drf;
     char dty[BFLRG], vl[BFLRG];
 
@@ -811,8 +815,8 @@ static void id_fd_out(idecl *ip, char *ty, char *nm, int nvl, char **vls)
  *              - of input/output arguments
  */
 
-static void id_fd_in_out(idecl *ip, char *ty, char *lty,
-			 char *nm, int nvl, char **vls)
+static void id_fd_in_out(idecl *ip, const char *ty, char *lty,
+			 const char *nm, int nvl, char **vls)
    {int l;
     char dty[BFLRG], lvl[BFLRG];
 
@@ -847,8 +851,8 @@ static void id_fd_in_out(idecl *ip, char *ty, char *lty,
  *          - of input arguments
  */
 
-static void id_fd_in(idecl *ip, char *ty, char *lty,
-		     char *nm, int arr, int nvl, char **vls)
+static void id_fd_in(idecl *ip, const char *ty, char *lty,
+		     const char *nm, int arr, int nvl, char **vls)
    {int l, drf, strp, sarr;
     char dty[BFLRG], lvl[BFLRG];
 
@@ -974,7 +978,7 @@ static void process_interp_def(farg *al)
  *                    - return TRUE if successful
  */
 
-static int process_qualifiers(farg *al, char *qual)
+static int process_qualifiers(farg *al, const char *qual)
    {int rv, arr, ptr;
     char t[BFLRG];
     char *dv, *val, *dir, **lst, **ta;
@@ -1064,7 +1068,7 @@ static int process_qualifiers(farg *al, char *qual)
  *            - return TRUE iff successful
  */
 
-static int split_decl(farg *al, char *s, int isarg)
+static int split_decl(farg *al, const char *s, int isarg)
    {int nc, rv;
     char t[BFLRG];
     char *p, *pn, *pt, *qual;
@@ -1179,7 +1183,7 @@ static farg *proc_args(fdecl *dcl)
 
 /* FIND_FUNC - return true if function named in prototype PR matches F */
 
-static int find_func(char *pr, char *f)
+static int find_func(const char *pr, const char *f)
    {int rv;
     char t[BFLRG];
     char *p;
@@ -1197,7 +1201,7 @@ static int find_func(char *pr, char *f)
  *            - return it iff successful
  */
 
-static int find_proto(fdecl *dcl, char **cpr, char *f)
+static int find_proto(fdecl *dcl, char **cpr, const char *f)
    {int ip, na, nt, ok;
     char pf[BFLRG];
     char *p, *pa, *sp, *pro, *cfn;
@@ -1304,7 +1308,7 @@ static void hsep(FILE *fp)
 /* FOREACH_ENUM_DEFS - map FEMIT over all enums in BD */
 
 void foreach_enum_defs(bindes *bd,
-		       void (*femit)(bindes *bd, char *tag,
+		       void (*femit)(bindes *bd, const char *tag,
 				     der_list *el, int ie, int ni),
 		       int wh)
    {int ie, ne;
@@ -1334,7 +1338,7 @@ void foreach_enum_defs(bindes *bd,
 /* FOREACH_STRUCT_DEFS - map FEMIT over all structs in BD */
 
 void foreach_struct_defs(bindes *bd,
-			 void (*femit)(bindes *bd, char *tag,
+			 void (*femit)(bindes *bd, const char *tag,
 				       der_list *sl, int is, int ni),
 			 int wh)
    {int is, ns;
@@ -1369,7 +1373,7 @@ void foreach_struct_defs(bindes *bd,
 /* FOREACH_UNION_DEFS - map FEMIT over all unions in BD */
 
 void foreach_union_defs(bindes *bd,
-			void (*femit)(bindes *bd, char *tag,
+			void (*femit)(bindes *bd, const char *tag,
 				      der_list *ul, int iu, int ni),
 			int wh)
    {int iu, nu;
@@ -1427,8 +1431,8 @@ static void emit_local_var_init(FILE *fc, fdecl *dcl)
  *          - in which case return LF in D
  */
 
-static char *map_name(char *d, int nc, char *cf, char *lf,
-		      char *sfx, int cs, int us, pboolean cls)
+static char *map_name(char *d, int nc, const char *cf, const char *lf,
+		      const char *sfx, int cs, int us, pboolean cls)
    {int i, n, ok;
     static char *pre[] = { "SC_", "PM_", "PD_", "PG_", "PA_" };
 
@@ -1625,7 +1629,7 @@ static void find_bind(statedes *st, int iref)
 
 /* HAS_BINDING - return the LANG binding specification */
 
-static char *has_binding(fdecl *dcl, char *lang)
+static char *has_binding(fdecl *dcl, const char *lang)
    {int ib;
     char *b, *spec;
     char **bindings;
@@ -1647,12 +1651,11 @@ static char *has_binding(fdecl *dcl, char *lang)
 
 /* SETUP_BINDER - initialize the data members of BD */
 
-static void setup_binder(statedes *st, int iref, char *pck, char **sbi)
+static void setup_binder(statedes *st, int iref, const char *pck, char **sbi)
    {
 
     if (st != NULL)
        {st->pck = pck;
-
 	st->sbi = sbi;
 	st->nbi = lst_length(sbi);
 
@@ -1707,7 +1710,7 @@ static void cf_call_list(char *a, int nc, fdecl *dcl, int local)
  *              - interpreter function call
  */
 
-static void if_call_list(char *a, int nc, fdecl *dcl, char *dlm)
+static void if_call_list(char *a, int nc, fdecl *dcl, const char *dlm)
    {int i, na, voida;
     farg *al;
 
@@ -1779,7 +1782,7 @@ static void c_proto(char *pr, int nc, fdecl *dcl)
  *       - return TRUE iff successful
  */
 
-static int blang(statedes *st, char *pck, char *fbi, int iref)
+static int blang(statedes *st, const char *pck, const char *fbi, int iref)
    {int ib, rv;
     char **sbi;
     bindes *pb;

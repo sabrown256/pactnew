@@ -43,7 +43,7 @@ void map_fortran_types(void)
 
 /* FEMIT - emit lines broken apropriately for Fortran */
 
-static void femit(FILE *fp, char *t, char *trm)
+static void femit(FILE *fp, char *t, const char *trm)
    {int i, c, n, nc;
     char *pt;
 
@@ -82,7 +82,7 @@ static void femit(FILE *fp, char *t, char *trm)
 
 /* CF_TYPE - return Fortran type corresponding to C type TY */
 
-static void cf_type(char *a, int nc, char *ty)
+static void cf_type(char *a, int nc, const char *ty)
    {char *fty;
     type_desc *td;
 
@@ -300,8 +300,9 @@ static void init_fortran(statedes *st, bindes *bd)
 
 /* FORTRAN_WRAP_DECL - function declaration */
 
-static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
-			      fparam knd, char *rt, char *cfn, char *ffn)
+static void fortran_wrap_decl(FILE *fp, fdecl *dcl, fparam knd,
+			      const char *rt, const char *cfn,
+			      const char *ffn)
    {char ucn[BFLRG], dcn[BFLRG], a[BFLRG], t[BFLRG];
 
     map_name(dcn, BFLRG, cfn, ffn, "f", -1, FALSE, FALSE);
@@ -377,7 +378,7 @@ static void fortran_wrap_decl(FILE *fp, fdecl *dcl,
 /* FORTRAN_WRAP_LOCAL_DECL - local variable declarations */
 
 static void fortran_wrap_local_decl(FILE *fp, fdecl *dcl,
-				    fparam knd, char *rt)
+				    fparam knd, const char *rt)
    {int i, na, nv, voida, voidf;
     char t[BFLRG];
     char *nm, *ty;
@@ -518,7 +519,7 @@ static void fortran_wrap_local_assn(FILE *fp, fdecl *dcl)
 /* FORTRAN_WRAP_LOCAL_CALL - function call */
 
 static void fortran_wrap_local_call(FILE *fp, fdecl *dcl,
-				    fparam knd, char *rt)
+				    fparam knd, const char *rt)
    {int voidf;
     char a[BFLRG];
     char *nm;
@@ -584,10 +585,11 @@ static void fortran_wrap_local_return(FILE *fp, fdecl *dcl, fparam knd)
  *              - using name FFN
  */
 
-static void fortran_wrap(FILE *fp, fdecl *dcl, char *ffn)
+static void fortran_wrap(FILE *fp, fdecl *dcl, const char *ffn)
    {fparam knd;
     char rt[BFLRG];
-    char *cfn, *fn;
+    char *cfn;
+    const char *fn;
 
     cfn = dcl->proto.name;
 
@@ -1023,7 +1025,8 @@ static void init_module(statedes *st, bindes *bd)
 
 /* MODULE_NATIVE_F - write interface for native Fortran function */
 
-static char **module_native_f(FILE *fp, fdecl *dcl, char **sa, char *pck)
+static char **module_native_f(FILE *fp, fdecl *dcl, char **sa,
+			      const char *pck)
    {int i, voidf;
     char *oper, *p;
 
@@ -1069,7 +1072,7 @@ static char **module_native_f(FILE *fp, fdecl *dcl, char **sa, char *pck)
  *                      - external
  */
 
-static int module_pre_wrappable(char *pr)
+static int module_pre_wrappable(const char *pr)
    {int rv;
 
     rv = ((is_var_arg(pr) == FALSE) &&
@@ -1087,7 +1090,8 @@ static int module_pre_wrappable(char *pr)
  *                     - for functions that can only be declared external
  */
 
-static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
+static void module_pre_wrap_ext(FILE *fp, const char *pr, char **ta,
+				const char *pck)
    {
 
     if ((ta != NULL) && (module_pre_wrappable(pr) == FALSE))
@@ -1103,8 +1107,8 @@ static void module_pre_wrap_ext(FILE *fp, char *pr, char **ta, char *pck)
 
 /* MODULE_ENUM_DECL - write the Fortran interface C enums TAG */
 
-static void module_enum_decl(bindes *bd, char *tag, der_list *el,
-			     int ie, int ni)
+static void module_enum_decl(bindes *bd, const char *tag,
+			     der_list *el, int ie, int ni)
    {int i, nc;
     long vl;
     char s[BFLRG], x[BFLRG];
@@ -1164,8 +1168,8 @@ static void module_enum_decl(bindes *bd, char *tag, der_list *el,
 
 /* MODULE_STRUCT_DECL - write the Fortran interface C structs TAG */
 
-static void module_struct_decl(bindes *bd, char *tag, der_list *sl,
-			       int is, int ni)
+static void module_struct_decl(bindes *bd, const char *tag,
+			       der_list *sl, int is, int ni)
    {FILE *fm, **fpa;
 
     fpa = bd->fp;
@@ -1212,7 +1216,8 @@ static void module_struct_decl(bindes *bd, char *tag, der_list *sl,
  *                      - for functions that can only be fully declared
  */
 
-static void module_pre_wrap_full(FILE *fp, char *pr, char **ta, char *pck)
+static void module_pre_wrap_full(FILE *fp, const char *pr, char **ta,
+				 const char *pck)
    {int i, nt, voidf;
     char a[BFLRG], t[BFLRG];
     char *rty, *oper, *dcn;
@@ -1277,7 +1282,8 @@ static int module_itf_wrappable(fdecl *dcl)
 
 /* MODULE_ITF_WRAP_EXT - write the interface for a simple extern */
 
-static void module_itf_wrap_ext(FILE *fp, fdecl *dcl, char *pck, char *ffn)
+static void module_itf_wrap_ext(FILE *fp, fdecl *dcl,
+				const char *pck, const char *ffn)
    {char dcn[BFLRG], fty[BFLRG], cty[BFLRG];
     char *cfn, *rty;
     static int first = TRUE;
@@ -1314,7 +1320,8 @@ static void module_itf_wrap_ext(FILE *fp, fdecl *dcl, char *pck, char *ffn)
  *                      - C function CFN
  */
 
-static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
+static void module_itf_wrap_full(FILE *fp, fdecl *dcl,
+				 const char *pck, const char *ffn)
    {int i, ns, voidf;
     char dcn[BFLRG], a[BFLRG], t[BFLRG];
     char fty[BFLRG], cty[BFLRG];
@@ -1380,7 +1387,7 @@ static void module_itf_wrap_full(FILE *fp, fdecl *dcl, char *pck, char *ffn)
  *                     - C function CFN
  */
 
-static void module_interop_wrap(FILE *fp, fdecl *dcl, char *ffn)
+static void module_interop_wrap(FILE *fp, fdecl *dcl, const char *ffn)
    {int i, na, voidf, voida;
     char dcn[BFLRG], a[BFLRG];
     char fty[BFLRG], cty[BFLRG];

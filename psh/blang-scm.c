@@ -47,7 +47,7 @@ static void scheme_type_name_list(tns_list *na, tn_list *nc)
 /* LOOKUP_SCHEME_TYPE - get the Scheme type name for T into A */
 
 
-int lookup_scheme_type(char *a, int nc, char *t)
+int lookup_scheme_type(char *a, int nc, const char *t)
    {int rv;
     char *tl;
     type_desc *td;
@@ -110,7 +110,7 @@ static void cs_type(char *a, int nc, farg *al, int drf)
 
 /* SO_TYPE - return the Scheme object constructor for C type TY */
 
-static fparam so_type(char *a, int nc, char *ty)
+static fparam so_type(char *a, int nc, const char *ty)
    {fparam rv;
 
     rv = FP_SCALAR;
@@ -265,7 +265,7 @@ static void scheme_wrap_decl(FILE *fc, fdecl *dcl)
 /* SCHEME_WRAP_LOCAL_DECL - local variable declarations */
 
 static void scheme_wrap_local_decl(FILE *fc, fdecl *dcl,
-				   fparam knd, char *so)
+				   fparam knd, const char *so)
    {int i, na, nv, voida, voidf;
     char t[BFLRG];
     char *rty;
@@ -433,7 +433,7 @@ static void scheme_array_return(char *t, int nc, fdecl *dcl)
 /* SCHEME_SCALAR_RETURN - compute scalar return from DCL */
 
 static void scheme_scalar_return(char *t, int nc,
-				 fdecl *dcl, fparam knd, char *so)
+				 fdecl *dcl, fparam knd, const char *so)
    {char dty[BFLRG];
     char *ty;
     type_desc *td;
@@ -491,7 +491,7 @@ static void scheme_scalar_return(char *t, int nc,
 /* SCHEME_WRAP_LOCAL_RETURN - function return */
 
 static void scheme_wrap_local_return(FILE *fc, fdecl *dcl,
-				     fparam knd, char *so)
+				     fparam knd, const char *so)
    {char t[BFLRG];
 
     scheme_array_return(t, BFLRG, dcl);
@@ -512,7 +512,7 @@ static void scheme_wrap_local_return(FILE *fc, fdecl *dcl,
 
 /* SCHEME_ENUM_DEFS - write the SCHEME interface C enums TAG */
 
-static void scheme_enum_defs(bindes *bd, char *tag, der_list *el,
+static void scheme_enum_defs(bindes *bd, const char *tag, der_list *el,
 			     int ie, int ni)
    {char *pck;
     FILE *fc, **fpa;
@@ -569,7 +569,7 @@ static void scheme_enum_defs(bindes *bd, char *tag, der_list *el,
  *                       - in the header file
  */
 
-static void scheme_hdr_struct_def(FILE *fh, der_list *sl, char *pck)
+static void scheme_hdr_struct_def(FILE *fh, der_list *sl, const char *pck)
    {int i;
     char lnm[BFSML], unm[BFSML], mnm[BFSML];
     char *p, *mbr;
@@ -623,7 +623,7 @@ static void scheme_hdr_struct_def(FILE *fh, der_list *sl, char *pck)
  *                     - in the C file
  */
 
-static void scheme_c_struct_def(FILE *fc, der_list *sl, char *pck)
+static void scheme_c_struct_def(FILE *fc, der_list *sl, const char *pck)
    {tns_list tl;
 
     scheme_type_name_list(&tl, &sl->na);
@@ -654,8 +654,8 @@ static void scheme_c_struct_def(FILE *fc, der_list *sl, char *pck)
 
 /* SCHEME_STRUCT_DEFS - write the SCHEME interface C structs TAG */
 
-static void scheme_struct_defs(bindes *bd, char *tag, der_list *sl,
-			       int is, int ni)
+static void scheme_struct_defs(bindes *bd, const char *tag,
+			       der_list *sl, int is, int ni)
    {char *pck;
     FILE *fc, *fh, **fpa;
     statedes *st;
@@ -697,8 +697,8 @@ static void scheme_struct_defs(bindes *bd, char *tag, der_list *sl,
  *                    - SCHEME object from C structs
  */
 
-static void scheme_object_defs(bindes *bd, char *tag, der_list *sl,
-			       int is, int ni)
+static void scheme_object_defs(bindes *bd, const char *tag,
+			       der_list *sl, int is, int ni)
    {int i, ok;
     char topt[BFSML];
     char **to;
@@ -833,11 +833,11 @@ static void scheme_object_defs(bindes *bd, char *tag, der_list *sl,
 
 /* SCHEME_WRAP_INSTALL - add the installation of the function */
 
-static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
+static char **scheme_wrap_install(char **fl, fdecl *dcl, const char *sfn,
 				  char **com)
    {int voida;
     char a[BFLRG], t[BFLRG], dcn[BFLRG], ifn[BFLRG];
-    char *pi;
+    const char *pi;
 
     voida = dcl->voida;
 
@@ -884,7 +884,7 @@ static char **scheme_wrap_install(char **fl, fdecl *dcl, char *sfn,
  */
 
 static char **scheme_wrap(FILE *fc, char **fl, fdecl *dcl,
-			  char *sfn, char **com)
+			  const char *sfn, char **com)
    {fparam knd;
     char so[BFLRG];
 
@@ -1034,7 +1034,8 @@ static void fin_scheme(bindes *bd)
 static void bind_doc_scheme(FILE *fp, fdecl *dcl, doc_kind dk)
    {char as[BFLRG], dcn[BFLRG];
     char *bfn, *cfn;
-    extern void doc_proto_name_only(char *a, int nc, fdecl *dcl, char *dlm);
+    extern void doc_proto_name_only(char *a, int nc, fdecl *dcl,
+				    const char *dlm);
 
     cfn = dcl->proto.name;
     bfn = has_binding(dcl, "scheme");
