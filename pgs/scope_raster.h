@@ -142,7 +142,7 @@ extern void
  _PG_copy_frame(frame *fr1, frame *fr2);
 
 extern PG_RAST_device
- *PG_make_raster_device(int w, int h, char *name,
+ *PG_make_raster_device(int w, int h, const char *name,
 			frame *infr, int rgb, FILE *fp),
  *_PG_get_raster(PG_device *dev, int resz);
 

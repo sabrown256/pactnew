@@ -67,7 +67,7 @@ extern void
 
 /* PG_MAKE_RASTER_DEVICE - make a raster device struct */
 
-PG_RAST_device *PG_make_raster_device(int w, int h, char *name,
+PG_RAST_device *PG_make_raster_device(int w, int h, const char *name,
 				      frame *infr, int rgb, FILE *fp)
    {PG_RAST_device *mdv;
 

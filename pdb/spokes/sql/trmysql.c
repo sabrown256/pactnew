@@ -29,7 +29,7 @@
 
 /* _MYSQL_ERROR - handle MYSQL errors */
 
-static void _MYSQL_error(MYSQL *conn, char *msg)
+static void _MYSQL_error(MYSQL *conn, const char *msg)
    {
 
     printf("MYSQL %s: %s failed\n", msg, mysql_error(conn));
@@ -75,7 +75,7 @@ static void _MYSQL_split_row(SC_array *out, char *s)
 /* _MYSQL_GATHER_ROW - make lines out of the tokens of row IN */
 
 static void _MYSQL_gather_row(SC_array *out, MYSQL_ROW in,
-			      int nf, char *delim)
+			      int nf, const char *delim)
    {int i;
     char s[MAX_BFSZ];
 
@@ -97,7 +97,7 @@ static void _MYSQL_gather_row(SC_array *out, MYSQL_ROW in,
 
 /* _MYSQL_OPER - do the specified SQL operation */
 
-int _MYSQL_oper(FILE *fp, char *sql)
+int _MYSQL_oper(FILE *fp, const char *sql)
    {int rv;
     MYSQL *conn;
 
@@ -118,7 +118,7 @@ int _MYSQL_oper(FILE *fp, char *sql)
 
 /* _MYSQL_QUERY - do the specified query */
 
-sql_table *_MYSQL_query(FILE *fp, char *sql, char *delim, int add)
+sql_table *_MYSQL_query(FILE *fp, char *sql, const char *delim, int add)
    {int nf, nr;
     SC_array *arr;
     MYSQL_RES *res;
@@ -180,7 +180,7 @@ static sql_table *_MYSQL_tables(FILE *fp)
 
 /* _MYSQL_DESC - describe a type for MYSQL */
 
-static sql_table *_MYSQL_desc(FILE *fp, char *s)
+static sql_table *_MYSQL_desc(FILE *fp, const char *s)
    {char cmd[MAXLINE];
     sql_table *tab;
 
@@ -195,7 +195,7 @@ static sql_table *_MYSQL_desc(FILE *fp, char *s)
 
 /* _MYSQL_NITEMS - return the number of rows in table S */
 
-static int _MYSQL_nitems(FILE *fp, char *s)
+static int _MYSQL_nitems(FILE *fp, const char *s)
    {int nr;
     char cmd[MAXLINE];
     sql_table *tab;
@@ -215,7 +215,7 @@ static int _MYSQL_nitems(FILE *fp, char *s)
 
 /* _MYSQL_SELECT - do a select for MYSQL */
 
-static sql_table *_MYSQL_select(FILE *fp, char *s)
+static sql_table *_MYSQL_select(FILE *fp, const char *s)
    {char cmd[MAXLINE];
     sql_table *tab;
 

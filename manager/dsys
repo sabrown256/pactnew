@@ -1522,7 +1522,7 @@ CFG_DONE:
 
         set All = "seld"
 
-        set ROOT    = `$PWHERE -n 1 smake`
+        set ROOT    = `pwhere -n 1 smake`
         set BINDIR  = $ROOT:h
         set RepoDir = ""
         set SrcDir  = ""
