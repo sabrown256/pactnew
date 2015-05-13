@@ -190,7 +190,7 @@ void separatorv(FILE *fp)
  *       - this implements NoteVT
  */
 
-void notet(FILE *fp, char *tag, const char *fmt, ...)
+void notet(FILE *fp, const char *tag, const char *fmt, ...)
    {char bf[BFLRG];
 
     if (state.verbose == TRUE)
@@ -287,7 +287,7 @@ static run_state transition(process *pp, run_state new)
  *               - is of the form [<host>:]<file>
  */
 
-static void get_host_file(char *host, char *file, long nc, char *s)
+static void get_host_file(char *host, char *file, long nc, const char *s)
    {char *p;
 
     nstrncpy(host, nc, s, -1);
@@ -517,7 +517,7 @@ static void finup(process *pp, void *a)
 
 /* LOG_IN - log input messages from the process */
 
-static int log_in(process *pp, char *ar, char *s)
+static int log_in(process *pp, char *ar, const char *s)
    {int rv;
     char *p;
     hfspec *sp;
@@ -557,13 +557,12 @@ static int log_in(process *pp, char *ar, char *s)
 
 /* use the log file name as a buffer if no log file is open */
 	else
-           {if (LAST_CHAR(s) == '\n')
-	       LAST_CHAR(s) = '\0';
-	    notej(pp, "text(%s)", s);
+	   {nstrncpy(sp->logn, BFLRG, s, -1);
+	    if (LAST_CHAR(sp->logn) == '\n')
+	       LAST_CHAR(sp->logn) = '\0';
+	    notej(pp, "text(%s)", sp->logn);
 	    if (sp->running < RUNNING)
-	       sp->running = transition(pp, RUNNING);
-	    nstrncpy(sp->logn, BFLRG, s, -1);
-	    sp->logn[BFLRG-1] = '\0';};};
+	       sp->running = transition(pp, RUNNING);};};
 
     return(rv);}
 
@@ -596,7 +595,8 @@ static int acc_in(int fd, process *pp, char *s)
 
 /* ARUN - execute a command asynchronously */
 
-static process *arun(hfspec *sp, char *fnm, void *a, const char *fmt, ...)
+static process *arun(hfspec *sp, const char *fnm,
+		     void *a, const char *fmt, ...)
    {char s[BFLRG], cmd[BFLRG];
     process *pp;
 
@@ -699,7 +699,7 @@ int is_background(void)
  *           - this is an AWAIT callback
  */
 
-static int check_tty(char *sect)
+static int check_tty(const char *sect)
    {int rv;
     char in[BFLRG];
     char *p;
@@ -858,7 +858,7 @@ static int make_report(donetdes *st, hfspec *sp, int nsp, int rpt)
  *        - this is an AWAIT callback
  */
 
-static void waitup(int cyc, char *sect, void *a,
+static void waitup(int cyc, const char *sect, void *a,
 		   int nd, int np, int tc, int tf)
    {int pc;
     static int pcl;
@@ -895,7 +895,8 @@ static void waitup(int cyc, char *sect, void *a,
  *       -    TF      the total time to wait before declaring timout
  */
 
-static void cwait(donetdes *st, hfspec *sp, int nsp, char *sect, int tf)
+static void cwait(donetdes *st, hfspec *sp, int nsp,
+		  const char *sect, int tf)
    {int tc;
     char t[BFLRG];
 
@@ -1002,7 +1003,7 @@ static void set_phases(donetdes *st)
 
 /* POP_TOK - pop N tokens off of S */
 
-static char *pop_tok(char *s, int n, char *delim)
+static char *pop_tok(char *s, int n, const char *delim)
    {int i;
     char *p, *ps;
 
@@ -1018,8 +1019,9 @@ static char *pop_tok(char *s, int n, char *delim)
 
 /* WATCH_BUILD - handle watch chores for build phase */
 
-static int watch_build(char *plog, FILE *repf, char *pass, char *fail,
-		       char *wrk, char *skip)
+static int watch_build(char *plog, FILE *repf,
+		       const char *pass, const char *fail,
+		       const char *wrk, const char *skip)
    {int cfgfail, running;
     char s[BFLRG], hst[BFLRG], rmh[BFLRG];
     char cfg[BFLRG], dbop[BFLRG], usetmp[BFLRG];

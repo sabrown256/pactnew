@@ -15,7 +15,7 @@ static int
 
 static void init_doc(statedes *st, bindes *bd)
    {char fn[BFLRG];
-    char *pck;
+    const char *pck;
     FILE *fp;
 
     pck = st->pck;
@@ -248,7 +248,8 @@ static void man_wrap(statedes *st, fdecl *dcl,
 
 static int bind_doc(bindes *bd)
    {int ib, ndc, ndcl, rv;
-    char *pck, **cdc;
+    char **cdc;
+    const char *pck;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;

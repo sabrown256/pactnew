@@ -152,7 +152,8 @@ static fparam so_type(char *a, int nc, const char *ty)
 static void init_scheme(statedes *st, bindes *bd)
    {int i;
     char fn[BFLRG], upck[BFLRG], s[BFMG];
-    char *pck, *p, **tl;
+    char *p, **tl;
+    const char *pck;
     FILE *fc, *fh, *fp;
     smeta *sm;
 
@@ -514,7 +515,7 @@ static void scheme_wrap_local_return(FILE *fc, fdecl *dcl,
 
 static void scheme_enum_defs(bindes *bd, const char *tag, der_list *el,
 			     int ie, int ni)
-   {char *pck;
+   {const char *pck;
     FILE *fc, **fpa;
     statedes *st;
 
@@ -656,7 +657,7 @@ static void scheme_c_struct_def(FILE *fc, der_list *sl, const char *pck)
 
 static void scheme_struct_defs(bindes *bd, const char *tag,
 			       der_list *sl, int is, int ni)
-   {char *pck;
+   {const char *pck;
     FILE *fc, *fh, **fpa;
     statedes *st;
 
@@ -923,7 +924,7 @@ static char **scheme_wrap(FILE *fc, char **fl, fdecl *dcl,
 static void scheme_install(bindes *bd, char **fl)
    {int i;
     FILE *fc;
-    char *pck;
+    const char *pck;
     statedes *st;
 
     fc  = bd->fp[0];

@@ -333,7 +333,7 @@ char *concatenate(char *s, int nc, char **sa,
 
 /* UNSETENV - unset the environment variable VAR */
 
-int unsetenv(char *var)
+int unsetenv(const char *var)
    {int i, nc, ne, err;
     char s[BFLRG];
     extern char **environ;
@@ -947,12 +947,9 @@ char **tokenized(const char *s, const char *dlm, int flags)
 /* FREE_STRINGS - free the strings in the array lst */
 
 void free_strings(char **lst)
-   {int i;
+   {
 
-    if (lst != NULL)
-       {for (i = 0; lst[i] != NULL; i++)
-	    {FREE(lst[i]);};
-        FREE(lst);};
+    lst_free(lst);
 
     return;}
 
@@ -1769,17 +1766,20 @@ void clean_space(char *s)
  *             - also any leading whitespace before the quotes
  */
 
-char *strip_quote(char *t)
+char *strip_quote(const char *t)
    {int n;
+    char *s;
     static char bf[BFLRG];
 
     n = strspn(t, " \t");
     nstrncpy(bf, BFLRG, t+n, -1);
     if (bf[0] == '"')
-       {for (t = &LAST_CHAR(bf); (*t =='"') && (t != bf); *t-- = '\0');
-	t = bf + strspn(bf, "\"");};
+       {for (s = &LAST_CHAR(bf); (*s =='"') && (s != bf); *s-- = '\0');
+	s = bf + strspn(bf, "\"");}
+    else
+       s = (char *) t;
 
-    return(t);}
+    return(s);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -2608,7 +2608,7 @@ void splice_out_path(char *path)
 
 /* PUSH_PATH - look thru PATH for things to add to destination DPATH */
 
-void push_path(int end, char *dpath, char *path)
+void push_path(int end, char *dpath, const char *path)
    {char lpth[BFLRG], tp[BFLRG];
 
     if (IS_NULL(path) == FALSE)
@@ -3081,7 +3081,7 @@ int nsigaction(struct sigaction *oa, int sig, void (*fn)(int sig),
 
 /* LOG_ACTIVITY - log messages to FLOG */
 
-void log_activity(char *flog, int ilog, int ilev,
+void log_activity(const char *flog, int ilog, int ilev,
 		  const char *oper, const char *fmt, ...)
    {char msg[BFLRG];
     FILE *lg;

@@ -2335,9 +2335,10 @@ printf("leaving acheck: n(%d < %d)\n", nf, np);
  *       - poll for DT milliseconds in each cycle
  */
 
-int await(unsigned int tf, int dt, char *tag,
-	  int (*tty)(char *tag),
-	  void (*f)(int i, char *tag, void *a, int nd, int np, int tc, int tf),
+int await(unsigned int tf, int dt, const char *tag,
+	  int (*tty)(const char *tag),
+	  void (*f)(int i, const char *tag,
+		    void *a, int nd, int np, int tc, int tf),
 	  void *a)
    {int i, nd, np, st, ti;
     unsigned int tc;

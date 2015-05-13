@@ -38,7 +38,7 @@ static void help(void)
 
 /* EXPAND_PATH - print expanded path name to stdout */
 
-static int expand_path(char *name, int fullp, int nt, int dt, int rv)
+static int expand_path(const char *name, int fullp, int nt, int dt, int rv)
    {int i, nc, ok;
     char *fname;
     char pname[PATH_MAX], rname[PATH_MAX+1];

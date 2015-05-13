@@ -109,9 +109,10 @@ extern int
  PS_apoll(int to),
  PS_acheck(void),
  PS_afin(void (*f)(process *pp, void *a)),
- PS_await(unsigned int tf, int dt, char *tag,
-	  int (*tty)(char *tag),
-	  void (*f)(int i, char *tag, void *a, int nd, int np, int tc, int tf),
+ PS_await(unsigned int tf, int dt, const char *tag,
+	  int (*tty)(const char *tag),
+	  void (*f)(int i, const char *tag,
+		    void *a, int nd, int np, int tc, int tf),
 	  void *a);
 
 extern FILE
@@ -172,18 +173,18 @@ extern database
 /* LIBEVAL.C declarations */
 
 extern void
- PS_prune_env(char *tgt, char *info);
+ PS_prune_env(const char *tgt, const char *info);
 
 extern char
- *PS_expand_regx(char *d, int nd, char *s),
- *PS_expand_env(char *expr, int nc, char *varn, int rnull),
- *PS_eval(char *expr, int nc, char *varn);
+ *PS_expand_regx(char *d, int nd, const char *s),
+ *PS_expand_env(char *expr, int nc, const char *varn, int rnull),
+ *PS_eval(char *expr, int nc, const char *varn);
 
 
 /* LIBFIO.C declarations */
 
 extern void
- PS_log_safe(char *fnc, int err, char *type, void *a);
+ PS_log_safe(const char *fnc, int err, const char *type, void *a);
 
 extern int
  PS_open_safe(const char *path, int flags, mode_t mode),
@@ -191,10 +192,10 @@ extern int
  PS_fclose_safe(FILE *fp),
  PS_fflush_safe(FILE *fp),
  PS_block_fd(int fd, int on),
- PS_unlink_safe(char *fmt, ...);
+ PS_unlink_safe(const char *fmt, ...);
 
 extern int64_t
- PS_wait_fs(char *fn, int64_t ln, int na);
+ PS_wait_fs(const char *fn, int64_t ln, int na);
 
 extern ssize_t
  PS_read_safe(int fd, void *s, size_t nb, int req),
@@ -275,7 +276,8 @@ extern void
  PS_transfer_fnc_child(process_group *pg),
  _PS_post_info(process *pp),
  _PS_pgrp_wait(process *pp),
- _PS_pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf),
+ _PS_pgrp_work(int i, const char *tag,
+	       void *a, int nd, int np, int tc, int tf),
  _PS_pgrp_fin(process *pp, void *a),
  PS_register_io_pgrp(process_group *pg);
 
@@ -297,7 +299,7 @@ extern int
  _PS_pgrp_accept(int fd, process *pp, char *s),
  _PS_pgrp_reject(int fd, process *pp, char *s),
  _PS_deref_io(process *pp),
- _PS_pgrp_tty(char *tag),
+ _PS_pgrp_tty(const char *tag),
  _PS_fnc_wait(process_group *pg, int ip, int st),
  PS_wait_pgrp(process_group *pg),
  PS_show_pgrp(process_group *pg),
@@ -339,7 +341,7 @@ extern void
  PS_print_text(FILE *fp, const char *fmt, ...),
  PS_clean_space(char *s),
  PS_splice_out_path(char *path),
- PS_push_path(int end, char *dpath, char *path),
+ PS_push_path(int end, char *dpath, const char *path),
  PS_build_path(const char *base, ...),
  PS_key_val(char **key, char **val, char *s, const char *dlm),
  PS_unamef(char *s, int nc, const char *wh),
@@ -412,7 +414,7 @@ extern char
  *PS_run(int echo, const char *fmt, ...),
  *PS_grep(FILE *fp, const char *name, const char *fmt, ...),
  *PS_get_date(void),
- *PS_strip_quote(char *t),
+ *PS_strip_quote(const char *t),
  *PS_cnoval(void),
  *PS_cgetenv(int lit, const char *fmt, ...),
  **PS_cenv(int sort, char **rej),

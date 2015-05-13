@@ -203,7 +203,7 @@ static void c_enum_defs(bindes *bd, const char *tag,
 
 static void c_object_defs(bindes *bd, const char *tag,
 			  der_list *sl, int is, int ni)
-   {char *pck;
+   {const char *pck;
     FILE *fc, *fh, **fpa;
 
     fpa = bd->fp;
@@ -322,7 +322,8 @@ static int bind_c(bindes *bd)
 static void init_c(statedes *st, bindes *bd)
    {int i;
     char fn[BFLRG], upck[BFLRG], s[BFMG];
-    char *p, *pck, **el, **sl, **ul, **hl;
+    char *p, **el, **sl, **ul, **hl;
+    const char *pck;
     FILE *fc, *fh, *fp;
     cmeta *cm;
 

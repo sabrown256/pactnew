@@ -310,7 +310,7 @@ static void init_cross(rundes *st)
 
 /* INIT - setup the state */
 
-static int init(rundes *st, char *os, char *host)
+static int init(rundes *st, const char *os, const char *host)
    {int rv;
 	
     rv = TRUE;
@@ -373,7 +373,7 @@ static int init(rundes *st, char *os, char *host)
  *             - needed on AIX only
  */
 
-static char *shell_clean(char *s)
+static char *shell_clean(const char *s)
    {char *p;
 
     p = subst(s, "(", "\\(", -1);
@@ -443,7 +443,8 @@ static int check(rundes *st)
 
 /* PARSE_COLON - parse the ':' syntax element */
 
-static void parse_colon(rundes *st, char *sect, char *var, char *val)
+static void parse_colon(rundes *st, char *sect,
+			const char *var, const char *val)
    {char vl[BFMED];
     char *p;
 
@@ -483,7 +484,7 @@ static void parse_colon(rundes *st, char *sect, char *var, char *val)
  *           - return FALSE otherwise
  */
 
-static int eval_expr(rundes *st, char *expr)
+static int eval_expr(rundes *st, const char *expr)
    {int rv;
     char s[BFMED];
 
@@ -514,7 +515,8 @@ static int eval_expr(rundes *st, char *expr)
  *           - otherwise use the value of OK specified
  */
 
-static char *eval_cond(rundes *st, int ok, char *expr, char *cons, char *alt)
+static char *eval_cond(rundes *st, int ok,
+		       const char *expr, const char *cons, const char *alt)
    {static char val[BFMED];
 
 /* with a conditional expression */
@@ -556,8 +558,8 @@ static char *eval_cond(rundes *st, int ok, char *expr, char *cons, char *alt)
  *              - (see tests/run.s3 for possibilities)
  */
 
-static void assgn_action(rundes *st, int asgn, char *var,
-			 char *effvar, char *lval)
+static void assgn_action(rundes *st, int asgn, const char *var,
+			 const char *effvar, char *lval)
    {char *v, *vl;
 
     if (strcmp(lval, "-die-") == 0)

@@ -71,8 +71,9 @@ switch ($scsi[1])
 # old way, need a second pull after the report is made
 # AND it does not touch files causing emacs to prompt you to re-read them
               case 0:
-                   git pull $repo master >&! $log
+                   git pull --stat $repo master >&! $log
                    @ xstatus = $xstatus + $status
+                   grep '|' $log |& sed 's@|.*$@@'
                    if ($xstatus == 0) breaksw
 
 # new way - handles merge/conflict more like CVS and SVN

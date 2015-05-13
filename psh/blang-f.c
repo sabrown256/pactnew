@@ -252,7 +252,7 @@ static void fc_decl_list(char *a, int nc, fdecl *dcl)
 static void init_fortran(statedes *st, bindes *bd)
    {int nc, cfl;
     char fn[BFLRG], hf[BFLRG], ufn[BFLRG], fill[BFLRG];
-    char *pck;
+    const char *pck;
     FILE *fp;
 
     fp  = NULL;
@@ -973,7 +973,7 @@ static void mc_decl_list(char *a, int nc, fdecl *dcl)
 static void init_module(statedes *st, bindes *bd)
    {int nc, cfl;
     char fn[BFLRG], ufn[BFLRG], fill[BFLRG];
-    char *pck;
+    const char *pck;
     FILE *fp;
 
     fp = NULL;
@@ -1449,8 +1449,9 @@ static void module_interop_wrap(FILE *fp, fdecl *dcl, const char *ffn)
 static int bind_module(bindes *bd)
    {int ib, iw, rv, ndcl;
     char t[BFLRG];
-    char *ffn, *sb, *pck;
+    char *ffn, *sb;
     char **fpr, **fwr, **cdv, **sa, **ta;;
+    const char *pck;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fp;
@@ -1552,7 +1553,7 @@ static int bind_module(bindes *bd)
 
 static void fin_module(bindes *bd)
    {int i;
-    char *pck;
+    const char *pck;
     statedes *st;
     FILE *fp;
 

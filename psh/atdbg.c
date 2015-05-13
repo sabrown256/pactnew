@@ -67,7 +67,7 @@ struct s_dbgrsp
  *                - derived from NAME
  */
 
-static atproc *candidate_proc(atdbgdes *st, char *name)
+static atproc *candidate_proc(atdbgdes *st, const char *name)
    {int i, n;
     char pids[BFLRG];
     char *pl, *t;
@@ -193,7 +193,7 @@ static int send_msg(process *pp, int act, const char *fmt, ...)
 
 /* CACHE_RSP - put the message S in the cache for later transmission */
 
-static void cache_rsp(atdbgdes *st, char *s)
+static void cache_rsp(atdbgdes *st, const char *s)
    {
 
     if (st->msgs == NULL)
@@ -439,7 +439,7 @@ static int rsp_gdb(int fd, process *pp, char *t)
 
 /* USE_GDB - do the work with GDB */
 
-static int use_gdb(atdbgdes *st, char *fname, atproc *al)
+static int use_gdb(atdbgdes *st, const char *fname, atproc *al)
    {int rv, nl, sig;
     char cmd[BFLRG], s[BFLRG];
     process *pp;
@@ -491,7 +491,7 @@ static int use_gdb(atdbgdes *st, char *fname, atproc *al)
 
 /* USE_DBX - do the work with DBX */
 
-static int use_dbx(atdbgdes *st, char *fname, atproc *al)
+static int use_dbx(atdbgdes *st, const char *fname, atproc *al)
    {int rv;
     char *s;
     FILE *fp;

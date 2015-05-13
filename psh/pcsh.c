@@ -16,7 +16,7 @@
 
 /* SCRIPT_ENV - write the environment setup part of a script to FO */
 
-static void script_env(FILE *fo, char *pact)
+static void script_env(FILE *fo, const char *pact)
    {int haverc;
     char *p;
 
@@ -47,7 +47,7 @@ static void script_env(FILE *fo, char *pact)
  *               - return -1 if there are none or there is not a matching PEND
  */
 
-static int has_par_const(char **sa, char *tok)
+static int has_par_const(char **sa, const char *tok)
    {int i, ie, is, nc, ne, ns;
     char *t;
 
@@ -79,7 +79,8 @@ static int has_par_const(char **sa, char *tok)
 
 /* MAKE_SHELL_SCRIPT - prepare a shell script for invocation */
 
-static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
+static int make_shell_script(char **sa, const char *fname,
+			     const char *shell, const char *pact,
 			     char *args, int henv,
 			     char **vo, char **v, int k)
    {int i, co;
@@ -115,7 +116,7 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
 
 /* make the new command line to exec */
     co = 0;
-    vo[co++] = shell;
+    vo[co++] = STRSAVE(shell);
 
 /* get any command line args destined for the shell */
     for (i = 1; i < k; i++)
@@ -134,8 +135,9 @@ static int make_shell_script(char **sa, char *fname, char *shell, char *pact,
 
 /* MAKE_CTL_SCRIPT - write the parallel controller script */
 
-void make_ctl_script(char *fname, char *dname, char *lname,
-		     char *cmd, char *al, int *lm)
+void make_ctl_script(const char *fname, const char *dname,
+		     const char *lname, const char *cmd,
+		     const char *al, int *lm)
    {FILE *fp;
 
     fp = fopen_safe(fname, "w");
@@ -212,7 +214,7 @@ void make_ctl_script(char *fname, char *dname, char *lname,
  *                    - shell line in a PDO construct
  */
 
-static char **compute_pdo_limits(char **sa, int is, char *al, int nc)
+static char **compute_pdo_limits(char **sa, int is, const char *al, int nc)
    {int n;
     char fn[BFLRG], t[BFLRG];
     char *p, *r, **rv, **ra, **ta;
@@ -277,7 +279,8 @@ static char **compute_pdo_limits(char **sa, int is, char *al, int nc)
 /* MAKE_PDO_SCRIPT - prepare a shell script for parallel DO invocation */
 
 static int make_pdo_script(char **sa, int is, char *fname, int nc,
-			   char *shell, char *pact, char *args, int henv,
+			   const char *shell, const char *pact,
+			   char *args, int henv,
 			   char **vo, char **v, int k)
    {int i, ip, co, n;
     int lm[3];
@@ -337,7 +340,7 @@ static int make_pdo_script(char **sa, int is, char *fname, int nc,
  *                     - shell line in a PFOR construct
  */
 
-static char **compute_pfor_limits(char **sa, int is, char *al, int nc)
+static char **compute_pfor_limits(char **sa, int is, const char *al, int nc)
    {int i, n;
     char fn[BFLRG], t[BFLRG];
     char *p, *r, **rv, **ra, **ta;
@@ -398,7 +401,8 @@ static char **compute_pfor_limits(char **sa, int is, char *al, int nc)
 /* MAKE_PFOR_SCRIPT - prepare a shell script for parallel FOR invocation */
 
 static int make_pfor_script(char **sa, int is, char *fname, int nc,
-			    char *shell, char *pact, char *args, int henv,
+			    const char *shell, const char *pact,
+			    char *args, int henv,
 			    char **vo, char **v, int k)
    {int i, ip, co, n;
     int lm[3];
@@ -457,7 +461,7 @@ static int make_pfor_script(char **sa, int is, char *fname, int nc,
 
 /* MAKE_C_SCRIPT - write and compile a C program for invocation */
 
-static int make_c_script(char **sa, char *fname, char **v)
+static int make_c_script(char **sa, const char *fname, char **v)
    {int co;
     char s[BFLRG], cname[BFLRG], exe[BFLRG];
     char bindir[BFLRG], incdir[BFLRG];
@@ -494,7 +498,7 @@ static int make_c_script(char **sa, char *fname, char **v)
  *               - return the arglist in VO
  */
 
-static void invoke_script(char **vo, char *shell, char *pact,
+static void invoke_script(char **vo, const char *shell, const char *pact,
 			  char **v, int k, int c)
    {int i, is, co, henv;
     char fname[BFLRG], s[BFLRG], args[BFLRG];
@@ -569,7 +573,7 @@ static void invoke_script(char **vo, char *shell, char *pact,
  *                - return the arglist in VO
  */
 
-static void invoke_command(char **vo, char *shell, char *pact,
+static void invoke_command(char **vo, const char *shell, const char *pact,
 			   char **v, int k, int c)
    {int i, co, haverc;
     char s[BFLRG], t[BFLRG], u[BFLRG];
@@ -578,7 +582,7 @@ static void invoke_command(char **vo, char *shell, char *pact,
     haverc = cdefenv("PCSHRC");
 
     co = 0;
-    vo[co++] = shell;
+    vo[co++] = STRSAVE(shell);
 
 /* get in everything before the command */
     for (i = 1; i < k; i++)
@@ -628,7 +632,7 @@ static void invoke_command(char **vo, char *shell, char *pact,
  *                - return the arglist in VO
  */
 
-static void invoke_session(char **vo, char *shell, char *pact,
+static void invoke_session(char **vo, const char *shell, const char *pact,
 			   char **v, int c)
    {int i, co, nodot;
     char home[BFLRG], user[BFLRG], cshrc[BFLRG];
@@ -640,7 +644,7 @@ static void invoke_session(char **vo, char *shell, char *pact,
     co = 0;
 
     nodot    = FALSE;
-    vo[co++] = shell;
+    vo[co++] = STRSAVE(shell);
     for (i = 1; i <= c; i++)
         {p = v[i];
 	 if ((p != NULL) && (strcmp(p, "-f") == 0))

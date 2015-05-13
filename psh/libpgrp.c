@@ -2026,7 +2026,7 @@ void _pgrp_wait(process *pp)
  *           - return TRUE if we are done
  */
 
-int _pgrp_tty(char *tag)
+int _pgrp_tty(const char *tag)
    {int nf, np, rv;
     process_state *ps;
 
@@ -2109,7 +2109,8 @@ int _fnc_wait(process_group *pg, int ip, int st)
  *            - sent to the appropiate output channel
  */
 
-void _pgrp_work(int i, char *tag, void *a, int nd, int np, int tc, int tf)
+void _pgrp_work(int i, const char *tag,
+		void *a, int nd, int np, int tc, int tf)
    {int c, io, ip, ne, rv;
     io_mode md;
     io_device dv;
@@ -2319,7 +2320,8 @@ void dgetpgid(process_group *pg)
 /* _PRINT_PG - print the process_group status for SHOW_PGRP */
 
 static void _print_pg(process_group *pg, int i)
-   {char *bf, *rs, *aint;
+   {char *rs, *aint;
+    const char *bf;
     process_session *ss;
 
     ss   = pg->ss;

@@ -23,8 +23,8 @@ typedef struct s_ioerrdes ioerrdes;
 struct s_ioerrdes
    {int n;
     int err;
-    char *fnc;
-    char *type;
+    const char *fnc;
+    const char *type;
     void *a;};
 
 /*--------------------------------------------------------------------------*/
@@ -34,7 +34,7 @@ struct s_ioerrdes
 
 #define NERR  64
 
-void log_safe(char *fnc, int err, char *type, void *a)
+void log_safe(const char *fnc, int err, const char *type, void *a)
    {ioerrdes *pe;
     static ioerrdes errev[NERR];
     static int ne = -1;
@@ -462,7 +462,7 @@ size_t fwrite_safe(const void *s, size_t bpi, size_t nitems, FILE *fp)
  *             - return 0 iff successful
  */
 
-int unlink_safe(char *fmt, ...)
+int unlink_safe(const char *fmt, ...)
    {int i, ev, rv, na;
     char s[BFLRG];
     struct stat sb;
@@ -513,7 +513,7 @@ int unlink_safe(char *fmt, ...)
  *         - return the file size found
  */
 
-int64_t wait_fs(char *fn, int64_t ln, int na)
+int64_t wait_fs(const char *fn, int64_t ln, int na)
    {int i;
     int64_t fsz;
     struct stat sbf;

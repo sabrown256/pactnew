@@ -17,7 +17,7 @@
  *     - return TRUE if any lines were processed
  */
 
-static int cat(char *tag, int nc, int ne, int no)
+static int cat(const char *tag, int nc, int ne, int no)
    {int i, rv;
     char s[BFLRG];
     char *p;
@@ -41,7 +41,7 @@ static int cat(char *tag, int nc, int ne, int no)
  *      - process version of gexec_conv
  */
 
-static int conv(char *side)
+static int conv(const char *side)
    {int rv, nx;
     char s[BFLRG];
     char *p;
@@ -92,7 +92,7 @@ static int conv(char *side)
  *     - return TRUE if nothing was written to stderr
  */
 
-static int gen(char *tag, int nc, int ne, int no)
+static int gen(const char *tag, int nc, int ne, int no)
    {int ic, io, ie, lo, le, rv;
 
     lo = 1;

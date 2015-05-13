@@ -21,7 +21,7 @@
  *             - return the result in D
  */
 
-char *expand_regx(char *d, int nd, char *s)
+char *expand_regx(char *d, int nd, const char *s)
    {int id, is, ne, ns, st, qu;
     char **da, **sa;
     wordexp_t w;
@@ -64,7 +64,7 @@ char *expand_regx(char *d, int nd, char *s)
 
 /* EXPAND_ENV - expand all environment variables in EXPR */
 
-char *expand_env(char *expr, int nc, char *varn, int rnull)
+char *expand_env(char *expr, int nc, const char *varn, int rnull)
    {int i, n;
     char var[BFLRG], t[BFLRG];
     char *rv, *p, *val;
@@ -115,7 +115,7 @@ char *expand_env(char *expr, int nc, char *varn, int rnull)
 
 /* EVAL - evaluate a shell expression */
 
-char *eval(char *expr, int nc, char *varn)
+char *eval(char *expr, int nc, const char *varn)
    {char *rv, *s;
     static char res[20];
 
@@ -153,7 +153,7 @@ char *eval(char *expr, int nc, char *varn)
 
 /* PRUNE_ENV - clear out part of the environment specfied by TGT */
 
-void prune_env(char *tgt, char *info)
+void prune_env(const char *tgt, const char *info)
    {
 
     if (IS_NULL(tgt) == FALSE)

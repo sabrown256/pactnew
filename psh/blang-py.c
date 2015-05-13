@@ -224,7 +224,7 @@ static void py_arg(char *arg, int nc, const char *spec)
 
 static void python_enum_defs(bindes *bd, const char *tag,
 			     der_list *el, int ie, int ni)
-   {char *pck;
+   {const char *pck;
     FILE *fc, **fpa;
     statedes *st;
 
@@ -723,7 +723,7 @@ static void python_struct_defs(bindes *bd, const char *tag,
 
 static void python_object_defs(bindes *bd, const char *tag,
 			       der_list *sl, int is, int ni)
-   {char *pck;
+   {const char *pck;
     FILE *fc, **fpa;
     tnp_list tl;
     statedes *st;
@@ -773,7 +773,8 @@ static void python_object_defs(bindes *bd, const char *tag,
 static void init_python(statedes *st, bindes *bd)
    {int i;
     char fn[BFLRG], upck[BFLRG], s[BFMG];
-    char *pck, *p, **tl;
+    char *p, **tl;
+    const char *pck;
     FILE *fc, *fh, *fp;
     pmeta *pm;
 
@@ -1275,7 +1276,8 @@ static void python_wrap(FILE *fc, fdecl *dcl, const char *pfn)
 static void python_header(bindes *bd)
    {int ib, ndcl;
     char upk[BFLRG], t[BFLRG];
-    char *pck, *pfn;
+    char *pfn;
+    const char *pck;
     fdecl *dcl, *dcls;
     statedes *st;
     FILE *fh;
