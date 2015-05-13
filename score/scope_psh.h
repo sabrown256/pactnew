@@ -139,25 +139,25 @@ extern process_state
 
 extern void
  PS_reset_db(database *db),
- PS_load_db(database *db, char *vr, FILE *fp),
+ PS_load_db(database *db, const char *vr, FILE *fp),
  PS_delete_db(database *db, char *var),
  PS_free_db(database *db),
  PS_db_srv_close(database *db);
 
 extern int
- PS_dbset(client *cl, char *var, const char *fmt, ...),
+ PS_dbset(client *cl, const char *var, const char *fmt, ...),
  PS_dbdef(client *cl, const char *fmt, ...),
  PS_dbcmp(client *cl, char *var, char *val),
  PS_dbcmd(client *cl, char *cmd),
  PS_dbinitv(client *cl, char *var, const char *fmt, ...),
- PS_dbrestore(client *cl, char *dname),
+ PS_dbrestore(client *cl, const char *dname),
  PS_save_db(database *db, char **vars, FILE *fp, const char *fmt),
  PS_db_srv_open(client *cl, int init, int dbg, int auth),
  PS_db_srv_save(int fd, database *db),
  PS_db_srv_restart(database *db);
 
 extern char
- *PS_name_db(char *root),
+ *PS_name_db(const char *root),
  **_PS_db_clnt_ex(client *cl, int init, char *req),
  *PS_dbget(client *cl, int lit, const char *fmt, ...),
  *PS_put_db(database *db, char *var, char *val),
@@ -467,12 +467,12 @@ extern int
  PS_comm_write(client *cl, char *s, int nc, int to);
 
 extern char
- *PS_name_conn(char *root),
- *PS_name_log(char *root),
+ *PS_name_conn(const char *root),
+ *PS_name_log(const char *root),
  **PS_client_ex(client *cl, char *req);
 
 extern client
- *PS_make_client(ckind type, int port, int auth, char *root, 
+ *PS_make_client(ckind type, int port, int auth, const char *root, 
 		 void (*clog)(client *cl, int lvl, const char *fmt, ...),
 		 int (*cauth)(client *cl, int nc, char *ans, char *res));
 
@@ -521,7 +521,7 @@ extern char
 
 extern type_desc
  *PS_type_table(type_desc *td),
- *PS_lookup_type_info(char *ty),
+ *PS_lookup_type_info(const char *ty),
  *PS_resolve_type_alias(char *ty);
 
 extern int

@@ -49,7 +49,7 @@ struct s_vardes
 
 /* NAME_DB - derive the name of the database from ROOT */
 
-char *name_db(char *root)
+char *name_db(const char *root)
    {static char fname[BFLRG];
 
     snprintf(fname, BFLRG, "%s.db", root);
@@ -69,7 +69,8 @@ char *name_db(char *root)
 static int _db_srv_launch(client *cl)
    {int i, st, pid, rv, na;
     char s[BFLRG];
-    char *root, *fcon;
+    char *fcon;
+    const char *root;
 
     rv = FALSE;
 
@@ -144,7 +145,7 @@ char **_db_clnt_ex(client *cl, int init, char *req)
 
 /* DBSET - set the database variable VAR to VAL (counterpart to csetenv) */
 
-int dbset(client *cl, char *var, const char *fmt, ...)
+int dbset(client *cl, const char *var, const char *fmt, ...)
    {int i, err, nc, nr, ok;
     char val[BFLRG];
     char *t, **ta;
@@ -313,7 +314,7 @@ int dbinitv(client *cl, char *var, const char *fmt, ...)
  *           - of the current process
  */
 
-int dbrestore(client *cl, char *dname)
+int dbrestore(client *cl, const char *dname)
    {int i, rv, ok;
     char t[BFLRG];
     char **ta, *s, *vl;
@@ -789,7 +790,7 @@ char *get_multi_line(char **sa, int ni, int *pi, char *dlm, int qu)
 
 /* LOAD_DB - load the DB into memory from FP */
 
-void load_db(database *db, char *vr, FILE *fp)
+void load_db(database *db, const char *vr, FILE *fp)
    {char *var, *val, *p;
 
     if ((db != NULL) && (fp != NULL))
@@ -816,7 +817,8 @@ void load_db(database *db, char *vr, FILE *fp)
 /* MAKE_DB - initialize the DB */
 
 static database *make_db(client *cl, int dbg, int auth)
-   {char *fname, *flog, *root, *t;
+   {char *fname, *flog, *t;
+    const char *root;
     database *db;
 
     db = NULL;

@@ -58,7 +58,7 @@ struct s_client
     int auth;
     int nkey;
     char *key;
-    char *root;
+    const char *root;
     char *fcon;                 /* name of the connection file */
     ckind type;
     void *a;
@@ -536,7 +536,8 @@ static int connect_server(client *cl)
 char **get_connect_socket(client *cl)
    {int port;
     in_addr_t haddr;
-    char *root, *host, **sa;
+    char *host, **sa;
+    const char *root;
     connection *srv;
 
     sa = NULL;
@@ -706,7 +707,8 @@ int open_server(client *cl, ckind ioc, int auth)
 
 int close_sock(client *cl)
    {int st, rv;
-    char *conn, *root;
+    char *conn;
+    const char *root;
     connection *srv;
 
     rv = TRUE;

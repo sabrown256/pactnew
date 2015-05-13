@@ -59,7 +59,7 @@ static svr_session
 
 /* NAME_CONN - derive the name of the connection file from ROOT */
 
-char *name_conn(char *root)
+char *name_conn(const char *root)
    {static char fname[BFLRG];
 
     snprintf(fname, BFLRG, "%s.conn", root);
@@ -73,7 +73,7 @@ char *name_conn(char *root)
  *          - .../foo -> .../foo.log
  */
 
-char *name_log(char *root)
+char *name_log(const char *root)
    {char *p;
     static char lg[BFLRG];
 
@@ -98,7 +98,8 @@ char *name_log(char *root)
 
 void cl_logger(client *cl, int lvl, const char *fmt, ...)
    {char s[BFLRG];
-    char *root, *wh, *flog;
+    char *wh, *flog;
+    const char *root;
 
     VA_START(fmt);
     VSNPRINTF(s, BFLRG, fmt);
@@ -569,7 +570,7 @@ static void sigtimeout(int sig)
 
 /* MAKE_CLIENT - initialize and return a client connection instance */
 
-client *make_client(ckind type, int port, int auth, char *root, 
+client *make_client(ckind type, int port, int auth, const char *root, 
 		    void (*clg)(client *cl, int lvl, const char *fmt, ...),
                     int (*cauth)(client *cl, int nc, char *ans, char *res))
    {char *fcon, *t;

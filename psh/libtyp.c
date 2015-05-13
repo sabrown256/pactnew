@@ -142,7 +142,7 @@ char
  *       - return TRUE iff a pointer was dereferenced
  */
 
-int deref(char *d, int nc, char *s)
+int deref(char *d, int nc, const char *s)
    {int rv;
 
     rv = FALSE;
@@ -371,7 +371,7 @@ type_desc *type_table(type_desc *td)
 
 /* LOOKUP_TYPE_INFO - lookup and return a type from the type lists */
 
-type_desc *lookup_type_info(char *ty)
+type_desc *lookup_type_info(const char *ty)
    {int i;
     type_desc *tl, *rv;
 

@@ -147,7 +147,8 @@ static state
          0, NULL, NULL, NULL, };
 
 static void
- parse_line(client *cl, char *s, char *key, char *oper, char *value, int nc);
+ parse_line(client *cl, const char *s,
+	    char *key, char *oper, char *value, int nc);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -179,7 +180,7 @@ static char *echo(int lg, const char *fmt, ...)
 
 /* PUSH_FILE - push S onto the file stack */
 
-static char *push_file(char *s, int itype)
+static char *push_file(const char *s, int itype)
    {int id, n, nd, ok;
     file_entry *se;
     static char lfile[BFLRG], t[BFLRG];
@@ -263,7 +264,7 @@ static void pop_file(void)
 
 /* PUSH_STRUCT - push S onto the struct stack */
 
-static void push_struct(char *item, char *collection, int itype)
+static void push_struct(const char *item, char *collection, int itype)
    {int n;
     char t[BFLRG], lst[BFLRG];
     char *p, *ps;
@@ -376,8 +377,10 @@ static int reset_env(int c, char **v)
  *                 - look for sub-class SUB of type STYPE
  */
 
-static int write_class_pco(client *cl, FILE *out, char *clss, char *ctype,
-			   char *sub, char *stype, char *ind)
+static int write_class_pco(client *cl, FILE *out,
+			   const char *clss, const char *ctype,
+			   const char *sub, const char *stype,
+			   const char *ind)
    {int i, n, ic, nc, global;
     char cln[BFLRG], fmt[BFLRG];
     char *c, *pc, *t, *var, *val, *entry;
@@ -461,7 +464,7 @@ static int write_class_pco(client *cl, FILE *out, char *clss, char *ctype,
  *           - to be read back in by pco
  */
 
-static void write_pco(client *cl, state *st, char *dbname)
+static void write_pco(client *cl, state *st, const char *dbname)
    {int rv;
     char t[BFLRG];
     FILE *out;
@@ -493,7 +496,7 @@ static void write_pco(client *cl, state *st, char *dbname)
  *         - remove matches from TA
  */
 
-char **sublist(char **ta, int na, char *s, char **exc, int ne)
+char **sublist(char **ta, int na, const char *s, char **exc, int ne)
    {int i, ie, nw, ok;
     char w[BFLRG];
     char *t, **sa;
@@ -529,8 +532,10 @@ char **sublist(char **ta, int na, char *s, char **exc, int ne)
  *                  - omit NE variables named by EXC
  */
 
-static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
-			    char *ind, char **ta, int na, char **exc, int ne)
+static int write_class_perl(client *cl, FILE *out,
+			    const char *clss, const char *ctype,
+			    const char *ind,
+			    char **ta, int na, char **exc, int ne)
    {int i, l, n, ic, nc, ni, global;
     char cln[BFLRG];
     char *c, *var, *val;
@@ -629,7 +634,7 @@ static int write_class_perl(client *cl, FILE *out, char *clss, char *ctype,
  *            - to be read by mio
  */
 
-static void write_perl(client *cl, state *st, char *dbname)
+static void write_perl(client *cl, state *st, const char *dbname)
    {int rv, na, ne;
     char t[BFLRG];
     char **ta;
@@ -679,7 +684,7 @@ static void write_perl(client *cl, state *st, char *dbname)
 
 /* PCO_SAVE_DB - write a text representation of the configuration database */
 
-static int pco_save_db(client *cl, char *dbname)
+static int pco_save_db(client *cl, const char *dbname)
    {int rv;
     char t[BFLRG];
 
@@ -708,7 +713,7 @@ static int pco_save_db(client *cl, char *dbname)
 
 /* PCO_LOAD_DB - load the specified database */
 
-static int pco_load_db(client *cl, char *dbname)
+static int pco_load_db(client *cl, const char *dbname)
    {int rv, i, nv;
     char **ta;
 
@@ -737,7 +742,7 @@ static int pco_load_db(client *cl, char *dbname)
 /* ENV_OUT - write out an environment variable to various files */
 
 static void env_out(FILE *fsh, FILE *fcsh, FILE *fdk, FILE *fmd,
-		    char *var, char *val)
+		    const char *var, const char *val)
    {char s[BFLRG];
     char *vl;
 
@@ -1312,7 +1317,7 @@ static void parse_opt(client *cl, char *s, int nc)
 
 /* PARSE_LINE - parse the next line from the input */
 
-static void parse_line(client *cl, char *s,
+static void parse_line(client *cl, const char *s,
 		       char *key, char *oper, char *value, int nc)
    {char t[BFLRG];
     char *p;
@@ -1678,7 +1683,7 @@ static void set_inst_base(client *cl, char *ib)
  *           - any environment variable
  */
 
-static void env_subst(client *cl, char *refvar, char *nt)
+static void env_subst(client *cl, const char *refvar, const char *nt)
    {int i, nc, nv;
     char *ot, *vr, *vl, *p, **ta;
 
@@ -1713,7 +1718,8 @@ static void env_subst(client *cl, char *refvar, char *nt)
  *             - only do assigment if VAL is not empty
  */
 
-void do_cond_set(client *cl, char *var, char *oper, char *val)
+void do_cond_set(client *cl, const char *var, const char *oper,
+		 const char *val)
    {char *t;
 
     t = echo(FALSE, val);
@@ -1733,7 +1739,7 @@ void do_cond_set(client *cl, char *var, char *oper, char *val)
 
 /* SET_VAR - set a variable as directed */
 
-static void set_var(client *cl, char *var, char *oper, char *val)
+static void set_var(client *cl, const char *var, const char *oper, char *val)
    {char fvar[BFLRG], nval[BFLRG], mval[BFLRG], lval[BFLRG];
     char s[BFLRG+1];
     char *prfx, *t, *p;
@@ -1873,9 +1879,11 @@ static void set_var(client *cl, char *var, char *oper, char *val)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PROCESS_USE - do all the variable settings implied by a Use specification */
+/* PROCESS_USE - do all the variable settings implied
+ *             - by a Use specification
+ */
 
-static void process_use(client *cl, char *sg, char *oper)
+static void process_use(client *cl, const char *sg, const char *oper)
    {int is, whch;
     char nvr[BFLRG], ulst[BFLRG];
     char *val, *currg, *currt, **sa;
@@ -1957,7 +1965,7 @@ static void process_use(client *cl, char *sg, char *oper)
  *     <cfg-id>   := 1 based index of platform for specific features
  */
 
-static void parse_features(char *t, int nc, int np, char *ft)
+static void parse_features(char *t, int nc, int np, const char *ft)
    {int i, nt, i_this, has_other;
     char anp[10];
     char **lst, *tk;
@@ -2000,7 +2008,7 @@ static void parse_features(char *t, int nc, int np, char *ft)
  *             - syntax: platform <cfg> <PSY_InstRoot> [<args>*]
  */
 
-static void do_platform(client *cl, char *oper, char *value)
+static void do_platform(client *cl, const char *oper, const char *value)
    {int is, ncc;
     char t[BFLRG], cfg[BFSML], sid[BFSML];
     char *p, *ccl, *sib, **cca, **spec;
@@ -2121,7 +2129,8 @@ static void config_platforms(void)
  *             - }
  */
 
-static int do_run_work(client *cl, int il, char *oper, char *value)
+static int do_run_work(client *cl, int il, const char *oper,
+		       const char *value)
    {int i, ok, nc, rv;
     char t[BFLRG], cmd[BFLRG];
     char *db;
@@ -2165,7 +2174,7 @@ static int do_run_work(client *cl, int il, char *oper, char *value)
 
 /* READ_CONFIG - read the user configuration file */
 
-static void read_config(client *cl, char *cfg, int quiet)
+static void read_config(client *cl, const char *cfg, int quiet)
    {int il;
     char line[BFLRG], key[BFLRG], oper[BFLRG], value[BFLRG];
     char *path;
@@ -2360,7 +2369,7 @@ static void read_config(client *cl, char *cfg, int quiet)
 
 /* ADD_DO_RUN - add an entry to the database */
 
-static void add_do_run(FILE *fl, FILE *fp, char *lf)
+static void add_do_run(FILE *fl, FILE *fp, const char *lf)
    {int i;
     char **sa;
 
@@ -2384,13 +2393,13 @@ static void add_do_run(FILE *fl, FILE *fp, char *lf)
 
 /* DO_RUN_SPEC - return the path to S in LST */
 
-static char *do_run_spec(char *lst, char *s)
+static char *do_run_spec(const char *lst, const char *s)
    {char *file;
     static char t[BFLRG];
 
     file = NULL;
     if (file_exists(s) == TRUE)
-       file = s;
+       file = (char *) s;
 
     else
        {FOREACH(d, lst, " \t\n")

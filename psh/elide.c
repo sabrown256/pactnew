@@ -250,7 +250,7 @@ void retained_text(char *d, int nd, char *s, parse *ip)
  *       - return TRUE iff successful
  */
 
-int elide(char *fname, parse *ip)
+int elide(const char *fname, parse *ip)
    {int il, rv;
     char s[BFLRG], t[BFLRG];
     char *p;

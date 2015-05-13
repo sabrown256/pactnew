@@ -111,7 +111,7 @@ int verifyx(client *cl, int nc, char *ans, char *res)
  *             -     FNAME = @      -> <root>.db
  */
 
-static char *srv_save_db(database *db, char *fname,
+static char *srv_save_db(database *db, const char *fname,
 			 char **var, const char *fmt)
    {int ok;
     char s[BFLRG];
@@ -170,10 +170,10 @@ static char *srv_save_db(database *db, char *fname,
 
 /* SRV_LOAD_DB - load the database */
 
-static char *srv_load_db(client *cl, char *fname, char *var)
+static char *srv_load_db(client *cl, const char *fname, const char *var)
    {int nva, nvb;
     char s[BFLRG];
-    char *root;
+    const char *root;
     FILE *fp;
     database *db;
     static char t[BFLRG];
@@ -232,7 +232,8 @@ static char *srv_load_db(client *cl, char *fname, char *var)
 
 static void srv_logger(srvdes *sv, int lvl, const char *fmt, ...)
    {char s[BFLRG];
-    char *root, *flog;
+    char *flog;
+    const char *root;
     client *cl;
 
     VA_START(fmt);
@@ -425,7 +426,7 @@ static char *do_load(client *cl, char *s)
 
 /* RENDER_VAL - render database value, VAL, according to FMT */
 
-static char *render_val(char *var, char *val, char *fmt)
+static char *render_val(const char *var, char *val, const char *fmt)
    {char *s;
     static char t[BFLRG];
 
@@ -454,7 +455,7 @@ static char *render_val(char *var, char *val, char *fmt)
 
 /* DO_COND_INIT - handle conditional initialization */
 
-static char *do_cond_init(database *db, char *s, char *fmt)
+static char *do_cond_init(database *db, char *s, const char *fmt)
    {int st;
     char *var, *val, *nvl;
 
@@ -475,7 +476,7 @@ static char *do_cond_init(database *db, char *s, char *fmt)
 
 /* DO_DEFD - handle defined query */
 
-static char *do_defd(database *db, char *s, char *fmt)
+static char *do_defd(database *db, char *s, const char *fmt)
    {int st;
     char *var, *val, *nvl;
 
@@ -502,7 +503,7 @@ static char *do_defd(database *db, char *s, char *fmt)
 
 /* DO_SET_GET - handle variable set or get operations */
 
-static char **do_set_get(database *db, char **lst, char *s, char *fmt)
+static char **do_set_get(database *db, char **lst, char *s, const char *fmt)
    {int is, ns;
     char *var, *val, **sa;
     hashtab *tb;
@@ -673,7 +674,7 @@ static char **srv_process(srvdes *sv, char *s)
  *        - return TRUE iff successful
  */
 
-static int server(char *root, int init, int dmn)
+static int server(const char *root, int init, int dmn)
    {int rv, st;
     client *cl;
     srvdes sv;
@@ -722,7 +723,7 @@ static int server(char *root, int init, int dmn)
  *          - if LTR is TRUE strip off the quotes the server side added
  */
 
-static int exchange(char *root, int ltr, char *req)
+static int exchange(const char *root, int ltr, char *req)
    {int i, n, rv;
     char **ta;
     client *cl;
