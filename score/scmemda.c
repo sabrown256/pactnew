@@ -537,7 +537,7 @@ int SC_reg_mem(const void *p, long length, const char *name)
  * #bind SC_dereg_mem fortran()
  */
 
-int SC_dereg_mem(void *p)
+int SC_dereg_mem(const void *p)
    {int rv;
     long nb;
     mem_descriptor *desc;
@@ -796,7 +796,7 @@ long SC_arrlen(const void *p)
  * #bind SC_mark fortran() python()
  */
 
-int SC_mark(void *p, int n)
+int SC_mark(const void *p, int n)
    {mem_descriptor *desc;
     mem_inf *info;
 
@@ -817,7 +817,7 @@ int SC_mark(void *p, int n)
 
 /* SC_SET_COUNT - set the reference count of the given object */
 
-int SC_set_count(void *p, int n)
+int SC_set_count(const void *p, int n)
    {mem_descriptor *desc;
     mem_inf *info;
 
@@ -837,7 +837,7 @@ int SC_set_count(void *p, int n)
  *              - pass the pointer P through
  */
 
-void *SC_permanent(void *p)
+const void *SC_permanent(const void *p)
    {mem_descriptor *desc;
     mem_inf *info;
 
@@ -852,7 +852,7 @@ void *SC_permanent(void *p)
 
 /* SC_MEM_ATTRS - set various attribute on the memory block P */
 
-void *SC_mem_attrs(void *p, int attr)
+const void *SC_mem_attrs(const void *p, int attr)
    {mem_descriptor *desc;
     mem_inf *info;
 
@@ -955,7 +955,7 @@ char *SC_arrname(const void *p)
  *                - return the original type
  */
 
-int SC_set_arrtype(void *p, int type)
+int SC_set_arrtype(const void *p, int type)
    {int n;
     mem_descriptor *desc;
     mem_inf *info;

@@ -58,6 +58,11 @@ int _PD_register_spokes(void)
 
 EOF
 
+foreach i ($spokes)
+    echo "    extern int PD_register_${i}(void);" >>& pdspoke.c
+end
+echo "" >>& pdspoke.c
+
 echo "    if (ns == 0)" >>& pdspoke.c
 echo "       {G_register_pdb_types();" >>& pdspoke.c
 echo "        ns += (PD_register_pdb() >= 0);" >>& pdspoke.c

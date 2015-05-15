@@ -1000,9 +1000,11 @@ extern SC_mem_fnc
  SC_use_c_mm(void),
  SC_trap_pointer(void *p, int sig);
 
+extern const void
+ *SC_permanent(const void *p),
+ *SC_mem_attrs(const void *p, int attr);
+
 extern void
- *SC_permanent(void *p),
- *SC_mem_attrs(void *p, int attr),
  SC_untrap_pointer(void *p),
  *SC_copy_item(const void *in),
  SC_free_reg_mem_table(void);
@@ -1014,14 +1016,14 @@ extern int
  SC_mem_info(const void *p, long *pl, int *pt, int *pr, char **pn),
  SC_mem_trace(void),
  SC_reg_mem(const void *p, long length, const char *name),
- SC_dereg_mem(void *p),
+ SC_dereg_mem(const void *p),
  SC_is_score_ptr(const void *p),
- SC_mark(void *p, int n),
- SC_set_count(void *p, int n),
+ SC_mark(const void *p, int n),
+ SC_set_count(const void *p, int n),
  SC_ref_count(const void *p),
  SC_safe_to_free(const void *p),
  SC_arrtype(const void *p, int type),
- SC_set_arrtype(void *p, int type);
+ SC_set_arrtype(const void *p, int type);
 
 extern long
  SC_mem_chk(int typ),
