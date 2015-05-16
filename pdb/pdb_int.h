@@ -437,9 +437,9 @@ extern int64_t
 /* PDBDIR.C declarations */
 
 extern char
- **_PD_ls_extr(PDBfile *file, const char *path, const char *type,
+ **_PD_ls_extr(const PDBfile *file, const char *path, const char *type,
 	       long size, int *num, int all, const char *flags),
- *_PD_fixname(PDBfile *file, const char *inname);
+ *_PD_fixname(const PDBfile *file, const char *inname);
 
 
 /* PDBX.C declarations */
@@ -535,7 +535,8 @@ extern int
  _PD_remove_type(PDBfile *file, char *name),
  _PD_rev_chrt(hasharr *ch),
  _PD_items_per_tuple(defstr *dp),
- _PD_set_current_address(PDBfile *file, int64_t addr, int wh, PD_major_op tag),
+ _PD_set_current_address(PDBfile *file, int64_t addr,
+			 int wh, PD_major_op tag),
  _PD_init_s(void);
 
 extern int64_t
@@ -543,7 +544,7 @@ extern int64_t
  _PD_eod(PDBfile *file),
  _PD_get_next_address(PDBfile *file, const char *type, inti ni,
 		      const void *vr, int seekf, int tellf, int colf),
- _PD_get_current_address(PDBfile *file, PD_major_op tag);
+ _PD_get_current_address(const PDBfile *file, PD_major_op tag);
 
 extern defstr
  *_PD_defstr(PDBfile *file, PD_chart_kind host,
@@ -554,7 +555,7 @@ extern defstr
  *_PD_defstr_inst(PDBfile *file, const char *name, SC_kind kind,
 		  memdes *desc, PD_byte_order ord,
 		  int *ordr, long *formt, PD_chart_kind chk),
- *_PD_type_container(PDBfile *file, defstr *dp);
+ *_PD_type_container(const PDBfile *file, defstr *dp);
 
 extern PDBfile
  *_PD_create(tr_layer *tr, SC_udl *pu, char *name, char *mode, void *a),
@@ -573,7 +574,7 @@ extern dimdes
  *_PD_ex_dims(const char *memb, int defoff, int *pde);
 
 extern defstr
- *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, const char *ty);
+ *_PD_type_lookup(const PDBfile *file, PD_chart_kind ch, const char *ty);
 
 extern long
  _PD_member_items(const char *s),

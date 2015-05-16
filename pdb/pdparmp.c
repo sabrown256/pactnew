@@ -1463,7 +1463,7 @@ static BF_FILE *_PD_get_file_ptr_d(FILE *file)
 
 /* _PD_GET_FILE_SIZE_D - return the file size */
 
-static int64_t _PD_get_file_size_d(PDBfile *file)
+static int64_t _PD_get_file_size_d(const PDBfile *file)
    {int status;
     int64_t rv;
     MPI_Offset sz;

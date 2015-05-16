@@ -329,7 +329,7 @@ intb _PD_num_indirects(char *type, hasharr *tab)
  *                      - for deref_addr variants
  */
 
-static void _PD_block_deref_addr(PD_smp_state *pa, PDBfile *file,
+static void _PD_block_deref_addr(PD_smp_state *pa, const PDBfile *file,
 				 locator *stck, long n,
 				 int64_t addr, long numb)
    {dimdes *dims;
@@ -946,7 +946,7 @@ static int64_t _PD_ptr_deref_addr(PD_smp_state *pa, int n)
  */
 
 static int64_t _PD_ptr_index_deref(PD_smp_state *pa, int n,
-                                 dimdes **pdims, long *pnumb)
+				   dimdes **pdims, long *pnumb)
    {int64_t addr;
     char *type;
     SC_array *nbl;
@@ -1271,7 +1271,7 @@ static int _PD_is_member(char *name, memdes *desc, hasharr *tab, long *pns)
  */
 
 static char *_PD_get_type_member(PDBfile *file, PD_smp_state *pa,
-				 char *path_name, char *name,
+				 const char *path_name, const char *name,
 				 memdes *desc, defstr **pdp)
    {char *mtype;
     hasharr *tab;
@@ -2092,7 +2092,7 @@ static void _PD_parse(PD_smp_state *pa)
  *
  */
 
-syment *_PD_effective_ep(PDBfile *file, const char *name,
+syment *_PD_effective_ep(const PDBfile *file, const char *name,
 			 int flag, char *fullname)
    {int alloc_frames;
     dimdes *dims;
@@ -2168,7 +2168,7 @@ syment *_PD_effective_ep(PDBfile *file, const char *name,
 	     break;};
 
 /* copy these arguments into global (file static) variables */
-    FILE_S      = file;
+    FILE_S      = (PDBfile *) file;
     FRAME(flag) = flag;
 
     _PD_parse(pa);

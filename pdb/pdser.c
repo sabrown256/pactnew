@@ -168,7 +168,7 @@ static BF_FILE *_PD_get_file_ptr_s(FILE *file)
 
 /* _PD_GET_FILE_SIZE_S - return the file size */
 
-static int64_t _PD_get_file_size_s(PDBfile *file)
+static int64_t _PD_get_file_size_s(const PDBfile *file)
    {int64_t rv;
     FILE *fp;
 

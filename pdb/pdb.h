@@ -762,7 +762,7 @@ struct s_PD_pfm_fnc
     int (*is_null_fp)(void *fp);
     int (*is_sequential)(void);
     int (*is_master)(PDBfile *file);
-    int64_t (*get_file_size)(PDBfile *fp);
+    int64_t (*get_file_size)(const PDBfile *fp);
     int64_t (*getspace)(PDBfile *file, size_t nbytes, int rflag, int colf);
     int64_t (*next_address)(PDBfile *file, const char *type, long number,
 			    const void *vr, int seekf, int tellf, int colf);
@@ -1026,14 +1026,15 @@ extern void
 /* PDBDIR.C declarations */
 
 extern char
- **PD_ls(PDBfile *file, const char *path, const char *type, int *num),
- **PD_ls_alt(PDBfile *file, const char *path, const char *type,
+ **PD_ls(const PDBfile *file, const char *path,
+	 const char *type, int *num),
+ **PD_ls_alt(const PDBfile *file, const char *path, const char *type,
 	     int *num, const char *flags),
- *PD_pwd(PDBfile *file);
+ *PD_pwd(const PDBfile *file);
 
 extern int
  PD_cd(PDBfile *file, const char *dirname),
- PD_isdir(PDBfile *file, const char *dirname),
+ PD_isdir(const PDBfile *file, const char *dirname),
  PD_mkdir(PDBfile *file, const char *dirname),
  PD_ln(PDBfile *file, const char *oldname, const char *newname),
  PD_def_dir(PDBfile *file);
@@ -1196,20 +1197,20 @@ extern dimdes
  *PD_entry_dimensions(syment *ep);
 
 extern defstr
- *PD_inquire_type(PDBfile *file, const char *name),
- *PD_inquire_host_type(PDBfile *file, const char *name);
+ *PD_inquire_type(const PDBfile *file, const char *name),
+ *PD_inquire_host_type(const PDBfile *file, const char *name);
 
 extern char
- *PD_get_file_name(PDBfile *file),
+ *PD_get_file_name(const PDBfile *file),
  *PD_entry_type(syment *ep),
  *PD_get_error(void);
 
 extern PD_major_op
- PD_get_mode(PDBfile *file),
+ PD_get_mode(const PDBfile *file),
  PD_set_mode(PDBfile *file, PD_major_op v);
 
 extern PD_major_order
- PD_get_major_order(PDBfile *file),
+ PD_get_major_order(const PDBfile *file),
  PD_set_major_order(PDBfile *file, PD_major_order v);
 
 extern int64_t
@@ -1217,8 +1218,8 @@ extern int64_t
  PD_set_buffer_size(int64_t v),
  PD_entry_set_address(syment *ep, int64_t a),
  PD_entry_address(syment *ep),
- PD_get_file_length(PDBfile *file),
- PD_get_max_file_size(PDBfile *file),
+ PD_get_file_length(const PDBfile *file),
+ PD_get_max_file_size(const PDBfile *file),
  PD_set_max_file_size(PDBfile *file, int64_t v);
 
 extern long
@@ -1226,11 +1227,11 @@ extern long
  PD_set_pointer_size(long n);
 
 extern int
- PD_get_system_version(PDBfile *file),
+ PD_get_system_version(const PDBfile *file),
  PD_get_entry_info(syment *ep, char **ptyp, long *pni, int *pnd, long **pdim),
- PD_get_offset(PDBfile *file),
+ PD_get_offset(const PDBfile *file),
  PD_set_offset(PDBfile *file, int v),
- PD_get_track_pointers(PDBfile *file),
+ PD_get_track_pointers(const PDBfile *file),
  PD_set_track_pointers(PDBfile *file, int v),
  PD_get_fmt_version(void),
  PD_set_fmt_version(int v),
@@ -1270,16 +1271,16 @@ extern char
 		   int major_order, int def_off);
 
 extern haelem
- *PD_inquire_symbol(PDBfile *file, const char *name,
+ *PD_inquire_symbol(const PDBfile *file, const char *name,
 		    int flag, char *fullname, hasharr *tab);
 
 extern syment
- *PD_inquire_entry(PDBfile *file, const char *name,
+ *PD_inquire_entry(const PDBfile *file, const char *name,
 		   int flag, char *fullname),
- *PD_query_entry(PDBfile *file, const char *name, char *fullname),
- *PD_effective_entry(PDBfile *file, const char *name,
+ *PD_query_entry(const PDBfile *file, const char *name, char *fullname),
+ *PD_effective_entry(const PDBfile *file, const char *name,
 		     int flag, char *fullname),
- *_PD_effective_ep(PDBfile *file, const char *name,
+ *_PD_effective_ep(const PDBfile *file, const char *name,
 		   int flag, char *fullname);
 
 

@@ -287,7 +287,7 @@ int _PD_safe_flush(PDBfile *file)
  * #bind PD_inquire_type fortran() scheme() python()
  */
 
-defstr *PD_inquire_type(PDBfile *file ARG(,,cls), const char *name)
+defstr *PD_inquire_type(const PDBfile *file ARG(,,cls), const char *name)
    {defstr *dp;
 
     dp = NULL;
@@ -307,7 +307,8 @@ defstr *PD_inquire_type(PDBfile *file ARG(,,cls), const char *name)
  * #bind PD_inquire_host_type fortran() scheme() python()
  */
 
-defstr *PD_inquire_host_type(PDBfile *file ARG(,,cls), const char *name)
+defstr *PD_inquire_host_type(const PDBfile *file ARG(,,cls),
+			     const char *name)
    {defstr *dp;
 
     if (_PD_indirection(name) == TRUE)
@@ -478,7 +479,8 @@ static defstr *_PD_defstr_in(hasharr *chart, const char *name, SC_kind kind,
 /*--------------------------------------------------------------------------*/
 
 /* _PD_DEFSTR - primitive define struct used to install the primitive types
- *            - in the specified chart set (both hashed and non-hashed versions) 
+ *            - in the specified chart set
+ *            - (both hashed and non-hashed versions) 
  */
 
 defstr *_PD_defstr(PDBfile *file, PD_chart_kind chk,
@@ -682,7 +684,7 @@ void PD_typedef_primitive_types(PDBfile *file ARG(,,cls))
  *                    - standard primitive types, return NULL
  */
 
-defstr *_PD_type_container(PDBfile *file, defstr *dp)
+defstr *_PD_type_container(const PDBfile *file, defstr *dp)
    {int i, n, id, ipt;
     long size;
     char *type;
@@ -746,7 +748,7 @@ int _PD_items_per_tuple(defstr *dp)
 
 /* _PD_GET_CURRENT_ADDRESS - return the current file address */
 
-int64_t _PD_get_current_address(PDBfile *file, PD_major_op tag)
+int64_t _PD_get_current_address(const PDBfile *file, PD_major_op tag)
    {int64_t addr;
     FILE *fp;
 
@@ -1158,7 +1160,7 @@ int64_t PD_set_buffer_size(int64_t v)
  * #bind PD_get_system_version fortran() scheme() python()
  */
 
-int PD_get_system_version(PDBfile *file ARG(,,cls))
+int PD_get_system_version(const PDBfile *file ARG(,,cls))
    {int rv;
 
     if (file != NULL)
@@ -1176,7 +1178,7 @@ int PD_get_system_version(PDBfile *file ARG(,,cls))
  * #bind PD_get_file_length fortran() scheme() python()
  */
 
-int64_t PD_get_file_length(PDBfile *file ARG(,,cls))
+int64_t PD_get_file_length(const PDBfile *file ARG(,,cls))
    {int64_t rv;
 
     rv = _PD_GET_FILE_SIZE(file);
@@ -1571,7 +1573,7 @@ void _PD_request_unset(PDBfile *file)
  * #bind PD_get_mode fortran() scheme() python()
  */
 
-PD_major_op PD_get_mode(PDBfile *file ARG(,,cls))
+PD_major_op PD_get_mode(const PDBfile *file ARG(,,cls))
    {PD_major_op rv;
 
     if (file != NULL)
@@ -1608,7 +1610,7 @@ PD_major_op PD_set_mode(PDBfile *file ARG(,,cls), PD_major_op v)
  * #bind PD_get_offset fortran() scheme() python()
  */
 
-int PD_get_offset(PDBfile *file ARG(,,cls))
+int PD_get_offset(const PDBfile *file ARG(,,cls))
    {int rv;
 
     if (file != NULL)
@@ -1645,7 +1647,7 @@ int PD_set_offset(PDBfile *file ARG(,,cls), int v)
  * #bind PD_get_major_order fortran() scheme() python()
  */
 
-PD_major_order PD_get_major_order(PDBfile *file ARG(,,cls))
+PD_major_order PD_get_major_order(const PDBfile *file ARG(,,cls))
    {PD_major_order rv;
 
     if (file != NULL)
@@ -1682,7 +1684,7 @@ PD_major_order PD_set_major_order(PDBfile *file ARG(,,cls), PD_major_order v)
  * #bind PD_get_track_pointers fortran() scheme() python()
  */
 
-int PD_get_track_pointers(PDBfile *file ARG(,,cls))
+int PD_get_track_pointers(const PDBfile *file ARG(,,cls))
    {int rv;
 
     if (file != NULL)
@@ -1720,7 +1722,7 @@ int PD_set_track_pointers(PDBfile *file ARG(,,cls), int v)
  * #bind PD_get_max_file_size fortran() scheme() python()
  */
 
-int64_t PD_get_max_file_size(PDBfile *file ARG(,,cls))
+int64_t PD_get_max_file_size(const PDBfile *file ARG(,,cls))
    {int64_t rv;
 
     if (file != NULL)
@@ -1822,7 +1824,7 @@ long PD_set_pointer_size(long n)
  * #bind PD_get_file_name fortran() scheme() python()
  */
 
-char *PD_get_file_name(PDBfile *file ARG(,,cls))
+char *PD_get_file_name(const PDBfile *file ARG(,,cls))
    {char *rv;
 
     if (file != NULL)

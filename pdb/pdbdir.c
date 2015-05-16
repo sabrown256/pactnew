@@ -246,7 +246,7 @@ static int _PD_is_hidden(const char *pattern, const char *entry)
  *             - are terminated with a slash.
  */
 
-char **_PD_ls_extr(PDBfile *file, const char *path, const char *type,
+char **_PD_ls_extr(const PDBfile *file, const char *path, const char *type,
 		   long size, int *num, int all, const char *flags)
    {int nc, ne, nvars, i, has_dirs, head, pass; 
     int iflags, psx;
@@ -429,7 +429,8 @@ char **_PD_ls_extr(PDBfile *file, const char *path, const char *type,
  * #bind PD_ls fortran() scheme() python()
  */
 
-char **PD_ls(PDBfile *file ARG(,,cls), const char *path, const char *type,
+char **PD_ls(const PDBfile *file ARG(,,cls),
+	     const char *path, const char *type,
 	     int *num)
    {char **rv;
 
@@ -451,7 +452,7 @@ char **PD_ls(PDBfile *file ARG(,,cls), const char *path, const char *type,
  * #bind PD_ls_alt fortran() scheme() python()
  */
 
-char **PD_ls_alt(PDBfile *file ARG(,,cls), const char *path,
+char **PD_ls_alt(const PDBfile *file ARG(,,cls), const char *path,
 		 const char *type, int *num, const char *flags)
    {char **rv;
 
@@ -516,7 +517,7 @@ int PD_def_dir(PDBfile *file ARG(,,cls))
  *                - exists
  */
 
-static int _PD_exist_path(PDBfile *file, const char *path)
+static int _PD_exist_path(const PDBfile *file, const char *path)
    {int ret;
     char head[MAXLINE];
     char *s;
@@ -549,7 +550,7 @@ static int _PD_exist_path(PDBfile *file, const char *path)
  * #bind PD_isdir fortran() scheme() python()
  */
 
-int PD_isdir(PDBfile *file ARG(,,cls), const char *dir)
+int PD_isdir(const PDBfile *file ARG(,,cls), const char *dir)
    {int ret;
     char name[MAXLINE];
     syment *ep;
@@ -640,7 +641,7 @@ int PD_mkdir(PDBfile *file ARG(,,cls), const char *dir)
  * #bind PD_pwd fortran() scheme() python()
  */
 
-char *PD_pwd(PDBfile *file ARG(,,cls))
+char *PD_pwd(const PDBfile *file ARG(,,cls))
    {char *cwd, *pre;
     PD_smp_state *pa;
 
@@ -668,10 +669,10 @@ char *PD_pwd(PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 
 /* _PD_FIXNAME - make full pathname from current working directory
- *                  - and the given pathname (absolute or relative)
+ *             - and the given pathname (absolute or relative)
  */
 
-char *_PD_fixname(PDBfile *file, const char *inname)
+char *_PD_fixname(const PDBfile *file, const char *inname)
    {char *node, *p, *s, *out;
     char tmpstr[MAXLINE];
     PD_smp_state *pa;

@@ -469,7 +469,8 @@ static defstr *_PD_lookup_type(const char *s, hasharr *tab)
  *                 - return the defstr
  */
 
-defstr *_PD_type_lookup(PDBfile *file, PD_chart_kind ch, const char *s)
+defstr *_PD_type_lookup(const PDBfile *file, PD_chart_kind ch,
+			const char *s)
    {defstr *dp;
 
     switch (ch)
@@ -593,7 +594,7 @@ int64_t _PD_member_location(const char *s, hasharr *tab,
  * #bind PD_inquire_symbol fortran() scheme() python()
  */
 
-haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
+haelem *PD_inquire_symbol(const PDBfile *file ARG(,,cls),
 			  const char *name, int flag,
 			  char *fullname, hasharr *tab)
    {char s[MAXLINE], t[MAXLINE];
@@ -637,7 +638,7 @@ haelem *PD_inquire_symbol(PDBfile *file ARG(,,cls),
  * #bind PD_query_entry fortran() scheme() python()
  */
 
-syment *PD_query_entry(PDBfile *file ARG(,,cls), const char *name,
+syment *PD_query_entry(const PDBfile *file ARG(,,cls), const char *name,
 		       char *fullname)
    {haelem *hp;
     syment *ep;
@@ -655,7 +656,7 @@ syment *PD_query_entry(PDBfile *file ARG(,,cls), const char *name,
  * #bind PD_inquire_entry fortran() scheme() python()
  */
 
-syment *PD_inquire_entry(PDBfile *file ARG(,,cls), const char *name,
+syment *PD_inquire_entry(const PDBfile *file ARG(,,cls), const char *name,
 			 int flag, char *fullname)
    {haelem *hp;
     syment *ep;
@@ -677,7 +678,7 @@ syment *PD_inquire_entry(PDBfile *file ARG(,,cls), const char *name,
  * #bind PD_effective_entry fortran() scheme() python()
  */
 
-syment *PD_effective_entry(PDBfile *file ARG(,,cls), const char *name,
+syment *PD_effective_entry(const PDBfile *file ARG(,,cls), const char *name,
 			   int flag, char *fullname)
    {syment *ep;
 
