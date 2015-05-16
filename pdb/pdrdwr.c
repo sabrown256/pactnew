@@ -253,7 +253,7 @@ static void _PD_init_dimind(dimind *pi, long offset, long stride, char *expr)
  *                           - from the given hyper index expression
  */
 
-static dimind  *_PD_compute_hyper_strides(PDBfile *file, char *ind,
+static dimind  *_PD_compute_hyper_strides(const PDBfile *file, char *ind,
 					  dimdes *dims, int *pnd)
    {int i, nd, max_nd, off;
     inti maxs, old_start, old_stop;
@@ -388,7 +388,7 @@ static dimind  *_PD_compute_hyper_strides(PDBfile *file, char *ind,
  *                  -
  */
 
-int64_t _PD_hyper_number(PDBfile *file, char *indxpr,
+int64_t _PD_hyper_number(const PDBfile *file, char *indxpr,
 			 dimdes *dims, inti *poff)
    {int i, nd;
     inti maxs, sum, offs;
@@ -422,7 +422,8 @@ int64_t _PD_hyper_number(PDBfile *file, char *indxpr,
  * #bind PD_hyper_number fortran() scheme() python()
  */
 
-long PD_hyper_number(PDBfile *file ARG(,,cls), const char *name, syment *ep)
+long PD_hyper_number(const PDBfile *file ARG(,,cls),
+		     const char *name, syment *ep)
    {int c;
     long rv;
     char s[MAXLINE];

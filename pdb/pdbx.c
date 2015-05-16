@@ -118,7 +118,7 @@ static void _PD_rl_attribute_value(attribute_value *avl)
  * #bind PD_inquire_attribute fortran() scheme() python()
  */
 
-attribute *PD_inquire_attribute(PDBfile *file ARG(,,cls),
+attribute *PD_inquire_attribute(const PDBfile *file ARG(,,cls),
 				const char *name, char *path)
    {haelem *hp;
     attribute *at;
@@ -138,7 +138,7 @@ attribute *PD_inquire_attribute(PDBfile *file ARG(,,cls),
  * #bind PD_inquire_attribute_value fortran() scheme() python()
  */
 
-attribute_value *PD_inquire_attribute_value(PDBfile *file ARG(,,cls),
+attribute_value *PD_inquire_attribute_value(const PDBfile *file ARG(,,cls),
 					    const char *name, char *path)
    {haelem *hp;
     attribute_value *avl;
@@ -333,7 +333,7 @@ int PD_set_attribute(PDBfile *file ARG(,,cls),
  * #bind PD_get_attribute fortran() scheme() python()
  */
 
-void *PD_get_attribute(PDBfile *file ARG(,,cls),
+void *PD_get_attribute(const PDBfile *file ARG(,,cls),
 		       const char *vr, const char *at)
    {char fat[MAXLINE], favl[MAXLINE];
     char *vt;

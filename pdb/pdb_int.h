@@ -398,7 +398,8 @@ extern long
 		    intb hbpi, PD_byte_order hord, data_standard *hs);
 
 extern int64_t
- _PD_hyper_number(PDBfile *file, char *indxpr, dimdes *dims, inti *poff);
+ _PD_hyper_number(const PDBfile *file, char *indxpr,
+		  dimdes *dims, inti *poff);
 
 extern void
  _PD_sign_extend(char *out, inti ni,
@@ -665,13 +666,13 @@ extern char
 /* PDPRNT.C declarations */
 
 extern int
- _PD_print_leaf(PD_printdes *prnt, PDBfile *file,
+ _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
 		const char *vr, inti ni,
 		const char *type, int irecursion, int n, long *ind);
 
 extern void
- _PD_set_digits(PDBfile *file),
- _PD_digits_tol(PDBfile *file_a, PDBfile *file_b);
+ _PD_set_digits(const PDBfile *file),
+ _PD_digits_tol(const PDBfile *file_a, const PDBfile *file_b);
 
 
 /* PDPTR.C declarations */

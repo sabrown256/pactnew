@@ -260,7 +260,8 @@ typedef struct s_PD_pfm_fnc PD_pfm_fnc;
 typedef struct s_PD_scope_public PD_scope_public;
 
 typedef int (*PFifltdes)(PDBfile *file, fltdes *fl, fltdat *inf);
-typedef memdes *(*PFPDBwrite)(PDBfile *file, const char *vr, defstr *defp);
+typedef memdes *(*PFPDBwrite)(const PDBfile *file,
+			      const char *vr, defstr *defp);
 typedef memdes *(*PFPDBread)(memdes *members);
 
 typedef int (*PFSymDelay)(PDBfile *file, int ad,
@@ -1084,7 +1085,7 @@ extern defstr
 /* PDBX.C declarations */
 
 extern void
- *PD_get_attribute(PDBfile *file, const char *vr, const char *at);
+ *PD_get_attribute(const PDBfile *file, const char *vr, const char *at);
 
 extern int
  PD_def_pdb_types(PDBfile *file),
@@ -1110,10 +1111,11 @@ extern int
 
 extern attribute
  *PD_mk_attribute(const char *at, const char *type),
- *PD_inquire_attribute(PDBfile *file, const char *name, char *path);
+ *PD_inquire_attribute(const PDBfile *file, const char *name, char *path);
 
 extern attribute_value
- *PD_inquire_attribute_value(PDBfile *file, const char *name, char *path);
+ *PD_inquire_attribute_value(const PDBfile *file,
+			     const char *name, char *path);
 
 extern void
  PD_rel_image(PD_image *im),
@@ -1296,16 +1298,17 @@ extern int
 /* PDPRNT.C declarations */
 
 extern int
- PD_print_entry(PDBfile *file, const char *name, const void *vr, syment *ep),
- PD_write_entry(FILE *f0,
-                PDBfile *file, const char *name, const void *vr, syment *ep,
+ PD_print_entry(const PDBfile *file, const char *name,
+		const void *vr, syment *ep),
+ PD_write_entry(FILE *f0, const PDBfile *file,
+		const char *name, const void *vr, syment *ep,
                 int n, long *ind);
 
 extern void
- PD_print_extras(PDBfile *file),
+ PD_print_extras(const PDBfile *file),
  PD_print_syment(syment *ep),
  PD_print_defstr(defstr *dp),
- PD_write_extras(FILE *f0, PDBfile *file),
+ PD_write_extras(FILE *f0, const PDBfile *file),
  PD_write_syment(FILE *f0, syment *ep),
  PD_write_defstr(FILE *f0, defstr *dp);
 
@@ -1319,7 +1322,7 @@ extern int
 /* PDRDWR.C declarations */
 
 extern long
- PD_hyper_number(PDBfile *file, const char *name, syment *ep);
+ PD_hyper_number(const PDBfile *file, const char *name, syment *ep);
 
 extern char
  *PD_dereference(char *s);

@@ -17,7 +17,7 @@ typedef int (*PFPrnt)(FILE *fp, void *p, int i, int mode);
 static int
  _PD_print_data(FILE *f0,
 		char *prefix, char *before, char *after,
-		char *nodename, PDBfile *file, const void *vr,
+		char *nodename, const PDBfile *file, const void *vr,
 		inti ni, char *type, dimdes *dims,
 		int mjr, int def_off, int irecursion,
 		int n, long *ind);
@@ -205,7 +205,7 @@ static void _PD_disp_data(PD_printdes *prnt, const void *x,
  * #bind PD_write_extras fortran() scheme() python()
  */
 
-void PD_write_extras(FILE *f0, PDBfile *file ARG(,,cls))
+void PD_write_extras(FILE *f0, const PDBfile *file ARG(,,cls))
    {long i;
     char *date;
     defstr *dp;
@@ -279,7 +279,7 @@ void PD_write_extras(FILE *f0, PDBfile *file ARG(,,cls))
  * #bind PD_print_extras fortran() scheme() python()
  */
 
-void PD_print_extras(PDBfile *file ARG(,,cls))
+void PD_print_extras(const PDBfile *file ARG(,,cls))
    {
 
     PD_write_extras(stdout, file);
@@ -504,7 +504,8 @@ static void _PD_print_char_kind(PD_printdes *prnt, const char *vr, inti ni,
  *              - indices
  */
 
-static int _PD_io_print(PD_printdes *prnt, PDBfile *file, const char *vr,
+static int _PD_io_print(PD_printdes *prnt, const PDBfile *file,
+			const char *vr,
 			inti ni, const char *type, int n, long *ind)
    {int k, m, idx, nn, isz, status, quo;
     int id, ifx, ifp, icx;
@@ -610,7 +611,7 @@ static int _PD_io_print(PD_printdes *prnt, PDBfile *file, const char *vr,
  * #bind PD_write_entry fortran() scheme() python()
  */
 
-int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
+int PD_write_entry(FILE *f0, const PDBfile *file ARG(,,cls),
 		   const char *name, const void *vr,
 		   syment *ep, int n, long *ind)
    {int status;
@@ -660,7 +661,7 @@ int PD_write_entry(FILE *f0, PDBfile *file ARG(,,cls),
  * #bind PD_print_entry fortran() scheme() python()
  */
 
-int PD_print_entry(PDBfile *file ARG(,,cls),
+int PD_print_entry(const PDBfile *file ARG(,,cls),
 		   const char *name, const void *vr, syment *ep)
    {int rv;
 
@@ -673,8 +674,8 @@ int PD_print_entry(PDBfile *file ARG(,,cls),
 
 /* _PD_PRINT_INDIRECTION - handle the indirects for the print process */
 
-static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
-				 inti ni, char *type,
+static int _PD_print_indirection(PD_printdes *prnt, const PDBfile *file,
+				 char **vr, inti ni, char *type,
                                  int irecursion, int n, long *ind)
    {int min_index, status, def_off;
     inti i, ditems, nc, nr;
@@ -755,7 +756,7 @@ static int _PD_print_indirection(PD_printdes *prnt, PDBfile *file, char **vr,
 /* _PD_PRINT_DATA - print out variables in a nicely formatted way  */
 
 static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after, 
-                          char *nodename, PDBfile *file,
+                          char *nodename, const PDBfile *file,
 			  const void *vr, inti ni,
                           char *type, dimdes *dims, int mjr, int def_off, 
                           int irecursion, int n, long *ind)
@@ -791,7 +792,8 @@ static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after,
 /* _PD_PRINT_MEMBER - print the specified member of a struct */
 
 static int _PD_print_member(FILE *f0, char *prefix,
-			    char *mbefore, char *mafter, PDBfile *file,
+			    char *mbefore, char *mafter,
+			    const PDBfile *file,
 			    const char *svr, const char *type,
 			    memdes *desc, char *mfield, long nb,
 			    int mjr, int def_off, 
@@ -854,7 +856,7 @@ static int _PD_print_member(FILE *f0, char *prefix,
  *                - otherwise, lookup the type, and display each member.
  */
 
-int _PD_print_leaf(PD_printdes *prnt, PDBfile *file,
+int _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
 		   const char *vr, inti ni,
 		   const char *type, int irecursion, int n, long *ind)
    {int mjr, def_off;
@@ -907,7 +909,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file,
         strcpy(s, before);
 
         if (PD_gs.write != NULL)
-           mem_lst = (*PD_gs.write)(file, vr, defp);
+           mem_lst = PD_gs.write(file, vr, defp);
 
         size = defp->size;
 
@@ -982,7 +984,7 @@ int _PD_print_leaf(PD_printdes *prnt, PDBfile *file,
 
 /* _PD_SET_DIGITS - set the decimal printing precision parameters */
 
-void _PD_set_digits(PDBfile *file)
+void _PD_set_digits(const PDBfile *file)
    {int i, d, dig;
     int *fix_pre;
     long *f;
@@ -1023,7 +1025,7 @@ void _PD_set_digits(PDBfile *file)
  *                - the comparison tolerances for floating point numbers
  */
 
-void _PD_digits_tol(PDBfile *file_a, PDBfile *file_b)
+void _PD_digits_tol(const PDBfile *file_a, const PDBfile *file_b)
    {int i, nmb, da, db, dig;
     int *fix_pre;
     long *fa, *fb;
