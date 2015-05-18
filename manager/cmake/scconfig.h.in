@@ -1,0 +1,96 @@
+/*
+ * SCCONFIG.H - configuration defined by empress
+ *            - defines the following configuration parameters for PACT
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#ifndef PCK_CONFIGURATION
+
+#define PCK_CONFIGURATION
+
+#define PACT_VERSION        "@PACT_VERSION@"
+#define CPU_TYPE            x86_64
+#define FPU_TYPE            x87
+#define PSY_Arch            "@PACT_PSY_Arch@"
+#define PSY_TYPE            "unknown"
+#define PSY_ID              "lnx-2.12-o"
+#define PSY_Prefix          "z-"
+#define PSY_TmpDir          "z-lnx-2.12-o"
+#define USE_COMPILER        "gcc"
+#define COMPILER_GNU
+#define COMPILER_VERSION    "4.9.0"
+#define SHELL_Default       "/bin/bash"
+#define PACT_SO_CACHE       "/lnx-2.12-o"
+
+#define ANSI
+#undef SIGNED
+#define SIGNED signed
+#undef INLINE
+#define INLINE
+#undef NORETURN
+#define NORETURN _Noreturn
+#define NO_LONG_LONG
+#define AF_LONG8
+#define AF_LONG_DOUBLE_IO 2
+#define FIXNUM int
+
+#define FC_INT_PTR_DIFFER
+#define HAVE_ANSI_FLOAT16
+#define HAVE_ANSI_C9X_COMPLEX
+#define HAVE_ANSI_C9X_FENV
+#define HAVE_COMPLEX_VA_ARG
+#define HAVE_GNU_FENV
+#define HAVE_VA_COPY
+#define HAVE_SQL
+#define HAVE_SQLITE
+#define HAVE_SQLITE_V2
+#define HAVE_JPEGLIB
+#define HAVE_PNGLIB
+#define HAVE_FORK_EXEC
+#define HAVE_GETHOSTBYNAME
+#define HAVE_RESOURCE_USAGE
+#define HAVE_GETPWUID
+#define HAVE_POSIX_SIGNALS
+#define HAVE_STREAMS
+#define HAVE_UNIX98_PTY
+#define HAVE_MMAP
+#define HAVE_POSIX_STRERROR
+#define HAVE_VSNPRINTF
+#define HAVE_GNU_LIBC_6
+#define HAVE_DYNAMIC_LINKER
+#define HAVE_BFD
+#define OpenMP_OVER_SCHED
+#define RF_DEBUG
+#define USE_FLEX
+#define HAVE_X11
+#define HAVE_OGL
+#define LEH_TTY_CRNL
+#define LEH_TTY_ECHO
+#define LEH_TTY_VTIME
+
+#define BFD_VERSION ""
+#define HAVE_DEV_ZERO
+#cmakedefine HAVE_PROCESS_CONTROL
+#cmakedefine HAVE_SOCKETS
+typedef unsigned int SOCKOPT_T;
+
+
+#define FABSL  fabsl
+#define POWL  powl
+#define CREALL  creall
+#define CIMAGL  cimagl
+
+#define FF_ID(x, X)      x ## _
+
+#undef UNIX
+#define UNIX
+#undef USE_SYSV
+#define USE_SYSV
+#undef LINUX
+#define LINUX
+#include <sclnx.h>
+
+#endif

@@ -318,7 +318,7 @@ extern PM_mapping
 /* SXHOOK.C declarations */
 
 extern memdes
- *_SX_hash_hook(PDBfile *file, const char *vr, defstr *dp);
+ *_SX_hash_hook(const PDBfile *file, const char *vr, defstr *dp);
 
 extern void
  _SX_init_hash_objects(SS_psides *si, PDBfile *file),

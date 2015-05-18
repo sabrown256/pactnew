@@ -116,7 +116,7 @@ switch ($cname)
         set pact_cc_family = CLANG
         set pact_cx_family = CLANG
         set pact_fc_family = GNU
-        set opt   = ( -v )
+        set opt   = ( --version )
         set pat   = ( clang version )
 
 # toxic piece of crap

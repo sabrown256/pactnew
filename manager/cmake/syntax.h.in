@@ -1,0 +1,22 @@
+/*
+ * SYNTAX.H - Configure SCHEME Syntax Modes for empress
+ *
+ * Source Version: 5.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#define HAVE_C_SYNTAX
+#define HAVE_F_SYNTAX
+#define HAVE_M_SYNTAX
+
+#define DEF_SYNTAX_MODES(_si) \
+    SS_init_m_syntax_mode(_si); \
+    SS_init_f_syntax_mode(_si); \
+    SS_init_c_syntax_mode(_si)
+
+extern void
+ SS_init_m_syntax_mode(SS_psides *si),
+ SS_init_f_syntax_mode(SS_psides *si),
+ SS_init_c_syntax_mode(SS_psides *si);
+

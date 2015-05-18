@@ -10,16 +10,19 @@
 unalias *
 umask 007
 
-setenv TestScrDir $cwd
-foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
-   if (-f $f/functions-pact.csh) then
-      pushd $f >>& /dev/null
-      setenv TestScrDir $cwd
-      setenv PSY_Base $cwd:h
-      popd >>& /dev/null
-      break
-   endif
-end
+
+if ($?TestScrDir == 0) then
+   setenv TestScrDir $cwd
+   foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
+      if (-f $f/functions-pact.csh) then
+         pushd $f >>& /dev/null
+         setenv TestScrDir $cwd
+         setenv PSY_Base $cwd:h
+         popd >>& /dev/null
+         break
+      endif
+   end
+endif
 source $TestScrDir/functions-pact.csh
 setenv TEST_CHECK $TestScrDir/test-check
 
@@ -65,7 +68,11 @@ if ($?Valgrind == 0) then
    setenv Valgrind ""
 endif
 
-set ldof = `pact -info PSY_Dbg_Opt`
+if ($?PSY_Dbg_Opt == 0) then
+   set ldof = `pact -info PSY_Dbg_Opt`
+else
+   set ldof = $PSY_Dbg_Opt
+endif
 switch ($ldof)
    case debug:
         setenv LogSfx  g
@@ -102,7 +109,10 @@ setenv ZeroSpace  "-z 2"
    setenv LibDir    $PSY_Root/lib
    setenv BinDir    $PSY_Root/bin
 
-   setenv TestDir   $SrcDir/$PSY_TmpDir/test
+   if ($?TestDir == 0) then
+      # Cmake sets testdir itself
+      setenv TestDir   $SrcDir/$PSY_TmpDir/test
+   endif
    setenv FilesDir  $SrcDir/tests
    setenv RefDir    $FilesDir/ref
 

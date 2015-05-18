@@ -525,11 +525,11 @@ extern void
  _PD_def_real(PDBfile *file, const char *type),
  _PD_d_install(PDBfile *file, const char *name, defstr *def,
 	       PD_chart_kind chk, const char *alias),
- _PD_e_install(PDBfile *file, const char *name, syment *entr, int lookup),
  _PD_request_unset(PDBfile *file),
  _PD_replace_file(PDBfile *file, const char *name, int64_t addr);
 
 extern int
+ _PD_e_install(PDBfile *file, const char *name, syment *entr, int lookup),
  _PD_compare_std(data_standard *a, data_standard *b,
 		 data_alignment *c, data_alignment *d),
  _PD_safe_flush(PDBfile *file),

@@ -1,0 +1,501 @@
+#
+# CMakeLists.txt for Portable Data Base Library
+#
+# Files and Directories
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set(LibName pdb)
+set(TGTLib TRUE)
+
+#--TGTExe = ${BinDir}/pcexec
+#--TGTLib = ${LibDir}/lib${LibName}.a
+#--TGTInc = ${Hdrs} ppc.h
+
+#--OD = DefaultG
+
+#
+# Compiler/Loader Options
+#
+#--CcFlags = -I. -I${IncDir} ${MDInc} ${MDI_Inc}
+#--FcFlags = -I. -I${IncDir}
+#--LdFlags = -L${LibDir} ${LDFLAGS}
+
+#--ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+
+#
+# Files to Save for Backup (pact save)
+#
+#--SaveFiles = *.c *.h *.f
+
+#
+# Files to remove in directory clean (pact clean)
+#
+#--CleanFiles  = 
+#--RemoveFiles = ${BinDir}/tpdb  ${BinDir}/tpda   ${BinDir}/tpdas      \
+#--              ${BinDir}/tpdop ${BinDir}/tpdap  ${BinDir}/tpdgs      \
+#--              ${BinDir}/tpdfr ${BinDir}/tpdc   ${BinDir}/tpdp       \
+#--              ${BinDir}/tpdls ${BinDir}/tpdnrm ${BinDir}/tpdcs      \
+#--              ${BinDir}/tpdn  ${BinDir}/tpdsmp ${BinDir}/tpddp      \
+#--              ${BinDir}/tpdrc ${BinDir}/tpdtd  ${BinDir}/tpdds      \
+#--              ${BinDir}/tpdf  ${BinDir}/tpdxrd ${BinDir}/tpdxn      \
+#--              ${BinDir}/pcexec ${BinDir}/pdtime ${BinDir}/pdb2hdf   \
+#--              ${BinDir}/exambin ${BinDir}/exam
+
+#
+# Things upon which install depends (pact install)
+#
+#--InstallDep = ${TGTLib}
+#--BinDep =
+#--BinObj =
+
+#
+# Required Libraries
+#
+#--Libs = ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+
+#--DepLib = ${LibDir}/libpml.a \
+#--	 ${LibDir}/libscore.a
+
+#--targets :
+#--	@echo "Targets for PDB"
+#--	@echo "   Apps      : make pdb2hdf   "
+#--	@echo "   attr      : make attribute tests"
+#--	@echo "   Cstd      : make standard tests"
+#--	@echo "   def       : make typedef and cast tests"
+#--	@echo "   dp        : make DP IO test"
+#--	@echo "   exam      : make exam utility"
+#--	@echo "   exambin   : make exambin utility"
+#--	@echo "   fd        : make file descriptor test"
+#--	@echo "   Gst       : make gather test"
+#--	@echo "   install   : install PDB headers and utilities in dev/sys_id"
+#--	@echo "   link      : link PDB utilities for public use"
+#--	@echo "   Lst       : make list test"
+#--	@echo "   net       : make net IO test"
+#--	@echo "   pdb2hdf   : make pdb2hdf"
+#--	@echo "   sharedlib : build and install PDB shared libs in dev/sys_id"
+#--	@echo "   smp       : make SMP IO test"
+#--	@echo "   test      : run the PDB test suite"
+#--	@echo "   time      : make timing test"
+#--	@echo "   trans     : make text translation utility"
+
+#
+# Headers Files
+#
+set(Hdrs pdb.h pdb_int.h pdb_old.h scope_dp.h)
+set(TGTInc ${Hdrs})   # XXX ppc.h
+
+#
+# Object Files
+#
+#--gcs = ${PACTTmpDir}/gc-pdb.c
+
+set(SrcsA pnet.c pnbin.c pnpio.c)
+set(SrcsN ${MPDevicesS} ${IPCDevicesS} ${SrcsA})
+
+set(SPARC pnparc.c pnmpi.c)
+set(SNOIPC pnnil.c)
+
+set(Srcs
+    pdb.c pdbaib.c pdcast.c pdfmt.c pdfmta.c pdfmtb.c pdfmtc.c pdsymt.c
+    pdcomm.c pdbmp.c pdser.c pdlow.c pdrdwr.c pdptr.c
+    pdmemb.c pdgs.c pdcsum.c pdflt.c pdblk.c pdbmm.c pdconv.c
+    pdpath.c pdbfc.c pdbnet.c pdprnt.c pdshar.c pdtgt.c pdbx.c
+    pdmap.c pdbdir.c pdszof.c pdpar.c pdparmp.c pdold.c
+    ${SrcsN}
+# ${gcs}
+    )
+# XXX remove pdspoke.c, in GSrcs
+
+#--gco = gc-pdb.o
+
+#--ObjsA = pnet.o pnbin.o pnpio.o
+#--ObjsN = ${MPDevicesO} ${IPCDevicesO} ${ObjsA}
+
+#--${ObjsN} : ${Hdrs}
+
+#--OPARC  = pnparc.o pnmpi.o
+#--ONOIPC = pnnil.o
+
+#--Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdsymt.o pdblk.o      \
+#--       pdcast.o pdrdwr.o pdptr.o pdprnt.o pdmemb.o pdflt.o          \
+#--       pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o          \
+#--       pdcsum.o pdbx.o pdmap.o pdszof.o pdbdir.o pdpar.o pdcomm.o   \
+#--       pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o pdold.o \
+#--       ${gco}
+
+#--gca = ${TGTLib}(gc-pdb.o)
+
+#--ArObjsN = ${MPDevicesO} ${IPCDevicesO}         \
+#--          ${TGTLib}(pnet.o) ${TGTLib}(pnbin.o) \
+#--          ${TGTLib}(pnpio.o)
+
+#--ArPARC  = ${TGTLib}(pnparc.o) ${TGTLib}(pnmpi.o)
+#--ArNOIPC = ${TGTLib}(pnnil.o)
+
+#--ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o) ${TGTLib}(pdcast.o)    \
+#--         ${TGTLib}(pdfmt.o) ${TGTLib}(pdfmta.o)                      \
+#--         ${TGTLib}(pdfmtb.o) ${TGTLib}(pdfmtc.o) ${TGTLib}(pdsymt.o) \
+#--         ${TGTLib}(pdcomm.o) ${TGTLib}(pdbmp.o) ${TGTLib}(pdser.o)   \
+#--         ${TGTLib}(pdlow.o) ${TGTLib}(pdrdwr.o) ${TGTLib}(pdptr.o)   \
+#--         ${TGTLib}(pdmemb.o) ${TGTLib}(pdgs.o)                       \
+#--         ${TGTLib}(pdcsum.o) ${TGTLib}(pdflt.o)                      \
+#--         ${TGTLib}(pdblk.o) ${TGTLib}(pdbmm.o) ${TGTLib}(pdconv.o)   \
+#--         ${TGTLib}(pdpath.o) ${TGTLib}(pdbfc.o) ${TGTLib}(pdbnet.o)  \
+#--         ${TGTLib}(pdprnt.o) ${TGTLib}(pdshar.o) ${TGTLib}(pdtgt.o)  \
+#--         ${TGTLib}(pdbx.o) ${TGTLib}(pdmap.o) ${TGTLib}(pdbdir.o)    \
+#--         ${TGTLib}(pdszof.o) ${TGTLib}(pdpar.o) ${TGTLib}(pdparmp.o) \
+#--         ${TGTLib}(pdspoke.o) ${TGTLib}(pdold.o)                     \
+#--         ${ArObjsN} ${gca}
+
+#--${LibDep} : ${hdrf} ${Hdrs} pdspoke.c pdb_formats.h scope_dp.h
+
+#
+# Generated code rules
+#
+
+#--${IncDir}/pdform.h :
+#--	@(echo "template -desc 1 -o pdform.h" ; \
+#--	  ${CROSS_FE} ${BinDir}/template -t ${EtcDir}/types.db -desc 1 -o ${IncDir}/pdform.h)
+add_custom_command(
+    OUTPUT ${IncDir}/pdform.h
+    DEPENDS template
+    COMMAND ${BinDir}/template -t ${EtcDir}/types.db -desc 1 -o ${IncDir}/pdform.h
+    COMMENT "template -desc 1 -o pdform.h"
+    )
+LIST(APPEND hdrf ${IncDir}/pdform.h)
+
+#--GenInc = ${PACTTmpDir}/gc-pdb.h
+
+#--${IncDir}/pdb_gen.h : ${IncDir}/pdform.h ${GenInc}
+#--	@echo "build pdb_gen.h"
+#--	@rm -f ${IncDir}/pdb_gen.h
+#--	@cat ${GenInc} > ${IncDir}/pdb_gen.h
+
+#--hdrf = ${IncDir}/pdform.h ${IncDir}/pdb_gen.h
+
+# spokes
+
+#--pdspoke.c : config-spokes pdshar.c
+#--	config-spokes
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pdspoke.c
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/config-spokes
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/config-spokes
+            -root ${CMAKE_CURRENT_BINARY_DIR}
+            -src  ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "config-spokes"
+    )
+LIST(APPEND GSrcs ${CMAKE_CURRENT_BINARY_DIR}/pdspoke.c)
+
+#--spokef = pdspoke.c
+
+#--IncAction = @pact generate
+set(do-bproto TRUE)
+
+include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
+
+#--LibAction = @(echo "build-spokes" ; build-spokes spoke ; pact devgen)
+add_custom_target(build-spokes
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build-spokes
+    COMMENT "build-spokes"
+)
+
+
+#--build : ${hdrf} pdspoke.c
+#--	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+#--	build-spokes build
+
+#
+# standard tests
+#
+
+#--Cstd : ${TGTExe} \
+#--       ${BinDir}/tpdb  ${BinDir}/tpdn  ${BinDir}/tpda  ${BinDir}/tpdas  \
+#--       ${BinDir}/tpdop ${BinDir}/tpdgs ${BinDir}/tpdls ${BinDir}/tpdnrm \
+#--       ${BinDir}/tpdrc ${BinDir}/tpdtd ${BinDir}/tpdcs ${BinDir}/tpdap  \
+#--       ${BinDir}/tpdfr ${BinDir}/tpdbf ${BinDir}/tpdfd ${BinDir}/tpdfc  \
+#--       ${BinDir}/tpdc  ${BinDir}/tpdf  ${BinDir}/tpdp  ${BinDir}/tpdds  \
+#--       ${BinDir}/tpnm  ${BinDir}/tpnb  ${BinDir}/tpnc                   \
+#--       ${DepLib}
+
+#--parallel : ${BinDir}/tpnp ${BinDir}/pcexec
+
+#--Apps : ${BinDir}/pdb2hdf
+
+#--Gst : ${BinDir}/tpdgs
+#--Lst : ${BinDir}/tpdls
+
+#--${BinDir}/tpdb : tpdb.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdb.c -o ${BinDir}/tpdb" ; \
+#--	  ${CLD} ${LdFlags} tpdb.c -o ${BinDir}/tpdb ${Libs})
+
+#--${BinDir}/tpdc : tpdc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdc.c -o ${BinDir}/tpdc" ; \
+#--	  ${CLD} ${LdFlags} tpdc.c -o ${BinDir}/tpdc ${Libs})
+
+#--${BinDir}/tpdf : tpdf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdf.c -o ${BinDir}/tpdf" ; \
+#--	  ${CLD} ${LdFlags} tpdf.c -o ${BinDir}/tpdf ${Libs})
+
+#--${BinDir}/tpdp : tpdp.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdp.c -o ${BinDir}/tpdp" ; \
+#--	  ${CLD} ${LdFlags} tpdp.c -o ${BinDir}/tpdp ${Libs})
+
+#--${BinDir}/tpda : tpda.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpda.c -o ${BinDir}/tpda" ; \
+#--	  ${CLD} ${LdFlags} tpda.c -o ${BinDir}/tpda ${Libs})
+
+#--${BinDir}/tpdas : tpdas.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdas.c -o ${BinDir}/tpdas" ; \
+#--	  ${CLD} ${LdFlags} tpdas.c -o ${BinDir}/tpdas ${Libs})
+
+#--${BinDir}/tpdop : tpdop.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdop.c -o ${BinDir}/tpdop" ; \
+#--	  ${CLD} ${LdFlags} tpdop.c -o ${BinDir}/tpdop ${Libs})
+
+#--${BinDir}/tpdap : tpdap.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdap.c -o ${BinDir}/tpdap" ; \
+#--	  ${CLD} ${LdFlags} tpdap.c -o ${BinDir}/tpdap ${Libs})
+
+#--${BinDir}/tpdgs : tpdgs.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdgs.c -o ${BinDir}/tpdgs" ; \
+#--	  ${CLD} ${LdFlags} tpdgs.c -o ${BinDir}/tpdgs ${Libs})
+
+#--${BinDir}/tpdls : tpdls.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdls.c -o ${BinDir}/tpdls" ; \
+#--	  ${CLD} ${LdFlags} tpdls.c -o ${BinDir}/tpdls ${Libs})
+
+#--${BinDir}/tpdnrm : tpdnrm.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdnrm.c -o ${BinDir}/tpdnrm" ; \
+#--	  ${CLD} ${LdFlags} tpdnrm.c -o ${BinDir}/tpdnrm ${Libs})
+
+#--${BinDir}/tpdcs : tpdcs.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdcs.c -o ${BinDir}/tpdcs" ; \
+#--	  ${CLD} ${LdFlags} tpdcs.c -o ${BinDir}/tpdcs ${Libs})
+#--        
+#--${BinDir}/tpdfr : tpdfr.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdfr.c -o ${BinDir}/tpdfr" ; \
+#--	  ${CLD} ${LdFlags} tpdfr.c -o ${BinDir}/tpdfr ${Libs})
+#--        
+#--${BinDir}/tpdbf : tpdbf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdbf.c -o ${BinDir}/tpdbf" ; \
+#--	  ${CLD} ${LdFlags} tpdbf.c -o ${BinDir}/tpdbf ${Libs})
+#--        
+#--${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdfc.c -o ${BinDir}/tpdfc" ; \
+#--	  ${CLD} ${LdFlags} tpdfc.c -o ${BinDir}/tpdfc ${Libs})
+#--        
+#--${BinDir}/tpdds : tpdds.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
+#--	@(echo "${CCAnnounce} tpdds.c -o ${BinDir}/tpdds" ; \
+#--	  ${CLD} ${LdFlags} tpdds.c -o ${BinDir}/tpdds ${Libs})
+#--        
+#
+# verify C++ compiles
+#
+#--chk++ :
+#--	${CXX} ${CcFlags} -c tests/chk++.cc -o ${PACTTmpDir}/chk++.o
+
+#
+# binary data tests
+#
+#--${BinDir}/tpnb : ${TGTLib} tpnb.c
+#--	@(echo "${CCAnnounce} tpnb.c -o ${BinDir}/tpnb" ; \
+#--	  ${CLD} ${LdFlags} tpnb.c -o ${BinDir}/tpnb ${Libs})
+
+#--${BinDir}/tpnc : ${TGTLib} tpnc.c
+#--	@(echo "${CCAnnounce} tpnc.c -o ${BinDir}/tpnc" ; \
+#--	  ${CLD} ${LdFlags} tpnc.c -o ${BinDir}/tpnc ${Libs})
+
+#--nan : ${BinDir}/tpdnan
+
+#--${BinDir}/tpdnan : ${TGTLib} tpdnan.c
+#--	@(echo "${CCAnnounce} tpdnan.c -o ${BinDir}/tpdnan" ; \
+#--	  ${CLD} ${LdFlags} tpdnan.c -o ${BinDir}/tpdnan ${Libs})
+
+#
+# multiple process tests
+#
+#--${BinDir}/tpnm : ${TGTLib} tpnm.c
+#--	@(echo "${CCAnnounce} tpnm.c -o ${BinDir}/tpnm" ; \
+#--	  ${CLD} ${LdFlags} tpnm.c -o ${BinDir}/tpnm ${Libs})
+#
+# parallel process tests
+#
+#--${BinDir}/tpnp : ${TGTLib} tpnp.c
+#--	@(echo "${CCAnnounce} tpnp.c -o ${BinDir}/tpnp" ; \
+#--	  ${CLD} ${LdFlags} tpnp.c -o ${BinDir}/tpnp ${Libs})
+
+#
+# process report
+#
+
+#--proc : ${BinDir}/tpnch
+
+#--${BinDir}/tpnch : ${TGTLib} tpnch.c
+#--	${CCCfe} ${LdFlags} tpnch.c -o ${BinDir}/tpnch ${Libs}
+
+#
+# make the executable
+#
+#--${TGTExe} : ${BinDep}
+#--	@(echo "${CCAnnounce} pcexec.c -o ${TGTExe}" ; \
+#--	  ${CLD} ${LdFlags} pcexec.c -o ${TGTExe} ${Libs})
+
+#
+# async - run the shell script pn-async in the resulting xterm 
+#       - run it twice and watch for pollable event type complaints
+#
+#--async : ${TGTExe}
+#--	csh -c 'xterm -geometry 60x20-0+0 -e csh'
+
+#
+# ascii vs binary performance
+#
+#--ascii : ${BinDir}/tpdd
+
+#--${BinDir}/tpdd : tpdd.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdd.c -o ${BinDir}/tpdd ${Libs} ${M" ; \
+#--	  ${CLD} ${LdFlags} tpdd.c -o ${BinDir}/tpdd ${Libs} ${MDI_Lib})
+
+#
+# large file test
+#
+#--lf : ${BinDir}/tpdlf
+
+#--${BinDir}/tpdlf : tpdlf.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdlf.c -o ${BinDir}/tpdlf ${Libs} ${M" ; \
+#--	  ${CLD} ${LdFlags} tpdlf.c -o ${BinDir}/tpdlf ${Libs} ${MDI_Lib})
+
+#
+# net io test
+#
+#--net : ${BinDir}/tpdn
+
+#--${BinDir}/tpdn : tpdn.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdn.c -o ${BinDir}/tpdn" ; \
+#--	  ${CLD} ${LdFlags} tpdn.c -o ${BinDir}/tpdn ${Libs})
+
+#
+# pdb to hdf converter
+#
+#--pdb2hdf :
+
+#--${BinDir}/pdb2hdf : applications/pdb2hdf.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} pdb2hdf.c -o ${BinDir}/pdb2hdf" ; \
+#--	  ${CLD} ${LdFlags} pdb2hdf.c -o ${BinDir}/pdb2hdf ${Libs})
+
+#
+# smp i/o test
+#
+#--smp : ${BinDir}/tpdsmp
+
+#--${BinDir}/tpdsmp : tpdsmp.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdsmp.c -o ${BinDir}/tpdsmp" ; \
+#--	  ${CLD} ${LdFlags} tpdsmp.c -o ${BinDir}/tpdsmp ${Libs})
+
+#
+# distributed mp i/o test
+#
+#--dp : ${BinDir}/tpddp
+
+#--${BinDir}/tpddp : tpddp.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpddp.c -o ${BinDir}/tpddp ${Libs}" ; \
+#--	  ${CC} ${LdFlags} tpddp.c -o ${BinDir}/tpddp ${Libs} ${DPLib})
+
+#
+# test attribute handling
+#
+#--attr : ${BinDir}/tpda ${BinDir}/tpdxrd ${BinDir}/tpdxn
+
+#--${BinDir}/tpdxrd : tpdxrd.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdxrd.c -o ${BinDir}/tpdxrd" ; \
+#--	  ${CLD} ${LdFlags} tpdxrd.c -o ${BinDir}/tpdxrd ${Libs})
+
+#--${BinDir}/tpdxn : tpdxn.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdxn.c -o ${BinDir}/tpdxn" ; \
+#--	  ${CLD} ${LdFlags} tpdxn.c -o ${BinDir}/tpdxn ${Libs})
+
+#
+# test cast and typedef of primitives handling
+#
+#--def : ${BinDir}/tpdrc ${BinDir}/tpdtd
+
+#--${BinDir}/tpdrc : tpdrc.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdrc.c -o ${BinDir}/tpdrc" ; \
+#--	  ${CLD} ${LdFlags} tpdrc.c -o ${BinDir}/tpdrc ${Libs})
+
+#--${BinDir}/tpdtd : tpdtd.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdtd.c -o ${BinDir}/tpdtd" ; \
+#--	  ${CLD} ${LdFlags} tpdtd.c -o ${BinDir}/tpdtd ${Libs})
+
+#
+# test file descriptor usage
+#
+#--fd : ${BinDir}/tpdfd
+
+#--${BinDir}/tpdfd : tpdfd.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} tpdfd.c -o ${BinDir}/tpdfd" ; \
+#--	  ${CLD} ${LdFlags} tpdfd.c -o ${BinDir}/tpdfd ${Libs})
+
+#
+# timing test
+#
+#--time : ${BinDir}/pdtime
+
+#--${BinDir}/pdtime : pdtime.c ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} pdtime.c -o ${BinDir}/pdtime" ; \
+#--	  ${CLD} ${LdFlags} pdtime.c -o ${BinDir}/pdtime ${Libs})
+
+#
+# exam
+#
+#--exambin :
+#--	${CLD} ${LdFlags} exambin.c -o ${BinDir}/exambin
+
+#--exam :
+#--	@(echo "${CCAnnounce} exam.c -o ${BinDi" ; \
+#--	  ${CLD} ${LdFlags} exam.c -o ${BinDir}/exam)
+
+#--trans : ${InstallDep} ${Hdrs} ${DepLib}
+#--	@(echo "${CCAnnounce} pdctrns.c -o ${BinDir}/pdctrns" ; \
+#--	  ${CLD} ${LdFlags} pdctrns.c -o ${BinDir}/pdctrns ${Libs})
+
+
+#
+# link 
+#
+#--link: ${InstallDep}
+#--	pact man3install
+
+#
+# install 
+#
+#--install:
+#--	pact link
+#--	pact incinstall
+
+#
+# sharedlib
+#
+#--sharedlib:
+#--	pact shared
+#--	pact incinstall
+
+#
+# inform
+#
+#--inform :
+#--	@rm -f required.objs
+#--	@echo ${Objs} > required.objs
+
+#
+# Run the PDB test suite
+#
+#--test :
+#--	@./pdtest
+

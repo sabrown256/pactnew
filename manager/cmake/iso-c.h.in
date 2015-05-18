@@ -1,0 +1,29 @@
+/*
+ * ISO-C.H - configuration defined by empress
+ *         - defines the ISO C, POSIX and XOPEN compliance expected
+ *
+ * Source Version: 3.0
+ * Software Release #: LLNL-CODE-422942
+ *
+ */
+
+#ifndef PCK_ISO_C
+
+#define PCK_ISO_C
+
+#define ISO_C99
+
+#ifdef __GNUC__
+
+# ifndef _XOPEN_SOURCE
+#  define _XOPEN_SOURCE     700
+# endif
+
+# ifndef _DARWIN_C_SOURCE
+#  define _DARWIN_C_SOURCE
+# endif
+
+#endif
+
+#endif
+

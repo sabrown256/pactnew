@@ -354,9 +354,12 @@ int _PD_remove_type(PDBfile *file, char *name)
 
 /* _PD_E_INSTALL - install a syment in the given hash table */
 
-void _PD_e_install(PDBfile *file, const char *name, syment *ep, int lookup)
-   {hasharr *tab;
+int _PD_e_install(PDBfile *file, const char *name, syment *ep, int lookup)
+   {int rv;
+    hasharr *tab;
     dimdes *dms;
+
+    rv = FALSE;
 
 /* do not add zero length variables to the symbol table */
     dms = PD_entry_dimensions(ep);
@@ -367,9 +370,11 @@ void _PD_e_install(PDBfile *file, const char *name, syment *ep, int lookup)
 	if (lookup)
 	   PD_remove_entry(file, name);
 
-	SC_hasharr_install(tab, name, ep, G_SYMENT_P_S, 1, -1);};
+	SC_hasharr_install(tab, name, ep, G_SYMENT_P_S, 1, -1);
 
-    return;}
+	rv = TRUE;};
+
+    return(rv);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

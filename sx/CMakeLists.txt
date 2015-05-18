@@ -1,0 +1,279 @@
+#
+# CMakeLists.txt for SX
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set(LibName sx)
+set(TGTLib FALSE)
+
+#--TGTLib = ${LibDir}/lib${LibName}.a
+#--TGTExe = ${BinDir}/sx
+set(TGTInc sx.h sx_int.h scope_ultra.h)
+
+#--UltraExe = ${BinDir}/ultra
+
+#--ExtDir = ${ScmDir}/extensions
+
+set(TGTScm
+    applications/sxview.scm applications/sxcomp.scm applications/sxdm.scm
+    applications/pdbvcmd.scm applications/pdbvar.scm
+    applications/pdbvdat.scm applications/pdbview.rc applications/pdbvio.scm
+    applications/pdbview.scm applications/pdbvplt.scm
+    applications/pdbvthemes.scm applications/binedit.scm
+    applications/pdbvdemo.scm applications/pdbvbatch.scm
+    applications/hardcopy.scm
+    applications/pdbvxmpl.scm applications/pdbview.pui
+    applications/gcel.scm applications/vcel.scm applications/nature.scm
+    applications/netcdf.scm applications/ezn.scm
+    applications/ultra.scm applications/consts.scm applications/func.scm
+    applications/annotate.scm applications/compare.scm applications/trig.scm
+    applications/slice.scm applications/movie.scm
+    applications/help.scm applications/synon.scm applications/slib.scm
+    applications/toolbox.scm applications/mouse.scm applications/ultra.pui
+)
+
+set(TGTScr
+    applications/pdbview
+    applications/pdbdiff
+    applications/pdbls
+    applications/pdbcp
+    applications/drun
+    applications/ultra
+)
+
+#--TGTScrX = tpu tzu
+
+#--OD = DefaultG
+
+#
+# Compiler/Loader Options
+#
+#--CcFlags = -I${IncDir} -I. ${MDInc} ${MDGInc}
+#--LdFlags = -L${LibDir} ${LDFLAGS}
+
+#--ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
+
+#
+# Files to Save for Backup (pact save)
+#
+#--SaveFiles = *.c *.h *.scm
+
+#
+# Files to remove in directory clean (pact clean)
+#
+#--CleanFiles = ${hdrf} ${gso} *~ core
+
+#
+# Things upon which install depends (pact install)
+#
+#--DepLib = ${LibDir}/libscheme.a \
+#--         ${LibDir}/libpanacea.a \
+#--         ${LibDir}/libpgs.a \
+#--         ${LibDir}/libpdb.a \
+#--         ${LibDir}/libpml.a \
+#--	 ${LibDir}/libscore.a
+
+#--InstallDep = ${TGTLib} ${TGTExe} ${TGTScm} ${TGTScr}
+#--BinDep = ${Hdrs} ${TGTLib} ${DepLib}
+#--BinObj = ${LdFlags}
+
+#
+# Required Libraries
+#
+#Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPDB} ${LPML} ${LMM} ${LSCORE} ${MDI_Lib} ${MDLib}
+#--Libs = ${LSX} ${LPANACEA} ${LPGS} ${MDGLib} ${LSCHEME} ${LPDB} ${LPML} ${LSCORE} ${MDI_Lib} ${MDLib} ${MDE_Lib}
+
+#--targets :
+#--	@echo "Targets for SX"
+#--	@echo "   install    : install SX headers and utilities in dev/PSY_id"
+#--	@echo "   link       : link SX utilities for public use"
+#--	@echo "   sharedlib  : build and install SX shared libs in dev/PSY_id"
+#--	@echo "   remove-sys : remove everything"
+#--	@echo "   test       : run the SX test suite"
+
+#
+# Headers Files
+#
+#--Hdrs = ${TGTInc} ${hdrf} ${IncDir}/sx_gen.h
+set(Hdrs ${TGTInc})
+
+#
+# Object Files
+#
+#--gcs = ${PACTTmpDir}/gc-sx.c
+
+set(PACTTmpDir  ${CMAKE_CURRENT_BINARY_DIR})
+
+set(gss
+    ${PACTTmpDir}/gs-score.c ${PACTTmpDir}/gs-pml.c ${PACTTmpDir}/gs-pdb.c
+    ${PACTTmpDir}/gs-pgs.c ${PACTTmpDir}/gs-panacea.c
+    ${PACTTmpDir}/gs-scheme.c
+)
+
+set(SrcsU
+    ulcmd.c ulfunc.c ulauxf.c
+    ulhand.c ulcntl.c
+)
+
+set(Srcs
+   sxhook.c sxmm.c sxmode.c sxgc.c sxcmd.c
+   sxhand.c sxfunc.c sxhbo.c sxpdb.c sxpdba.c sxpdbr.c
+   sxpdbc.c sxpdbd.c sxpdbf.c sxpdbl.c sxpan.c
+   sxpanw.c sxpml.c sxpmlg.c sxgri.c sxpgs.c sxpgsp.c sxgrot.c
+   sxshar.c sxset.c sxcont.c sxulio.c sxcrv.c sxtable.c
+   ${SrcsU} ${gss}
+# ${gcs}
+)
+
+#--gco = gc-sx.o
+
+#--gso = gs-score.o gs-pml.o gs-pdb.o   \
+#--      gs-pgs.o gs-panacea.o \
+#--      gs-scheme.o
+
+#--ObjsA = sxhook.o sxmm.o sxmode.o sxgc.o sxhand.o sxfunc.o sxhbo.o
+#--ObjsB = sxpdb.o sxpdba.o sxpdbr.o sxpdbc.o sxpdbd.o sxpdbf.o sxpdbl.o
+#--ObjsC = sxpan.o sxpanw.o
+#--ObjsD = sxgri.o sxpgs.o sxpgsp.o sxgrot.o
+#--ObjsE = sxpml.o sxpmlg.o
+#--ObjsU = ulcmd.o ulfunc.o ulauxf.o ulhand.o ulcntl.o
+#--ObjsY = sxshar.o
+#--ObjsZ = sxcmd.o sxset.o sxcont.o sxulio.o sxcrv.o sxtable.o
+#--Objs = ${ObjsA} ${ObjsB} ${ObjsC} ${ObjsD} ${ObjsE} ${ObjsY} ${ObjsZ} \
+#--       ${ObjsU} ${gso}
+
+#--gca = ${TGTLib}(gc-sx.o)
+
+#--gsa = ${TGTLib}(gs-score.o) ${TGTLib}(gs-pml.o) ${TGTLib}(gs-pdb.o)   \
+#--      ${TGTLib}(gs-pgs.o) ${TGTLib}(gs-panacea.o) \
+#--      ${TGTLib}(gs-scheme.o)
+
+#--ArObjsU = ${TGTLib}(ulcmd.o) ${TGTLib}(ulfunc.o) ${TGTLib}(ulauxf.o) \
+#-- 	  ${TGTLib}(ulhand.o) ${TGTLib}(ulcntl.o)
+
+#--ArObjs = ${TGTLib}(sxhook.o) ${TGTLib}(sxmm.o) ${TGTLib}(sxmode.o) \
+#--         ${TGTLib}(sxgc.o) ${TGTLib}(sxcmd.o) \
+#--         ${TGTLib}(sxhand.o) ${TGTLib}(sxfunc.o) ${TGTLib}(sxhbo.o) \
+#--         ${TGTLib}(sxpdb.o) ${TGTLib}(sxpdba.o) ${TGTLib}(sxpdbr.o) \
+#--         ${TGTLib}(sxpdbc.o) ${TGTLib}(sxpdbd.o) ${TGTLib}(sxpdbf.o) \
+#--         ${TGTLib}(sxpdbl.o) ${TGTLib}(sxpan.o) \
+#--         ${TGTLib}(sxpanw.o) ${TGTLib}(sxpml.o) ${TGTLib}(sxpmlg.o) \
+#--         ${TGTLib}(sxgri.o) ${TGTLib}(sxpgs.o) ${TGTLib}(sxpgsp.o) ${TGTLib}(sxgrot.o) \
+#--         ${TGTLib}(sxshar.o) ${TGTLib}(sxset.o) ${TGTLib}(sxcont.o)  \
+#--         ${TGTLib}(sxulio.o) ${TGTLib}(sxcrv.o) ${TGTLib}(sxtable.o) \
+#--         ${ArObjsU} ${gsa} ${gca}
+
+#--sxmain.o : ${Hdrs}
+#--ultra.o : ${Hdrs}
+#--${ObjsY} : ${Hdrs}
+#--${Objs} : ${Hdrs}
+#--${LibDep} : ${Hdrs} ${hdrf}
+
+#
+# Generated code rules
+#
+
+set(GenInc
+    ${PACTTmpDir}/gs-score.h ${PACTTmpDir}/gs-pml.h
+    ${PACTTmpDir}/gs-pdb.h ${PACTTmpDir}/gs-pgs.h
+    ${PACTTmpDir}/gs-panacea.h ${PACTTmpDir}/gs-scheme.h
+    ${PACTTmpDir}/gc-sx.h
+)
+
+#--${IncDir}/sx_gen.h : ${GenInc}
+#--	@echo "build sx_gen.h"
+#--	@rm -f ${IncDir}/sx_gen.h
+#--	@cat ${GenInc} > ${IncDir}/sx_gen.h
+
+#--${IncDir}/sxpdbd.h : sxpdbd.t
+#--	@(echo "template sxpdbd.t -o ${IncDir}/sxpdbd.h" ;  \
+#--	  ${BinDir}/template sxpdbd.t -o ${IncDir}/sxpdbd.h)
+add_custom_command(
+    OUTPUT ${IncDir}/sxpdbd.h
+    DEPENDS template ${CMAKE_CURRENT_SOURCE_DIR}/sxpdbd.t
+    COMMAND ${BinDir}/template ${CMAKE_CURRENT_SOURCE_DIR}/sxpdbd.t -o ${IncDir}/sxpdbd.h
+    COMMENT "template sxpdbd.t -o ${IncDir}/sxpdbd.h"
+    )
+LIST(APPEND hdrf ${IncDir}/sxpdbd.h)
+
+#--hdrf = ${IncDir}/sxpdbd.h
+
+# language bindings
+
+#--IncAction = @pact generate
+set(do-bproto TRUE)
+
+include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
+
+#--LibAction = @(echo "build-ext" ; build-ext ; pact devgen)
+
+#--build : ${IncDir}/sx_gen.h ${hdrf}
+#--	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+#--	@build-ext
+
+#
+# make the executable
+#
+#--${TGTExe} : ${BinDep} sxmain.c
+#--	@(echo "${CCAnnounce} sxmain.c -o ${TGTExe}" ; \
+#--	  ${CLD} -I${PACTTmpDir} ${LdFlags} sxmain.c -o ${TGTExe} ${Libs})
+
+#
+# OLD BINARY EXE
+#
+#${UltraExe} : ${BinDep} ultra.c
+#	@(echo "${CCAnnounce} ultra.c -o ${UltraExe}" ; \
+#	  ${CLD} ${LdFlags} ultra.c -o ${UltraExe} ${Libs})
+#
+#ultra : ${UltraExe}
+
+#
+# make the command test wrapper
+#
+#--${BinDir}/tsxcmd : ${BinDep}
+#--	@(echo "${CCAnnounce} tsxcmd.c -o ${BinDir}/tsxcmd" ; \
+#--	  ${CLD} ${LdFlags} tsxcmd.c -o ${BinDir}/tsxcmd ${Libs})
+
+#--command :
+#--	pact ${BinDir}/tsxcmd
+
+#
+# link 
+#
+#--link: ${InstallDep}
+#--	sinstall ultra.ini.user ${ScmDir}/ultra.ini
+#--	pact scminstall
+#--	pact scrinstall
+#--	@${BinDir}/install-ext ${PSY_Root} ${TGTScrX}
+
+#
+# install 
+#
+#--install:
+#--	pact link
+#--	pact incinstall
+
+#
+# sharedlib
+#
+#--sharedlib:
+#--	pact shared
+#--	pact incinstall
+
+#
+# inform
+#
+#--inform :
+#--	@rm -f required.objs
+#--	@echo ${Objs} > required.objs
+
+#
+# Run the SX test suite
+#
+#--test :
+#--	@./sxtest
+

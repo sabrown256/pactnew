@@ -144,7 +144,7 @@ SC_udl *_SC_parse_udl(const char *s)
 
 /* resolve path for container and entry */
 	    entry = _SC_udl_container(path, TRUE);
-	    path  = CSTRSAVE(path);
+	    path  = path;
 	    entry = CSTRSAVE(entry);};};
 
     if (pu != NULL)

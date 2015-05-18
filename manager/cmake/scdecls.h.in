@@ -1,0 +1,7 @@
+/*
+ * SCDECLS.H - define and declares things missing from the system headers
+ *
+ */
+
+#define N_DOUBLES_MD 8
+

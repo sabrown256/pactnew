@@ -28,7 +28,7 @@ static SX_iodes
  */
 
 static void _SX_ins_mem(SS_psides *si, defstr *dp,
-			char *member, int imem, PDBfile *file)
+			char *member, int imem, const PDBfile *file)
    {memdes *lst, *prev, *desc;
     int i;
 
@@ -61,7 +61,7 @@ static void _SX_ins_mem(SS_psides *si, defstr *dp,
  *               - PD_gs.write
  */
 
-memdes *_SX_hash_hook(PDBfile *file, const char *vr, defstr *dp)
+memdes *_SX_hash_hook(const PDBfile *file, const char *vr, defstr *dp)
    {char *type;
     int c;
     char new_mem[MAXLINE];

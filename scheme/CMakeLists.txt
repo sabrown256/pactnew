@@ -1,0 +1,267 @@
+#
+# CMakeLists.txt for PACT SCHEME
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set(LibName scheme)
+set(TGTLib FALSE)
+
+#--TGTLib = ${LibDir}/lib${LibName}.a
+#--TGTExe = ${BinDir}/scheme
+set(TGTInc scheme.h scheme_int.h)
+
+set(TGTScm
+    applications/runt.scm applications/lang.scm
+    applications/exec.scm applications/host-server.scm
+    applications/rmath.scm applications/measure.scm
+    ${SyntaxScheme}
+)
+
+#--OD = DefaultO
+
+# Compiler/Loader Options
+#--CcFlags = -I. -I../.. -I${IncDir} ${MDInc}
+#--LdFlags = -L${LibDir} ${LDFLAGS}
+
+#--ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+
+# files to Save for Backup (pact save)
+#--SaveFiles = *.c *.h *.scm
+
+# files to remove in directory clean (pact clean)
+#--CleanFiles = 
+
+# things upon which install depends (pact install)
+#--DepLib = ${LibDir}/libpdb.a \
+#--         ${LibDir}/libpml.a \
+#--	 ${LibDir}/libscore.a
+
+#--InstallDep = ${TGTLib} ${TGTExe}
+#--BinDep = ${Hdrs} ${TGTLib} shmain.c ${DepLib}
+#--BinObj = ${LdFlags} shmain.c
+
+# required Libraries
+#--Libs = ${LSCHEME} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDE_Lib}
+
+
+#--targets :
+#--	@echo "Targets for SCHEME"
+#--	@echo "   install   : install SCHEME headers and utilities in dev/PSY_id"
+#--	@echo "   link      : link SCHEME utilities for public use"
+#--	@echo "   profiler  : make a profiling version"
+#--	@echo "   scheme    : make the SCHEME executable"
+#--	@echo "   sharedlib : build and install SCHEME shared libs in dev/PSY_id"
+#--	@echo "   test      : run the SCHEME test suite"
+
+
+# headers Files
+set(Hdrs ${TGTInc})
+
+# C syntax mode specifications
+#--HCSyn = scope_parse_cc.h
+#--Oc    = shgrc.o shcsup.o
+#--Arc   = ${TGTLib}(shgrc.o) ${TGTLib}(shcsup.o)
+
+#--${TGTLib}(shgrc.o) : shlrc.l shgrc.y
+#--	@(cd ${PACTTmpDir} ; \
+#--	  ${RM} lex.yy.c y.tab.c shlrc.c shgrc.c errlog ; \
+#--          touch errlog ; \
+#--	  echo "lex shlrc.l" ; \
+#--	  ${LEX} ${PACTSrcDir}/shlrc.l >> errlog 2>&1 ; \
+#--          sed "s|lex.yy.c|shlrc.c|" lex.yy.c | sed "s|yy|shlrc_|g" > shlrc.c ; \
+#--	  ${RM} lex.yy.c ; \
+#--	  echo "yacc shgrc.y" ; \
+#--	  ${YACC} ${PACTSrcDir}/shgrc.y 2>> errlog ; \
+#--          sed "s|y.tab.c|shgrc.c|" y.tab.c | sed "s|yy|shgrc_|g" > shgrc.c ; \
+#--	  ${RM} y.tab.c ; \
+#--	  echo "${YCAnnounce} -c shgrc.c" ; \
+#--	  ${YC} -c shgrc.c -o shgrc.o ; \
+#--	  ${AR} ${AROpt} ${TGTLib} shgrc.o 2>> errlog ; \
+#--	  ${RM} shgrc.c shgrc.o shlrc.c )
+
+#--${Oc}  : ${HCSyn}
+#--${Arc} : ${HCSyn}
+
+#--csynt : ${TGTLib}(shgrc.o)
+
+# Fortran syntax mode specifications
+#--HFSyn = scope_parse_f.h
+#--Of    = shgrf.o shfsup.o
+#--Arf   = ${TGTLib}(shgrf.o) ${TGTLib}(shfsup.o)
+
+#--${TGTLib}(shgrf.o) : shlrf.l shgrf.y
+#--	@(cd ${PACTTmpDir} ; \
+#--	  ${RM} lex.yy.c y.tab.c shlrf.c shgrf.c errlog ; \
+#--          touch errlog ; \
+#--	  echo "lex shlrf.l" ; \
+#--	  ${LEX} ${PACTSrcDir}/shlrf.l >> errlog 2>&1 ; \
+#--          sed "s|lex.yy.c|shlrf.c|" lex.yy.c | sed "s|yy|shlrf_|g" > shlrf.c ; \
+#--	  ${RM} lex.yy.c ; \
+#--	  echo "yacc shgrf.y" ; \
+#--	  ${YACC} ${PACTSrcDir}/shgrf.y 2>> errlog ; \
+#--          sed "s|y.tab.c|shgrf.c|" y.tab.c | sed "s|yy|shgrf_|g" > shgrf.c ; \
+#--	  ${RM} y.tab.c ; \
+#--	  echo "${YCAnnounce} -c shgrf.c" ; \
+#--	  ${YC} -c shgrf.c -o shgrf.o ; \
+#--	  ${AR} ${AROpt} ${TGTLib} shgrf.o 2>> errlog ; \
+#--	  ${RM} shgrf.c shgrf.o shlrf.c )
+
+#--fsynt : ${TGTLib}(shgrf.o)
+
+#--${Of}  : ${HFSyn}
+#--${Arf} : ${HFSyn}
+
+# Basis syntax mode specifications
+#--HMSyn = scope_parse_m.h
+#--Om    = shgrm.o shmsup.o
+#--Arm   = ${TGTLib}(shgrm.o) ${TGTLib}(shmsup.o)
+
+#--${TGTLib}(shgrm.o) : shlrm.l shgrm.y
+#--	@(cd ${PACTTmpDir} ; \
+#--	  ${RM} lex.yy.c y.tab.c shlrm.c shgrm.c errlog ; \
+#--          touch errlog ; \
+#--	  echo "lex shlrm.l" ; \
+#--	  ${LEX} ${PACTSrcDir}/shlrm.l >> errlog 2>&1 ; \
+#--          sed "s|lex.yy.c|shlrm.c|" lex.yy.c | sed "s|yy|shlrm_|g" > shlrm.c ; \
+#--	  ${RM} lex.yy.c ; \
+#--	  echo "yacc shgrm.y" ; \
+#--	  ${YACC} ${PACTSrcDir}/shgrm.y 2>> errlog ; \
+#--          sed "s|y.tab.c|shgrm.c|" y.tab.c | sed "s|yy|shgrm_|g" > shgrm.c ; \
+#--	  ${RM} y.tab.c ; \
+#--	  echo "${YCAnnounce} -c shgrm.c" ; \
+#--	  ${YC} -c shgrm.c -o shgrm.o ; \
+#--	  ${AR} ${AROpt} ${TGTLib} shgrm.o 2>> errlog ; \
+#--	  ${RM} shgrm.c shgrm.o shlrm.c )
+
+#--msynt : ${TGTLib}(shgrm.o)
+
+#--${Om}  : ${HMSyn}
+#--${Arm} : ${HMSyn}
+
+#
+# Object Files
+#
+
+#--gcs = ${PACTTmpDir}/gc-scheme.c
+
+#--GSrcs = shcsup.c shfsup.c shmsup.c
+
+set(Srcs
+#    ${GSrcs}
+    shmm.c shprnt.c sheval.c shenvr.c shread.c shtlev.c
+    shprm1.c shprm2.c shprm3.c shprm4.c shprm5.c
+    shtty.c shint.c sharr.c shstrg.c shchr.c shlarg.c
+    shprc1.c shprc2.c shsynt.c shvar.c
+    ${gcs}
+)
+
+
+#--gco = gc-scheme.o
+
+#--PSObjs = shmm.o
+#--PrObjs = shprnt.o
+#--EvObjs = sheval.o shenvr.o sharr.o
+#--RdObjs = shread.o
+#--FnObjs = shtlev.o shint.o shprm1.o shprm2.o shprm3.o shprm4.o shprm5.o shtty.o
+#--LrObjs = shstrg.o shchr.o shlarg.o shprc1.o shprc2.o shsynt.o shvar.o
+
+#--Objs = ${PSObjs} ${PrObjs} ${EvObjs} ${RdObjs} ${FnObjs} ${LrObjs} \
+#--       ${gco}
+
+
+#--gca = ${TGTLib}(gc-scheme.o)
+
+#--ArObjs = ${TGTLib}(shmm.o) ${TGTLib}(shprnt.o) ${TGTLib}(sheval.o) \
+#--         ${TGTLib}(shenvr.o) ${TGTLib}(shread.o) ${TGTLib}(shtlev.o) \
+#--         ${TGTLib}(shprm1.o) ${TGTLib}(shprm2.o) ${TGTLib}(shprm3.o) \
+#--         ${TGTLib}(shprm4.o) ${TGTLib}(shprm5.o) \
+#--         ${TGTLib}(shtty.o) ${TGTLib}(shint.o) ${TGTLib}(sharr.o) \
+#--         ${TGTLib}(shstrg.o) ${TGTLib}(shchr.o) ${TGTLib}(shlarg.o) \
+#--         ${TGTLib}(shprc1.o) ${TGTLib}(shprc2.o) \
+#--         ${TGTLib}(shsynt.o) ${TGTLib}(shvar.o) \
+#--         ${gca}
+
+#--${LibDep} : ${hdrf} ${Hdrs} ${SyntaxModes}
+
+#
+# Generated code rules
+#
+
+# headers
+
+#--GenInc = ${PACTTmpDir}/gc-scheme.h
+
+#--${IncDir}/scheme_gen.h : ${GenInc}
+#--	@echo "build scheme_gen.h"
+#--	@rm -f ${IncDir}/scheme_gen.h
+#--	@cat ${GenInc} > ${IncDir}/scheme_gen.h
+
+#--hdrf = ${IncDir}/scheme_gen.h
+
+#--IncAction = @pact generate
+set(do-bproto TRUE)
+
+include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
+
+#--LibAction = @pact devgen
+
+#--build : ${hdrf}
+#--	pact csynt
+#--	pact fsynt
+#--	pact msynt
+#--	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
+
+#--profiler : 
+#--	pact remove
+#--	pact ${TGTLib}
+#--	${CC} -c shmain.c
+#--	${CLD} ${MainObj} -o ${TGTBin} ${Libs}
+
+# make the executable
+#--${TGTExe} : ${BinDep}
+#--	@(echo "${CCAnnounce} shmain.c -o ${TGTExe}" ; \
+#--	  ${CLD} ${LdFlags} shmain.c -o ${TGTExe} ${Libs})
+
+#--scheme :
+#--	touch shmain.c
+#--	pact install
+
+#
+# link 
+#
+#--link: ${InstallDep}
+#--	pact man3install
+#--	pact scminstall
+#--	@${BinDir}/install-ext ${PSY_Root}
+
+#
+# install 
+#
+#--install:
+#--	pact link
+#--	pact incinstall
+
+#
+# sharedlib
+#
+#sharedlib:
+#	pact shared
+#	pact incinstall
+
+#
+# inform
+#
+#--inform :
+#--	@${RM} required.objs
+#--	@echo ${Objs} > required.objs
+
+#
+# Run the SCHEME test suite
+#
+#--test :
+#--	@./shtest
+

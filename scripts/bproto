@@ -28,13 +28,17 @@ set tgt  = premk
 set vrb  = FALSE
 set flst = ""
 set dst  = $PSY_TmpDir/obj
+set tmpd = $dst
+set logd = $cwd/$dst
 set excl = ""
+set reld = ../../..
 
 while ($#argv > 0)
    switch ($1)
       case -d:
            shift
-           set dst = $1
+           set dst  = $1
+           set logd = $dst
            breaksw
       case -excl:
            shift
@@ -45,11 +49,12 @@ while ($#argv > 0)
            breaksw
       case -h:
            echo ""
-           echo "Usage: bproto [-d <dir>] [-f] [-h] [-m] [-v]"
+           echo "Usage: bproto [-d <dir>] [-f] [-h] [-m] [-root path] [-v]"
            echo "   d   put files in <dir> (default $PSY_TmpDir/obj)"
            echo "   f   generate prototypes for specified files"
            echo "   h   this help message"
            echo "   m   generate prototypes from pre-Make files (default)"
+           echo "   root root of out-of-source build"
            echo "   v   verbose operation"
            echo ""
            exit(1)
@@ -59,6 +64,12 @@ while ($#argv > 0)
       case -v:
            set vrb = TRUE
            breaksw
+      case -root:
+           shift
+           set logd = $dst
+	   set tmpd = .
+           set reld = ..
+           breaksw
       default:
            set flst = ( $flst $1 )
            breaksw
@@ -67,12 +78,12 @@ while ($#argv > 0)
 end
 
 # GOTCHA: intel compilers need the -l option to blang
-# to be technically correct - things are working without
-# it at the moment
+# to be technically correct
+# however things are working without it at the moment
 set opt = "-l"
 set opt = ""
 
-InitLog Log $cwd/$dst/bproto
+InitLog Log $logd/bproto
 
 Note $Log ""
 Note $Log "Generating C bindings for Fortran, SX, and Python"
@@ -526,10 +537,9 @@ Note $Log ""
 
    NoteD $Log "done"
 
-# only move generated files if DST equals ZDIR
-   set zdir = $PSY_TmpDir/obj
-   if ($dst == $zdir) then
-      flog $Log pushd $zdir
+# only move generated files if DST equals TMPD
+   if ($dst == $tmpd) then
+      flog $Log pushd $tmpd
       Note $Log "DB_TYPES = `printenv DB_TYPES`"
 
       flog $Log blang $opt -b $cbind:t -c $cproto:t -dv $cder:t $cdoc:t -f $fproto:t -w $fwrap:t -t $DB_TYPES
@@ -538,14 +548,14 @@ Note $Log ""
 # move all fortran stuff to the fortran package
       if ($d != fortran) then
          if (-f gf-$d.c) then
-            set ldst =  ../../../fortran/$zdir
+            set ldst =  $reld/fortran/$tmpd
             if (!(-d $ldst)) then
                flog $Log mkdir -p $ldst
             endif
             flog $Log mv gf-$d.c $ldst
          endif
          if (-f gm-$d.f) then
-            set ldst =  ../../../fortran/$zdir
+            set ldst =  $reld/fortran/$tmpd
             if (!(-d $ldst)) then
                flog $Log mkdir -p $ldst
             endif
@@ -557,7 +567,7 @@ Note $Log ""
       if ($d != sx) then
          foreach s (c h)
             if (-f gs-$d.$s) then
-               set ldst =  ../../../sx/$zdir
+               set ldst =  $reld/sx/$tmpd
                if (!(-d $ldst)) then
                   flog $Log mkdir -p $ldst
                endif
@@ -570,7 +580,7 @@ Note $Log ""
       if ($d != python) then
          foreach s (c h)
             if (-f gp-$d.$s) then
-               set ldst =  ../../../python/$zdir
+               set ldst =  $reld/python/$tmpd
                if (!(-d $ldst)) then
                   flog $Log mkdir -p $ldst
                endif
@@ -581,7 +591,7 @@ Note $Log ""
 
 # move all documentation to the doc package
       if (-f gh-$d.html) then
-         flog $Log mv gh-$d.html ../../../doc
+         flog $Log mv gh-$d.html $reld/doc
       endif
 
       flog $Log popd
