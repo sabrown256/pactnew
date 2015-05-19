@@ -363,7 +363,10 @@ int _PD_e_install(PDBfile *file, const char *name, syment *ep, int lookup)
 
 /* do not add zero length variables to the symbol table */
     dms = PD_entry_dimensions(ep);
-    if ((dms == NULL) || (dms->number != 0))
+    if ((dms != NULL) && (dms->number == 0))
+       _PD_rl_dimensions(dms);
+
+    else
        {tab = file->symtab;
 
 /* we can leak a lot of memory if we don't check this!! */

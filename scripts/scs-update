@@ -74,7 +74,14 @@ switch ($scsi[1])
                    git pull --stat $repo master >&! $log
                    @ xstatus = $xstatus + $status
                    grep '|' $log |& sed 's@|.*$@@'
-                   if ($xstatus == 0) breaksw
+                   if ($xstatus == 0) then
+
+# without this pull git status reports the local repository as
+# being ahead of the master
+                      git pull >&! $log
+                      @ xstatus = $xstatus + $status
+                      breaksw
+                    endif
 
 # new way - handles merge/conflict more like CVS and SVN
 # BUT it touches files causing emacs to prompt you to re-read them
@@ -88,14 +95,6 @@ switch ($scsi[1])
                    @ xstatus = $xstatus + $status
                    breaksw
             endsw
-
-	   if ($mode == 0) then
-
-# without this pull git status reports the local repository as
-# being ahead of the master
-              git pull $repo master >&! $log
-              @ xstatus = $xstatus + $status
-           endif
 
 # report changed files
            if ($sort == TRUE) then

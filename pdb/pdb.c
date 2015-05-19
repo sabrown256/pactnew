@@ -795,7 +795,7 @@ syment *PD_defent_alt(PDBfile *file ARG(,,cls), const char *name,
 syment *_PD_write(PDBfile *file, const char *name,
 		  const char *intype, const char *outtype,
 		  void *vr, dimdes *dims, int appnd, int *pnew)
-   {int c, new, ok;
+   {int c, new, ok, st;
     long number; 
     int64_t addr;
     char bf[MAXLINE];
@@ -905,7 +905,8 @@ syment *_PD_write(PDBfile *file, const char *name,
 	   {addr = PD_entry_address(ep);
 	    new  = FALSE;};
 
-	lname = (char *) fullpath;}
+	lname = (char *) fullpath;
+	st    = TRUE;}
 
 /* if the variable doesn't exist define it to the file */
     else
@@ -920,12 +921,10 @@ syment *_PD_write(PDBfile *file, const char *name,
 	addr = _PD_get_next_address(file, outtype, number, vr,
 				    FALSE, FALSE, FALSE);
 
-	ep = _PD_mk_syment(outtype, number, addr, NULL, dims);
-	_PD_e_install(file, lname, ep, TRUE);
+	ep  = _PD_mk_syment(outtype, number, addr, NULL, dims);
+	st  = _PD_e_install(file, lname, ep, TRUE);
 
-	addr = _PD_annotate_text(file, ep, lname, addr);
-
-	new = TRUE;};
+	addr = _PD_annotate_text(file, ep, lname, addr);};
 
 /* if the number of items is zero or the pointer NULL
  * do not attempt to do the actual write
@@ -964,11 +963,14 @@ syment *_PD_write(PDBfile *file, const char *name,
 
     _PD_request_unset(file);
 
-    *pnew = new;
-
     ok = _PD_cksum_var_write(file, lname, ep);
     SC_ASSERT(ok == TRUE);
   
+    if (st == FALSE)
+       _PD_rl_syment(ep);
+
+    *pnew = new;
+
     return(ep);}
 
 /*--------------------------------------------------------------------------*/

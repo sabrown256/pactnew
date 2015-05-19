@@ -352,7 +352,7 @@ endif
                       echo '   CC     = bgclang' >>& $pf
                       echo '   CC_Cfg = bgclang' >>& $pf
                       echo '   CXX    = bgclang++' >>& $pf
-                      echo '   LDLb  += -lnss_files -lnss_dns -lresolv' >>& $pf
+#                      echo '   LDLb  += -lnss_files -lnss_dns -lresolv' >>& $pf
                       echo '}' >>& $pf
                       echo 'Group RF {' >>& $pf
                       echo '   RPATH_FILTER = /usr/lib:/usr/lib64' >>& $pf
