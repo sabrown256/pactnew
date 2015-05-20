@@ -91,7 +91,7 @@ extern void
  _PG_X_move_gr_abs(PG_device *dev, double x, double y),
  _PG_X_move_tx_abs(PG_device *dev, double x, double y),
  _PG_X_move_tx_rel(PG_device *dev, double x, double y),
- _PG_X_get_image(PG_device *dev, unsigned char *bf, int ix, int iy,
+ _PG_X_get_image(const PG_device *dev, unsigned char *bf, int ix, int iy,
 		 int nx, int ny),
  _PG_X_put_image(PG_device *dev, unsigned char *bf, int ix, int iy,
 		 int nx, int ny);

@@ -867,8 +867,9 @@ extern void
  PM_vector_select_extrema(int nd, int n, double **x,
 			  char *map, double *extr),
  PM_scale_vectors(int nd, int n, double **x, double *s),
- PM_translate_vectors(int nd, int n, double **x, double *d),
- PM_rotate_vectors(int nd, int n, double **x, double *x0, double *a);
+ PM_translate_vectors(int nd, int n, double **x, const double *d),
+ PM_rotate_vectors(int nd, int n, double **x,
+		   const double *x0, const double *a);
 
 extern double
  PM_distance(int nd, double *x1, double *x2, double *g),

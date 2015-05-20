@@ -507,7 +507,7 @@ extern void
 /* GSVSP.C declarations */
 
 extern void
- _PG_find_clip_region(PG_device *dev, int *pc, int clip, int swflag),
+ _PG_find_clip_region(const PG_device *dev, int *pc, int clip, int swflag),
  _PG_fix_wtos(PG_device *dev, int wh);
 
 

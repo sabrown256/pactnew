@@ -34,10 +34,10 @@ static INLINE void _PG_scale_cp(int n, int nd, double **xi, double **xo)
 
 /* _PG_SC_WC_TO_NDC_A - convert one WC component X to NDC absolute */
 
-static INLINE double _PG_sc_wc_to_ndc_a(PG_device *dev, int id,
+static INLINE double _PG_sc_wc_to_ndc_a(const PG_device *dev, int id,
 					int nd, double x)
    {int l;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -51,10 +51,10 @@ static INLINE double _PG_sc_wc_to_ndc_a(PG_device *dev, int id,
 
 /* _PG_SC_NDC_TO_WC_A - convert one NDC component X to WC absolute */
 
-static INLINE double _PG_sc_ndc_to_wc_a(PG_device *dev, int id,
+static INLINE double _PG_sc_ndc_to_wc_a(const PG_device *dev, int id,
 					int nd, double x)
    {int l;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -68,11 +68,11 @@ static INLINE double _PG_sc_ndc_to_wc_a(PG_device *dev, int id,
 
 /* _PG_SC_NDC_TO_PC_A - convert one NDC component X to PC absolute */
 
-static INLINE double _PG_sc_ndc_to_pc_a(PG_device *dev, int id,
+static INLINE double _PG_sc_ndc_to_pc_a(const PG_device *dev, int id,
 					int nd, double x)
    {int l;
     double w, p;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -88,11 +88,11 @@ static INLINE double _PG_sc_ndc_to_pc_a(PG_device *dev, int id,
 
 /* _PG_SC_PC_TO_NDC_A - convert one PC component IX to NDC absolute */
 
-static INLINE double _PG_sc_pc_to_ndc_a(PG_device *dev, int id,
+static INLINE double _PG_sc_pc_to_ndc_a(const PG_device *dev, int id,
 					int nd, int ix)
    {int l, w;
     double x;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
     l = 2*id;
@@ -106,11 +106,11 @@ static INLINE double _PG_sc_pc_to_ndc_a(PG_device *dev, int id,
 
 /* _PG_SC_WC_TO_PC_A - convert one WC component X to PC absolute */
 
-static INLINE double _PG_sc_wc_to_pc_a(PG_device *dev, int id,
+static INLINE double _PG_sc_wc_to_pc_a(const PG_device *dev, int id,
 				       int nd, double x)
    {int l;
     double w, p;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -131,11 +131,11 @@ static INLINE double _PG_sc_wc_to_pc_a(PG_device *dev, int id,
 
 /* _PG_SC_PC_TO_WC_A - convert one PC component IX to WC absolute */
 
-static INLINE double _PG_sc_pc_to_wc_a(PG_device *dev, int id,
+static INLINE double _PG_sc_pc_to_wc_a(const PG_device *dev, int id,
 				       int nd, int ix)
    {int l, w;
     double x;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
     l = 2*id;
@@ -154,7 +154,7 @@ static INLINE double _PG_sc_pc_to_wc_a(PG_device *dev, int id,
 
 /* _PG_SC_WC_TO_NDC - convert N ND XI in WC to XO in NDC */
 
-static INLINE void _PG_sc_wc_to_ndc(PG_device *dev, int n, int nd,
+static INLINE void _PG_sc_wc_to_ndc(const PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -172,7 +172,7 @@ static INLINE void _PG_sc_wc_to_ndc(PG_device *dev, int n, int nd,
 
 /* _PG_SC_NDC_TO_WC - convert N ND XI in NDC to XO in WC */
 
-static INLINE void _PG_sc_ndc_to_wc(PG_device *dev, int n, int nd,
+static INLINE void _PG_sc_ndc_to_wc(const PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -190,7 +190,7 @@ static INLINE void _PG_sc_ndc_to_wc(PG_device *dev, int n, int nd,
 
 /* _PG_SC_NDC_TO_PC - convert N ND XI in NDC to XO in PC */
 
-static INLINE void _PG_sc_ndc_to_pc(PG_device *dev, int n, int nd,
+static INLINE void _PG_sc_ndc_to_pc(const PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -208,7 +208,7 @@ static INLINE void _PG_sc_ndc_to_pc(PG_device *dev, int n, int nd,
 
 /* _PG_SC_PC_TO_NDC - convert N ND XI in PC to XO in NDC */
 
-static INLINE void _PG_sc_pc_to_ndc(PG_device *dev, int n, int nd,
+static INLINE void _PG_sc_pc_to_ndc(const PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -226,7 +226,7 @@ static INLINE void _PG_sc_pc_to_ndc(PG_device *dev, int n, int nd,
 
 /* _PG_SC_WC_TO_PC - convert N ND XI in WC to XO in PC */
 
-static INLINE void _PG_sc_wc_to_pc(PG_device *dev, int n, int nd,
+static INLINE void _PG_sc_wc_to_pc(const PG_device *dev, int n, int nd,
 				   double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -244,7 +244,7 @@ static INLINE void _PG_sc_wc_to_pc(PG_device *dev, int n, int nd,
 
 /* _PG_SC_PC_TO_WC - convert N ND XI in PC to XO in WC */
 
-static INLINE void _PG_sc_pc_to_wc(PG_device *dev, int n, int nd,
+static INLINE void _PG_sc_pc_to_wc(const PG_device *dev, int n, int nd,
 				   double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -262,7 +262,8 @@ static INLINE void _PG_sc_pc_to_wc(PG_device *dev, int n, int nd,
 
 /* _PG_SC_WC_TO - convert N ND XI in WC to XO in OCS */
 
-static INLINE void _PG_sc_wc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
+static INLINE void _PG_sc_wc_to(const PG_device *dev, int n, int nd,
+				PG_coord_sys ocs,
 				double **xi, double **xo)
    {
 
@@ -289,7 +290,8 @@ static INLINE void _PG_sc_wc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
 
 /* _PG_SC_NDC_TO - convert N ND XI in NDC to XO in OCS */
 
-static INLINE void _PG_sc_ndc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
+static INLINE void _PG_sc_ndc_to(const PG_device *dev, int n, int nd,
+				 PG_coord_sys ocs,
 				 double **xi, double **xo)
    {
 
@@ -316,7 +318,8 @@ static INLINE void _PG_sc_ndc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs
 
 /* _PG_SC_PC_TO - convert N ND XI in PC to XO in OCS */
 
-static INLINE void _PG_sc_pc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
+static INLINE void _PG_sc_pc_to(const PG_device *dev, int n, int nd,
+				PG_coord_sys ocs,
 				double **xi, double **xo)
    {
 
@@ -346,7 +349,8 @@ static INLINE void _PG_sc_pc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
  *                 - represented here as double
  */
 
-void PG_scale_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **xi,
+void PG_scale_points(const PG_device *dev, int n, int nd,
+		     PG_coord_sys ics, double **xi,
 		     PG_coord_sys ocs, double **xo)
    {
 
@@ -392,10 +396,10 @@ static INLINE void _PG_trans_cp(int n, int nd, double **xi, double **xo)
 
 /* _PG_TR_WC_TO_NDC_A - convert one WC component X to NDC absolute */
 
-static INLINE double _PG_tr_wc_to_ndc_a(PG_device *dev, int id,
+static INLINE double _PG_tr_wc_to_ndc_a(const PG_device *dev, int id,
 					int nd, double x)
    {int l;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -411,10 +415,10 @@ static INLINE double _PG_tr_wc_to_ndc_a(PG_device *dev, int id,
 
 /* _PG_TR_NDC_TO_WC_A - convert one NDC component X to WC absolute */
 
-static INLINE double _PG_tr_ndc_to_wc_a(PG_device *dev, int id,
+static INLINE double _PG_tr_ndc_to_wc_a(const PG_device *dev, int id,
 					int nd, double x)
    {int l;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -428,11 +432,11 @@ static INLINE double _PG_tr_ndc_to_wc_a(PG_device *dev, int id,
 
 /* _PG_TR_NDC_TO_FRM_A - convert one NDC component X to FRAMEC absolute */
 
-static INLINE double _PG_tr_ndc_to_frm_a(PG_device *dev, int id,
+static INLINE double _PG_tr_ndc_to_frm_a(const PG_device *dev, int id,
 					 int nd, double x)
    {int l;
     double f, df;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -449,11 +453,11 @@ static INLINE double _PG_tr_ndc_to_frm_a(PG_device *dev, int id,
 
 /* _PG_TR_NDC_TO_PC_A - convert one NDC component X to PC absolute */
 
-static INLINE double _PG_tr_ndc_to_pc_a(PG_device *dev, int id, int nd,
+static INLINE double _PG_tr_ndc_to_pc_a(const PG_device *dev, int id, int nd,
 					double x, double *wo)
    {int l, ix;
     double w, p;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -478,11 +482,11 @@ static INLINE double _PG_tr_ndc_to_pc_a(PG_device *dev, int id, int nd,
 
 /* _PG_TR_NDC_TO_PC_D - convert one NDC delta (XL,XU) to PC */
 
-static INLINE int _PG_tr_ndc_to_pc_d(PG_device *dev, int id, int nd,
+static INLINE int _PG_tr_ndc_to_pc_d(const PG_device *dev, int id, int nd,
 				     double xl, double xu)
    {int l, idx;
     double w, dx;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -502,11 +506,11 @@ static INLINE int _PG_tr_ndc_to_pc_d(PG_device *dev, int id, int nd,
 
 /* _PG_TR_PC_TO_NDC_A - convert one PC component IX to NDC absolute */
 
-static INLINE double _PG_tr_pc_to_ndc_a(PG_device *dev, int id, int nd,
+static INLINE double _PG_tr_pc_to_ndc_a(const PG_device *dev, int id, int nd,
 					int ix, double *wo)
    {int l, w;
     double x;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
     l = 2*id;
@@ -521,11 +525,11 @@ static INLINE double _PG_tr_pc_to_ndc_a(PG_device *dev, int id, int nd,
 
 /* _PG_TR_WC_TO_PC_A - convert one WC component X to PC absolute */
 
-static INLINE double _PG_tr_wc_to_pc_a(PG_device *dev, int id, int nd,
+static INLINE double _PG_tr_wc_to_pc_a(const PG_device *dev, int id, int nd,
 				       double x, double *wo)
    {int l, ix;
     double w, p;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -554,11 +558,11 @@ static INLINE double _PG_tr_wc_to_pc_a(PG_device *dev, int id, int nd,
 
 /* _PG_TR_PC_TO_WC_A - convert one PC component IX to WC absolute */
 
-static INLINE double _PG_tr_pc_to_wc_a(PG_device *dev, int id, int nd,
+static INLINE double _PG_tr_pc_to_wc_a(const PG_device *dev, int id, int nd,
 				       int ix, double *wo)
    {int l, w;
     double x;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
     l = 2*id;
@@ -577,7 +581,7 @@ static INLINE double _PG_tr_pc_to_wc_a(PG_device *dev, int id, int nd,
 
 /* _PG_TR_WC_TO_NDC - convert N ND XI in WC to XO in NDC */
 
-static INLINE void _PG_tr_wc_to_ndc(PG_device *dev, int n, int nd,
+static INLINE void _PG_tr_wc_to_ndc(const PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -595,7 +599,7 @@ static INLINE void _PG_tr_wc_to_ndc(PG_device *dev, int n, int nd,
 
 /* _PG_TR_NDC_TO_WC - convert N ND XI in NDC to XO in WC */
 
-static INLINE void _PG_tr_ndc_to_wc(PG_device *dev, int n, int nd,
+static INLINE void _PG_tr_ndc_to_wc(const PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -613,7 +617,7 @@ static INLINE void _PG_tr_ndc_to_wc(PG_device *dev, int n, int nd,
 
 /* _PG_TR_NDC_TO_FRM - convert N ND XI in NDC to XO in FRAMEC */
 
-static INLINE void _PG_tr_ndc_to_frm(PG_device *dev, int n, int nd,
+static INLINE void _PG_tr_ndc_to_frm(const PG_device *dev, int n, int nd,
 				     double **xi, double **xo)
    {int i, id;
     double *pi, *po;
@@ -631,7 +635,7 @@ static INLINE void _PG_tr_ndc_to_frm(PG_device *dev, int n, int nd,
 
 /* _PG_TR_NDC_TO_PC - convert N ND XI in NDC to XO in PC */
 
-static INLINE void _PG_tr_ndc_to_pc(PG_device *dev, int n, int nd,
+static INLINE void _PG_tr_ndc_to_pc(const PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
    {int i, id;
     double wo[PG_SPACEDM];
@@ -653,7 +657,7 @@ static INLINE void _PG_tr_ndc_to_pc(PG_device *dev, int n, int nd,
 
 /* _PG_TR_PC_TO_NDC - convert N ND XI in PC to XO in NDC */
 
-static INLINE void _PG_tr_pc_to_ndc(PG_device *dev, int n, int nd,
+static INLINE void _PG_tr_pc_to_ndc(const PG_device *dev, int n, int nd,
 				    double **xi, double **xo)
    {int i, id;
     double wo[PG_SPACEDM];
@@ -675,7 +679,7 @@ static INLINE void _PG_tr_pc_to_ndc(PG_device *dev, int n, int nd,
 
 /* _PG_TR_WC_TO_PC - convert N ND XI in WC to XO in PC */
 
-static INLINE void _PG_tr_wc_to_pc(PG_device *dev, int n, int nd,
+static INLINE void _PG_tr_wc_to_pc(const PG_device *dev, int n, int nd,
 				   double **xi, double **xo)
    {int i, id;
     double wo[PG_SPACEDM];
@@ -697,7 +701,7 @@ static INLINE void _PG_tr_wc_to_pc(PG_device *dev, int n, int nd,
 
 /* _PG_TR_PC_TO_WC - convert N ND XI in PC to XO in WC */
 
-static INLINE void _PG_tr_pc_to_wc(PG_device *dev, int n, int nd,
+static INLINE void _PG_tr_pc_to_wc(const PG_device *dev, int n, int nd,
 				   double **xi, double **xo)
    {int i, id;
     double wo[PG_SPACEDM];
@@ -719,7 +723,8 @@ static INLINE void _PG_tr_pc_to_wc(PG_device *dev, int n, int nd,
 
 /* _PG_TR_WC_TO - convert N ND XI in WC to XO in OCS */
 
-static INLINE void _PG_tr_wc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
+static INLINE void _PG_tr_wc_to(const PG_device *dev, int n, int nd,
+				PG_coord_sys ocs,
 				double **xi, double **xo)
    {
 
@@ -746,7 +751,8 @@ static INLINE void _PG_tr_wc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
 
 /* _PG_TR_NDC_TO - convert N ND XI in NDC to XO in OCS */
 
-static INLINE void _PG_tr_ndc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
+static INLINE void _PG_tr_ndc_to(const PG_device *dev, int n, int nd,
+				 PG_coord_sys ocs,
 				 double **xi, double **xo)
    {
 
@@ -777,7 +783,8 @@ static INLINE void _PG_tr_ndc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs
 
 /* _PG_TR_PC_TO - convert N ND XI in PC to XO in OCS */
 
-static INLINE void _PG_tr_pc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
+static INLINE void _PG_tr_pc_to(const PG_device *dev, int n, int nd,
+				PG_coord_sys ocs,
 				double **xi, double **xo)
    {
 
@@ -807,7 +814,8 @@ static INLINE void _PG_tr_pc_to(PG_device *dev, int n, int nd, PG_coord_sys ocs,
  *                 - represented here as double
  */
 
-void PG_trans_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **xi,
+void PG_trans_points(const PG_device *dev, int n, int nd,
+		     PG_coord_sys ics, double **xi,
 		     PG_coord_sys ocs, double **xo)
    {
 
@@ -839,7 +847,7 @@ void PG_trans_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **x
  * #bind PG_trans_point fortran() scheme() python()
  */
 
-void PG_trans_point(PG_device *dev ARG(,,cls),
+void PG_trans_point(const PG_device *dev ARG(,,cls),
 		    int nd, PG_coord_sys ics, double *xi,
 		    PG_coord_sys ocs, double *xo)
    {int id;
@@ -861,8 +869,8 @@ void PG_trans_point(PG_device *dev ARG(,,cls),
 
 /* _PG_BOX_PC - convert a box BI in CS coordinates to PC */
 
-static void _PG_box_pc(PG_device *dev, int nd, PG_coord_sys cs,
-		       double *bi, double *pc)
+static void _PG_box_pc(const PG_device *dev, int nd, PG_coord_sys cs,
+		       const double *bi, double *pc)
    {int id, l, n, ix, idx;
     double wo[PG_SPACEDM];
     double bx[PG_BOXSZ];
@@ -921,7 +929,7 @@ static void _PG_box_pc(PG_device *dev, int nd, PG_coord_sys cs,
 
 /* _PG_BOX_NDC - convert a box BI in CS coordinates to NDC */
 
-static void _PG_box_ndc(PG_device *dev, int nd, PG_coord_sys cs,
+static void _PG_box_ndc(const PG_device *dev, int nd, PG_coord_sys cs,
 			double *bi, double *ndc)
    {int id, l, n;
     double wo[PG_SPACEDM];
@@ -963,7 +971,7 @@ static void _PG_box_ndc(PG_device *dev, int nd, PG_coord_sys cs,
 
 /* _PG_BOX_WC - convert a box BI in CS coordinates to WC */
 
-static void _PG_box_wc(PG_device *dev, int nd, PG_coord_sys cs,
+static void _PG_box_wc(const PG_device *dev, int nd, PG_coord_sys cs,
 		       double *bi, double *wc)
    {int id, l, n;
     double wo[PG_SPACEDM];
@@ -1007,7 +1015,8 @@ static void _PG_box_wc(PG_device *dev, int nd, PG_coord_sys cs,
  *              - OCS coordinates BO
  */
 
-void PG_trans_box(PG_device *dev, int nd, PG_coord_sys ics, double *bi,
+void PG_trans_box(const PG_device *dev, int nd,
+		  PG_coord_sys ics, double *bi,
 		  PG_coord_sys ocs, double *bo)
    {
 
@@ -1036,7 +1045,8 @@ void PG_trans_box(PG_device *dev, int nd, PG_coord_sys ics, double *bi,
  *                   - OCS coordinates DO
  */
 
-void PG_trans_interval(PG_device *dev, int nd, PG_coord_sys ics, double *dxi,
+void PG_trans_interval(const PG_device *dev, int nd,
+		       PG_coord_sys ics, double *dxi,
 		       PG_coord_sys ocs, double *dxo)
    {int id, l;
     double d;
@@ -1084,7 +1094,7 @@ void PG_box_init(int nd, double *bx, double mn, double mx)
 
 /* PG_BOX_COPY - copy box S to D */
 
-void PG_box_copy(int nd, double *d, double *s)
+void PG_box_copy(int nd, double *d, const double *s)
    {int l, n;
 
     n = 2*nd;
@@ -1098,7 +1108,7 @@ void PG_box_copy(int nd, double *d, double *s)
 
 /* PG_BOX_CONTAINS - return B_T if BOX contains P */
 
-pboolean PG_box_contains(int nd, double *box, double *p)
+pboolean PG_box_contains(int nd, const double *box, const double *p)
    {int id, l;
     pboolean ok;
 
@@ -1120,8 +1130,9 @@ pboolean PG_box_contains(int nd, double *box, double *p)
  *                   - log scales
  */
 
-static void _PG_log_transform(PG_device *dev, int nd, double *box)
-   {int id, l, *iflog;
+static void _PG_log_transform(const PG_device *dev, int nd, double *box)
+   {int id, l;
+    const int *iflog;
     double mn, mx, ma;
 
     iflog = dev->g.iflog;
@@ -1153,9 +1164,9 @@ static void _PG_log_transform(PG_device *dev, int nd, double *box)
 
 /* PG_LOG_SPACE - get WC BOX values correctly transformed for log scales */
 
-void PG_log_space(PG_device *dev, int nd, int dec, double *box)
+void PG_log_space(const PG_device *dev, int nd, int dec, double *box)
    {int id, l, n;
-    int *iflog;
+    const int *iflog;
     double xc;
 
     if (dec == TRUE)
@@ -1184,8 +1195,9 @@ void PG_log_space(PG_device *dev, int nd, int dec, double *box)
 
 /* PG_LOG_POINT - get WC point P values correctly transformed for log scales */
 
-void PG_log_point(PG_device *dev, int nd, double *p)
-   {int id, *iflog;
+void PG_log_point(const PG_device *dev, int nd, double *p)
+   {int id;
+    const int *iflog;
     double pc;
 
     iflog = dev->g.iflog;
@@ -1208,9 +1220,9 @@ void PG_log_point(PG_device *dev, int nd, double *p)
  *              - for linear scales
  */
 
-void PG_lin_space(PG_device *dev, int nd, double *box)
+void PG_lin_space(const PG_device *dev, int nd, double *box)
    {int id, l, n;
-    int *iflog;
+    const int *iflog;
     double xc;
 
     iflog = dev->g.iflog;
@@ -1237,8 +1249,9 @@ void PG_lin_space(PG_device *dev, int nd, double *box)
  *              - for linear scales
  */
 
-void PG_lin_point(PG_device *dev, int nd, double *p)
-   {int id, *iflog;
+void PG_lin_point(const PG_device *dev, int nd, double *p)
+   {int id;
+    const int *iflog;
     double pc;
 
     iflog = dev->g.iflog;
@@ -1265,7 +1278,7 @@ void PG_lin_point(PG_device *dev, int nd, double *p)
  *                      - whole window (FALSE) or the WC region (TRUE)
  */
 
-void _PG_find_clip_region(PG_device *dev, int *pc, int clip, int swflag)
+void _PG_find_clip_region(const PG_device *dev, int *pc, int clip, int swflag)
    {int l, pad;
     double wc[PG_BOXSZ], px[PG_BOXSZ];
 
@@ -1308,7 +1321,8 @@ void _PG_find_clip_region(PG_device *dev, int *pc, int clip, int swflag)
  *                     - in inscribed (in PC)
  */
 
-void PG_get_curve_extent(PG_device *dev, PG_curve *crv, PG_coord_sys cs, double *bx)
+void PG_get_curve_extent(const PG_device *dev, PG_curve *crv,
+			 PG_coord_sys cs, double *bx)
    {int i, n;
     int *x, *y;
     double pc[PG_BOXSZ];
@@ -1334,10 +1348,10 @@ void PG_get_curve_extent(PG_device *dev, PG_curve *crv, PG_coord_sys cs, double 
 
 /* PG_GET_LIMIT - return the limits of the device viewspace */
 
-void PG_get_limit(PG_device *dev, PG_coord_sys cs, double *lim)
+void PG_get_limit(const PG_device *dev, PG_coord_sys cs, double *lim)
    {int i, l, id;
     double x;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     if (dev == NULL)
        return;
@@ -1427,9 +1441,10 @@ void _PG_fix_wtos(PG_device *dev, int wh)
  * #bind PG_fget_axis_log_scale fortran() scheme(pg-get-axis-log-scale) python()
  */
 
-void PG_fget_axis_log_scale(PG_device *dev ARG(,,cls), int nd, int *iflg)
+void PG_fget_axis_log_scale(const PG_device *dev ARG(,,cls),
+			    int nd, int *iflg)
    {int id;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     if (dev != NULL)
        {g = &dev->g;
@@ -1601,9 +1616,9 @@ static INLINE void _PG_set_space_WC(PG_device *dev, int nd, double *wc)
  * #bind PG_get_viewspace fortran() scheme() python()
  */
 
-void PG_get_viewspace(PG_device *dev ARG(,,cls),
+void PG_get_viewspace(const PG_device *dev ARG(,,cls),
 		      PG_coord_sys cs, double *box)
-   {PG_dev_geometry *g;
+   {const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -1705,11 +1720,11 @@ void PG_init_viewspace(PG_device *dev, int setw)
  *             - also include the absolute position of the low corner
  */
 
-double **PG_get_hull(PG_device *dev, double *extr, int offs)
+double **PG_get_hull(const PG_device *dev, const double *extr, int offs)
    {int i, l;
     double dx[PG_SPACEDM];
     double **xc;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
 /* find offset/pad for extremal box */
     g = &dev->g;
@@ -1801,11 +1816,11 @@ void dviewbox(PG_dev_geometry *g, double *vbx, int n, double **x)
 
 /* _PG_RIGHT_SPACE_BOX - get the vectors into the right place */
 
-static void _PG_right_space_box(PG_device *dev, int n, double **x,
+static void _PG_right_space_box(const PG_device *dev, int n, double **x,
 				double *xo)
    {double vbx[PG_BOXSZ];
     double **xc;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g  = &dev->g;
     xc = PG_get_hull(dev, g->wc, FALSE);
@@ -1832,7 +1847,7 @@ static void _PG_right_space_box(PG_device *dev, int n, double **x,
  *                  - also include the absolute position of the low corner
  */
 
-double **PG_get_space_box(PG_device *dev, double *extr, int offs)
+double **PG_get_space_box(const PG_device *dev, double *extr, int offs)
    {double box[PG_BOXSZ];
     double **xc;
 
@@ -1855,11 +1870,11 @@ double **PG_get_space_box(PG_device *dev, double *extr, int offs)
 
 /* _PG_TR_NDC_TO_FRM_B - convert one NDC component X to FRAMEC absolute */
 
-static INLINE double _PG_tr_ndc_to_frm_b(PG_device *dev, int id,
+static INLINE double _PG_tr_ndc_to_frm_b(const PG_device *dev, int id,
 					 int nd, PG_coord_sys cs, double x)
    {int l;
     double f, df, ua, ub, x1, x2, f1, f2;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -1904,8 +1919,8 @@ static INLINE double _PG_tr_ndc_to_frm_b(PG_device *dev, int id,
  *                 - XO in frame relative values
  */
 
-void PG_frame_points(PG_device *dev, int nd, PG_coord_sys cs, long n, double **xi,
-		     double **xo)
+void PG_frame_points(const PG_device *dev, int nd, PG_coord_sys cs,
+		     long n, double **xi, double **xo)
    {int i, id;
     double *pi, *po;
 
@@ -1924,7 +1939,8 @@ void PG_frame_points(PG_device *dev, int nd, PG_coord_sys cs, long n, double **x
  *                - XO in frame relative values
  */
 
-void PG_frame_point(PG_device *dev, int nd, PG_coord_sys cs, double *xi, double *xo)
+void PG_frame_point(const PG_device *dev, int nd, PG_coord_sys cs,
+		    double *xi, double *xo)
    {int id;
     double *o[PG_SPACEDM], *n[PG_SPACEDM];
 
@@ -1943,10 +1959,11 @@ void PG_frame_point(PG_device *dev, int nd, PG_coord_sys cs, double *xi, double 
  *                   - DXO in frame relative values
  */
 
-void PG_frame_interval(PG_device *dev, int nd, double *dxi, double *dxo)
+void PG_frame_interval(const PG_device *dev, int nd,
+		       double *dxi, double *dxo)
    {int id, l;
     double df;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     if (dev != NULL)
        {g = &dev->g;
@@ -1965,7 +1982,7 @@ void PG_frame_interval(PG_device *dev, int nd, double *dxi, double *dxo)
  *              - relative values
  */
  
-void PG_frame_box(PG_device *dev, int nd, PG_coord_sys cs, double *box)
+void PG_frame_box(const PG_device *dev, int nd, PG_coord_sys cs, double *box)
    {int id, l;
     double mn, mx;
 
@@ -1991,10 +2008,10 @@ void PG_frame_box(PG_device *dev, int nd, PG_coord_sys cs, double *box)
  *                   - relative values
  */
  
-void PG_frame_viewport(PG_device *dev, int nd, double *ndc)
+void PG_frame_viewport(const PG_device *dev, int nd, double *ndc)
    {int id, l;
     double mn, mx, fn, df;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     if (dev != NULL)
        {g = &dev->g;
@@ -2026,10 +2043,10 @@ void PG_frame_viewport(PG_device *dev, int nd, double *ndc)
  *                   - relative values
  */
  
-void PG_viewport_frame(PG_device *dev, int nd, double *ndc)
+void PG_viewport_frame(const PG_device *dev, int nd, double *ndc)
    {int id, l;
     double fn, df;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     if (dev != NULL)
        {g = &dev->g;
@@ -2062,12 +2079,12 @@ void PG_viewport_frame(PG_device *dev, int nd, double *ndc)
  * #bind PG_fget_view_angle fortran() scheme() python()
  */
 
-void PG_fget_view_angle(PG_device *dev ARG(,,cls), int cnv,
+void PG_fget_view_angle(const PG_device *dev ARG(,,cls), int cnv,
 			double *pt ARG(*,out),
 			double *pp ARG(*,out),
 			double *pc ARG(*,out))
    {double cf;
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g  = &dev->g;
     cf = (cnv == TRUE) ? RAD_DEG : 1.0;
@@ -2133,7 +2150,8 @@ void PG_fset_view_angle(PG_device *dev ARG(,,cls), int cnv ARG(TRUE,in),
  * #bind PG_fget_light_angle fortran() scheme(pg-get-light-angle) python()
  */
 
-void PG_fget_light_angle(PG_device *dev ARG(,,cls), int cnv ARG(TRUE,in),
+void PG_fget_light_angle(const PG_device *dev ARG(,,cls),
+			 int cnv ARG(TRUE,in),
 			 double *pt ARG(*,out),
 			 double *pp ARG(*,out))
    {double cf;
@@ -2188,7 +2206,7 @@ void PG_fset_light_angle(PG_device *dev ARG(,,cls),
 /* _PG_CONFORM_TRANS - do the tranformation to make X in EXTR fit in DST */
 
 static INLINE void _PG_conform_trans(int nd, int n, double **x,
-				     double *sb, double *db)
+				     double *sb, const double *db)
    {int l, id, dos, dot;
     double smn, smx, dmn, dmx, sf, tf;
     double tr[PG_SPACEDM], sc[PG_SPACEDM], box[PG_BOXSZ];
@@ -2239,9 +2257,9 @@ static INLINE void _PG_conform_trans(int nd, int n, double **x,
  *                - so that it fits in view space
  */
 
-static INLINE void _PG_conform_wc(PG_device *dev, int nd, double *box,
+static INLINE void _PG_conform_wc(const PG_device *dev, int nd, double *box,
 				  int n, double **x)
-   {PG_dev_geometry *g;
+   {const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -2256,9 +2274,9 @@ static INLINE void _PG_conform_wc(PG_device *dev, int nd, double *box,
  *                 - so that it fits in view space
  */
 
-static INLINE void _PG_conform_ndc(PG_device *dev, int nd, double *box,
+static INLINE void _PG_conform_ndc(const PG_device *dev, int nd, double *box,
 				   int n, double **x)
-   {PG_dev_geometry *g;
+   {const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -2273,9 +2291,9 @@ static INLINE void _PG_conform_ndc(PG_device *dev, int nd, double *box,
  *                - so that it fits in view space
  */
 
-static INLINE void _PG_conform_pc(PG_device *dev, int nd, double *box,
+static INLINE void _PG_conform_pc(const PG_device *dev, int nd, double *box,
 				  int n, double **x)
-   {PG_dev_geometry *g;
+   {const const PG_dev_geometry *g;
 
     g = &dev->g;
 
@@ -2291,8 +2309,8 @@ static INLINE void _PG_conform_pc(PG_device *dev, int nd, double *box,
  *                 - typically done after rotations
  */
 
-void PG_conform_view(PG_device *dev, int nd, PG_coord_sys cs, double *box,
-		     int n, double **x)
+void PG_conform_view(const PG_device *dev, int nd, PG_coord_sys cs,
+		     double *box, int n, double **x)
    {
 
     switch (cs)
@@ -2315,10 +2333,10 @@ void PG_conform_view(PG_device *dev, int nd, PG_coord_sys cs, double *box,
 
 /* PG_ROTATE_VECTORS - rotate N ND vectors X about X0 by Euler angles VA */
 
-void PG_rotate_vectors(PG_device *dev, int nd, int n, double **x)
+void PG_rotate_vectors(const PG_device *dev, int nd, int n, double **x)
    {int id, l;
     double xo[PG_SPACEDM];
-    PG_dev_geometry *g;
+    const PG_dev_geometry *g;
 
     g = &dev->g;
     

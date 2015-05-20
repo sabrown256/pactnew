@@ -676,10 +676,10 @@ void _PG_win32_put_image(PG_device *dev, unsigned char *bf,
 /*--------------------------------------------------------------------------*/
 
 /* _PG_WIN32_GET_IMAGE - get the image on the screen into
- *                  - the image buffer
+ *                     - the image buffer
  */
 
-void _PG_win32_get_image(PG_device *dev, unsigned char *bf,
+void _PG_win32_get_image(const PG_device *dev, unsigned char *bf,
 			 int ix, int iy, int nx, int ny)
    {
 

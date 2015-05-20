@@ -931,7 +931,7 @@ void _PG_rst_put_image(PG_device *dev, unsigned char *bf,
  *                   - the image buffer
  */
 
-void _PG_rst_get_image(PG_device *dev, unsigned char *bf,
+void _PG_rst_get_image(const PG_device *dev, unsigned char *bf,
                        int ix, int iy, int nx, int ny)
    {int k, l, mo, mi, mx, my;
     unsigned char *r, *g, *b;

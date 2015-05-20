@@ -975,7 +975,7 @@ struct s_PG_device
     int (*grab_pointer)(PG_device *dev);
     int (*release_pointer)(PG_device *dev);
     int (*get_char)(PG_device *dev);
-    void (*get_image)(PG_device *dev, unsigned char *bf, int ix, int iy,
+    void (*get_image)(const PG_device *dev, unsigned char *bf, int ix, int iy,
 		      int nx, int ny);
     void (*get_text_ext)(PG_device *dev, int nd, PG_coord_sys cs,
 			 const char *s, double *bx);
@@ -1136,21 +1136,21 @@ extern PG_scope_public
 /* GSACC.C declarations */
 
 extern double
- PG_fget_char_space(PG_device *dev),
+ PG_fget_char_space(const PG_device *dev),
  PG_fset_char_space(PG_device *dev, double d),
- PG_fget_line_width(PG_device *dev),
+ PG_fget_line_width(const PG_device *dev),
  PG_fset_line_width(PG_device *dev, double wd),
- PG_fget_marker_orientation(PG_device *dev),
+ PG_fget_marker_orientation(const PG_device *dev),
  PG_fset_marker_orientation(PG_device *dev, double a),
- PG_fget_marker_scale(PG_device *dev),
+ PG_fget_marker_scale(const PG_device *dev),
  PG_fset_marker_scale(PG_device *dev, double s),
- PG_fget_max_intensity(PG_device *dev),
+ PG_fget_max_intensity(const PG_device *dev),
  PG_fset_max_intensity(PG_device *dev, double i),
- PG_fget_max_red_intensity(PG_device *dev),
+ PG_fget_max_red_intensity(const PG_device *dev),
  PG_fset_max_red_intensity(PG_device *dev, double i),
- PG_fget_max_green_intensity(PG_device *dev),
+ PG_fget_max_green_intensity(const PG_device *dev),
  PG_fset_max_green_intensity(PG_device *dev, double i),
- PG_fget_max_blue_intensity(PG_device *dev),
+ PG_fget_max_blue_intensity(const PG_device *dev),
  PG_fset_max_blue_intensity(PG_device *dev, double i),
  PG_fget_ps_dots_inch(void),
  PG_fset_ps_dots_inch(double dpi);
@@ -1160,35 +1160,35 @@ extern int64_t
  PG_fset_buffer_size(int64_t sz);
 
 extern bool
- PG_fget_clipping(PG_device *dev),
+ PG_fget_clipping(const PG_device *dev),
  PG_fset_clipping(PG_device *dev, bool flag);
 
 extern int
  PG_fget_clear_mode(void),
  PG_fset_clear_mode(int i),
- PG_fget_char_precision(PG_device *dev),
+ PG_fget_char_precision(const PG_device *dev),
  PG_fset_char_precision(PG_device *dev, int p),
- PG_fget_fill_bound(PG_device *dev),
+ PG_fget_fill_bound(const PG_device *dev),
  PG_fset_fill_bound(PG_device *dev, int v),
- PG_fget_finish_state(PG_device *dev),
+ PG_fget_finish_state(const PG_device *dev),
  PG_fset_finish_state(PG_device *dev, int v),
- PG_fget_identifier(PG_graph *g),
+ PG_fget_identifier(const PG_graph *g),
  PG_fset_identifier(PG_graph *g, int id),
- PG_fget_line_style(PG_device *dev),
+ PG_fget_line_style(const PG_device *dev),
  PG_fset_line_style(PG_device *dev, int st),
- PG_fget_pixmap_flag(PG_device *dev),
+ PG_fget_pixmap_flag(const PG_device *dev),
  PG_fset_pixmap_flag(PG_device *dev, int fl),
  PG_fget_use_pixmap(void),
  PG_fset_use_pixmap(int i),
- PG_fget_res_scale_factor(PG_device *dev),
+ PG_fget_res_scale_factor(const PG_device *dev),
  PG_fset_res_scale_factor(PG_device *dev, int s),
- PG_fget_border_width(PG_device *dev),
+ PG_fget_border_width(const PG_device *dev),
  PG_fset_border_width(PG_device *dev, int w),
- PG_fget_line_color(PG_device *dev),
+ PG_fget_line_color(const PG_device *dev),
  PG_fset_line_color(PG_device *dev, int clr, int mapped),
- PG_fget_text_color(PG_device *dev),
+ PG_fget_text_color(const PG_device *dev),
  PG_fset_text_color(PG_device *dev, int clr, int mapped),
- PG_fget_fill_color(PG_device *dev),
+ PG_fget_fill_color(const PG_device *dev),
  PG_fset_fill_color(PG_device *dev, int clr, int mapped),
  PG_grab_pointer(PG_device *dev),
  PG_release_pointer(PG_device *dev),
@@ -1202,17 +1202,17 @@ extern int
  PG_n_events_pending(PG_device *dev);
 
 extern void
- PG_fget_char_path(PG_device *dev, double *x),
+ PG_fget_char_path(const PG_device *dev, double *x),
  PG_fset_char_path(PG_device *dev, double *x),
- PG_fget_char_up(PG_device *dev, double *x),
+ PG_fget_char_up(const PG_device *dev, double *x),
  PG_fset_char_up(PG_device *dev, double *x),
- PG_fget_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
+ PG_fget_char_size_n(const PG_device *dev, int nd, PG_coord_sys cs, double *p),
  PG_fset_char_size_n(PG_device *dev, int nd, PG_coord_sys cs, double *p),
- PG_fget_font(PG_device *dev, char **of, char **ost, int *osz),
+ PG_fget_font(const PG_device *dev, char **of, char **ost, int *osz),
  PG_fset_font(PG_device *dev, const char *face, const char *style, int sz),
- PG_fget_viewport_pos(PG_device *dev, double *x),
+ PG_fget_viewport_pos(const PG_device *dev, double *x),
  PG_fset_viewport_pos(PG_device *dev, double *x),
- PG_fget_viewport_shape(PG_device *dev, double *dx, double *pa),
+ PG_fget_viewport_shape(const PG_device *dev, double *dx, double *pa),
  PG_fset_viewport_shape(PG_device *dev, double *dx, double asp),
  PG_handle_expose_event(PG_device *dev, PG_event *ev),
  PG_handle_update_event(PG_device *dev, PG_event *ev),
@@ -1247,7 +1247,7 @@ extern void
  PG_fill_curve(PG_device *dev, PG_curve *crv),
  PG_draw_curve(PG_device *dev, PG_curve *crv, int clip),
  PG_make_palette_current(PG_device *dev, PG_palette *p),
- PG_get_image_n(PG_device *dev, unsigned char *bf,
+ PG_get_image_n(const PG_device *dev, unsigned char *bf,
 		PG_coord_sys cs, double *irg),
  PG_put_image_n(PG_device *dev, unsigned char *bf,
 		PG_coord_sys cs, double *irg),
@@ -1258,11 +1258,11 @@ extern void
  PG_draw_to_rel_n(PG_device *dev, double *p);
 
 extern PG_logical_operation
- PG_fget_logical_op(PG_device *dev),
+ PG_fget_logical_op(const PG_device *dev),
  PG_fset_logical_op(PG_device *dev, PG_logical_operation lop);
 
 extern pcons
- *PG_fget_render_info(PG_graph *g),
+ *PG_fget_render_info(const PG_graph *g),
  *PG_fset_render_info(PG_graph *g, pcons *a);
 
 
@@ -1895,51 +1895,58 @@ extern void
 /* GSVSP.C declarations */
 
 extern void
- PG_log_space(PG_device *dev, int nd, int dec, double *box),
- PG_log_point(PG_device *dev, int nd, double *p),
- PG_lin_space(PG_device *dev, int nd, double *box),
- PG_lin_point(PG_device *dev, int nd, double *p),
- PG_get_curve_extent(PG_device *dev, PG_curve *crv, PG_coord_sys cs, double *bx),
- PG_get_limit(PG_device *dev, PG_coord_sys cs, double *lim),
- PG_frame_points(PG_device *dev, int nd, PG_coord_sys cs, long n, double **xi,
-		 double **xo),
- PG_frame_point(PG_device *dev, int nd, PG_coord_sys cs, double *xi, double *xo),
- PG_frame_interval(PG_device *dev, int nd, double *dxi, double *dxo),
- PG_frame_box(PG_device *dev, int nd, PG_coord_sys cs, double *box),
- PG_frame_viewport(PG_device *dev, int nd, double *ndc),
- PG_viewport_frame(PG_device *dev, int nd, double *ndc),
- PG_fget_axis_log_scale(PG_device *dev, int nd, int *iflg),
+ PG_log_space(const PG_device *dev, int nd, int dec, double *box),
+ PG_log_point(const PG_device *dev, int nd, double *p),
+ PG_lin_space(const PG_device *dev, int nd, double *box),
+ PG_lin_point(const PG_device *dev, int nd, double *p),
+ PG_get_curve_extent(const PG_device *dev, PG_curve *crv,
+		     PG_coord_sys cs, double *bx),
+ PG_get_limit(const PG_device *dev, PG_coord_sys cs, double *lim),
+ PG_frame_points(const PG_device *dev, int nd, PG_coord_sys cs,
+		 long n, double **xi, double **xo),
+ PG_frame_point(const PG_device *dev, int nd, PG_coord_sys cs,
+		double *xi, double *xo),
+ PG_frame_interval(const PG_device *dev, int nd, double *dxi, double *dxo),
+ PG_frame_box(const PG_device *dev, int nd, PG_coord_sys cs, double *box),
+ PG_frame_viewport(const PG_device *dev, int nd, double *ndc),
+ PG_viewport_frame(const PG_device *dev, int nd, double *ndc),
+ PG_fget_axis_log_scale(const PG_device *dev, int nd, int *iflg),
  PG_fset_axis_log_scale(PG_device *dev, int nd, int *iflg),
  PG_init_viewspace(PG_device *dev, int setw),
  PG_set_viewspace(PG_device *dev, int nd, PG_coord_sys cs, double *extr),
- PG_get_viewspace(PG_device *dev, PG_coord_sys cs, double *box),
- PG_fget_view_angle(PG_device *dev, int cnv,
+ PG_get_viewspace(const PG_device *dev, PG_coord_sys cs, double *box),
+ PG_fget_view_angle(const PG_device *dev, int cnv,
 		    double *pt, double *pp, double *pc),
  PG_fset_view_angle(PG_device *dev, int cnv,
 		    double *pt, double *pp, double *pc),
- PG_fget_light_angle(PG_device *dev, int cnv, double *pt, double *pp),
+ PG_fget_light_angle(const PG_device *dev, int cnv, double *pt, double *pp),
  PG_fset_light_angle(PG_device *dev, int cnv, double *pt, double *pp),
- PG_scale_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **xi,
+ PG_scale_points(const PG_device *dev, int n, int nd,
+		 PG_coord_sys ics, double **xi,
 		 PG_coord_sys ocs, double **xo),
- PG_trans_points(PG_device *dev, int n, int nd, PG_coord_sys ics, double **xi,
+ PG_trans_points(const PG_device *dev, int n, int nd,
+		 PG_coord_sys ics, double **xi,
 		 PG_coord_sys ocs, double **xo),
- PG_trans_point(PG_device *dev, int nd, PG_coord_sys ics, double *xi,
+ PG_trans_point(const PG_device *dev, int nd,
+		PG_coord_sys ics, double *xi,
 		PG_coord_sys ocs, double *xo),
- PG_trans_box(PG_device *dev, int nd, PG_coord_sys ics, double *bi,
+ PG_trans_box(const PG_device *dev, int nd,
+	      PG_coord_sys ics, double *bi,
 	      PG_coord_sys ocs, double *bo),
- PG_trans_interval(PG_device *dev, int nd, PG_coord_sys ics, double *dxi,
+ PG_trans_interval(const PG_device *dev, int nd,
+		   PG_coord_sys ics, double *dxi,
 		   PG_coord_sys ocs, double *dxo),
  PG_box_init(int nd, double *bx, double mn, double mx),
- PG_box_copy(int nd, double *d, double *s),
- PG_conform_view(PG_device *dev, int nd, PG_coord_sys cs, double *box,
+ PG_box_copy(int nd, double *d, const double *s),
+ PG_conform_view(const PG_device *dev, int nd, PG_coord_sys cs, double *box,
 		 int n, double **x),
- PG_rotate_vectors(PG_device *dev, int nd, int n, double **x);
+ PG_rotate_vectors(const PG_device *dev, int nd, int n, double **x);
 
 extern pboolean
- PG_box_contains(int nd, double *box, double *p);
+ PG_box_contains(int nd, const double *box, const double *p);
 
 extern double
- **PG_get_space_box(PG_device *dev, double *extr, int offs);
+ **PG_get_space_box(const PG_device *dev, double *extr, int offs);
 
 
 #ifdef __cplusplus

@@ -58,7 +58,7 @@ void
  _PG_win32_move_gr_abs(PG_device *dev, double x, double y),
  _PG_win32_move_tx_abs(PG_device *dev, double x, double y),
  _PG_win32_move_tx_rel(PG_device *dev, double x, double y),
- _PG_win32_get_image(PG_device *dev, unsigned char *bf, int ix, int iy,
+ _PG_win32_get_image(const PG_device *dev, unsigned char *bf, int ix, int iy,
 		     int nx, int ny),
  _PG_win32_put_image(PG_device *dev, unsigned char *bf, int ix, int iy,
 		     int nx, int ny),

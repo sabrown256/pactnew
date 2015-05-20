@@ -113,7 +113,7 @@ extern void
  _PG_GL_move_gr_abs(PG_device *dev, double x, double y),
  _PG_GL_move_tx_abs(PG_device *dev, double x, double y),
  _PG_GL_move_tx_rel(PG_device *dev, double x, double y),
- _PG_GL_get_image(PG_device *dev, unsigned char *bf, int ix, int iy,
+ _PG_GL_get_image(const PG_device *dev, unsigned char *bf, int ix, int iy,
 		  int nx, int ny),
  _PG_GL_put_image(PG_device *dev, unsigned char *bf, int ix, int iy,
 		  int nx, int ny);

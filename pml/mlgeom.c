@@ -1769,7 +1769,7 @@ void PM_scale_vectors(int nd, int n, double **x, double *s)
 
 /* PM_TRANSLATE_VECTORS - translate N ND vectors X by D */
 
-void PM_translate_vectors(int nd, int n, double **x, double *d)
+void PM_translate_vectors(int nd, int n, double **x, const double *d)
    {int i, id;
     double dc;
     double *px;
@@ -1788,14 +1788,14 @@ void PM_translate_vectors(int nd, int n, double **x, double *d)
  *              - by the angle, A (theta) in radians
  */
 
-static void _PM_rotate_2d(int n, double **x, double *x0, double a)
+static void _PM_rotate_2d(int n, double **x, const double *x0, double a)
    {int i;
     double ct, st, r11, r12, r21, r22;
     double xc, yc, xo[2];
     double *px, *py;
 
     if (x0 == NULL)
-       {x0 = xo;
+       {x0 = (const double *) xo;
 	for (i = 0; i < 2; i++)
 	    xo[i] = 0.0;};
 
@@ -1830,8 +1830,8 @@ static void _PM_rotate_2d(int n, double **x, double *x0, double a)
  *               -    by chi about z axis from positive y'' axis
  */
 
-static void _PM_rotate_3d(int n, double **x, double *xo,
-			  double *a)
+static void _PM_rotate_3d(int n, double **x,
+			  const double *xo, const double *a)
    {int i;
     double ct, st, cp, sp, cc, sc;
     double ctcp, stcp, ctsp, stsp;
@@ -1840,7 +1840,7 @@ static void _PM_rotate_3d(int n, double **x, double *xo,
     double theta, phi, chi;
 
     if (xo == NULL)
-       {xo = x0;
+       {xo = (const double *) x0;
 	for (i = 0; i < 3; i++)
 	    x0[i] = 0.0;};
 
@@ -1900,7 +1900,8 @@ static void _PM_rotate_3d(int n, double **x, double *xo,
  *                   -    by chi about z axis from positive y'' axis
  */
 
-void PM_rotate_vectors(int nd, int n, double **x, double *x0, double *a)
+void PM_rotate_vectors(int nd, int n, double **x,
+		       const double *x0, const double *a)
    {
 
     if (nd == 2)

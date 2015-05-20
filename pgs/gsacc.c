@@ -83,7 +83,7 @@ int PG_fset_clear_mode(int i ARG(CLEAR_SCREEN))
  * #bind PG_fget_clipping fortran() scheme(pg-get-clipping) python()
  */
 
-bool PG_fget_clipping(PG_device *dev ARG(,in,cls))
+bool PG_fget_clipping(const PG_device *dev ARG(,in,cls))
    {bool rv;
  
     rv = (dev == NULL) ? FALSE : dev->clipping;
@@ -119,7 +119,7 @@ bool PG_fset_clipping(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_char_path fortran() scheme(pg-get-char-path) python()
  */
 
-void PG_fget_char_path(PG_device *dev ARG(,in,cls),
+void PG_fget_char_path(const PG_device *dev ARG(,in,cls),
 		       double *x ARG([*,*],out))
    {
 
@@ -165,7 +165,7 @@ void PG_fset_char_path(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_char_up fortran() scheme(pg-get-char-up) python()
  */
 
-void PG_fget_char_up(PG_device *dev ARG(,in,cls),
+void PG_fget_char_up(const PG_device *dev ARG(,in,cls),
 		     double *x ARG([*,*],out))
    {
 
@@ -211,7 +211,7 @@ void PG_fset_char_up(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_char_precision fortran() scheme(pg-get-char-precision) python()
  */
 
-int PG_fget_char_precision(PG_device *dev ARG(,in,cls))
+int PG_fget_char_precision(const PG_device *dev ARG(,in,cls))
    {int rv;
 
     if (dev != NULL)
@@ -249,7 +249,7 @@ int PG_fset_char_precision(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_char_size_n fortran() scheme() python()
  */
 
-void PG_fget_char_size_n(PG_device *dev ARG(,in,cls),
+void PG_fget_char_size_n(const PG_device *dev ARG(,in,cls),
 			 int nd, PG_coord_sys cs,
 			 double *p ARG([0.0,0.0],out))
    {
@@ -304,7 +304,7 @@ void PG_fset_char_size_n(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_char_space fortran() scheme(pg-get-char-space) python()
  */
 
-double PG_fget_char_space(PG_device *dev ARG(,in,cls))
+double PG_fget_char_space(const PG_device *dev ARG(,in,cls))
    {double d;
 
     if (dev != NULL)
@@ -344,7 +344,7 @@ double PG_fset_char_space(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_fill_bound fortran() scheme(pg-get-fill-bound) python()
  */
 
-int PG_fget_fill_bound(PG_device *dev ARG(,in,cls))
+int PG_fget_fill_bound(const PG_device *dev ARG(,in,cls))
    {int rv;
 
     if (dev != NULL)
@@ -383,7 +383,7 @@ int PG_fset_fill_bound(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_finish_state fortran() scheme(pg-get-finish-state) python()
  */
 
-int PG_fget_finish_state(PG_device *dev ARG(,in,cls))
+int PG_fget_finish_state(const PG_device *dev ARG(,in,cls))
    {int rv;
 
     if (dev != NULL)
@@ -421,7 +421,7 @@ int PG_fset_finish_state(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_font fortran() scheme() python()
  */
 
-void PG_fget_font(PG_device *dev ARG(,in,cls),
+void PG_fget_font(const PG_device *dev ARG(,in,cls),
 		  char **of, char **ost, int *osz)
    {
 
@@ -468,7 +468,7 @@ void PG_fset_font(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_identifier fortran() scheme(pg-get-identifier) python()
  */
 
-int PG_fget_identifier(PG_graph *g)
+int PG_fget_identifier(const PG_graph *g)
    {int rv;
 
     if (g != NULL)
@@ -507,7 +507,7 @@ int PG_fset_identifier(PG_graph *g, int id ARG('A',in))
  * #bind PG_fget_logical_op fortran() scheme(pg-get-logical-op) python()
  */
 
-PG_logical_operation PG_fget_logical_op(PG_device *dev ARG(,in,cls))
+PG_logical_operation PG_fget_logical_op(const PG_device *dev ARG(,in,cls))
    {PG_logical_operation lop;
 
     if (dev != NULL)
@@ -547,7 +547,7 @@ PG_logical_operation PG_fset_logical_op(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_line_style fortran() scheme(pg-get-line-style) python()
  */
 
-int PG_fget_line_style(PG_device *dev ARG(,in,cls))
+int PG_fget_line_style(const PG_device *dev ARG(,in,cls))
    {int st;
 
     if (dev != NULL)
@@ -587,7 +587,7 @@ int PG_fset_line_style(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_line_width fortran() scheme(pg-get-line-width) python()
  */
 
-double PG_fget_line_width(PG_device *dev ARG(,in,cls))
+double PG_fget_line_width(const PG_device *dev ARG(,in,cls))
    {double wd;
 
     if (dev != NULL)
@@ -629,7 +629,7 @@ double PG_fset_line_width(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_marker_orientation fortran() scheme(pg-get-marker-orientation) python()
  */
 
-double PG_fget_marker_orientation(PG_device *dev ARG(,in,cls))
+double PG_fget_marker_orientation(const PG_device *dev ARG(,in,cls))
    {double rv;
 
     if (dev != NULL)
@@ -669,7 +669,7 @@ double PG_fset_marker_orientation(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_marker_scale fortran() scheme(pg-get-marker-scale) python()
  */
 
-double PG_fget_marker_scale(PG_device *dev ARG(,in,cls))
+double PG_fget_marker_scale(const PG_device *dev ARG(,in,cls))
    {double rv;
 
     if (dev != NULL)
@@ -709,7 +709,7 @@ double PG_fset_marker_scale(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_max_intensity fortran() scheme() python()
  */
 
-double PG_fget_max_intensity(PG_device *dev ARG(,in,cls))
+double PG_fget_max_intensity(const PG_device *dev ARG(,in,cls))
    {double rv;
 
     if (dev != NULL)
@@ -749,7 +749,7 @@ double PG_fset_max_intensity(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_max_red_intensity fortran() scheme(pg-get-max-red-intensity) python()
  */
 
-double PG_fget_max_red_intensity(PG_device *dev ARG(,in,cls))
+double PG_fget_max_red_intensity(const PG_device *dev ARG(,in,cls))
    {double rv;
 
     if (dev != NULL)
@@ -789,7 +789,7 @@ double PG_fset_max_red_intensity(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_max_green_intensity fortran() scheme(pg-get-max-green-intensity) python()
  */
 
-double PG_fget_max_green_intensity(PG_device *dev ARG(,in,cls))
+double PG_fget_max_green_intensity(const PG_device *dev ARG(,in,cls))
    {double rv;
 
     if (dev != NULL)
@@ -829,7 +829,7 @@ double PG_fset_max_green_intensity(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_max_blue_intensity fortran() scheme(pg-get-max-blue-intensity) python()
  */
 
-double PG_fget_max_blue_intensity(PG_device *dev ARG(,in,cls))
+double PG_fget_max_blue_intensity(const PG_device *dev ARG(,in,cls))
    {double rv;
 
     if (dev != NULL)
@@ -869,7 +869,7 @@ double PG_fset_max_blue_intensity(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_pixmap_flag fortran() scheme(ps-get-pixmap-flag) python()
  */
 
-int PG_fget_pixmap_flag(PG_device *dev ARG(,in,cls))
+int PG_fget_pixmap_flag(const PG_device *dev ARG(,in,cls))
    {int fl;
 
     if (dev != NULL)
@@ -941,7 +941,7 @@ double PG_fset_ps_dots_inch(double dpi)
  * #bind PG_fget_render_info fortran() scheme() python()
  */
 
-pcons *PG_fget_render_info(PG_graph *g)
+pcons *PG_fget_render_info(const PG_graph *g)
    {pcons *rv;
 
     rv = NULL;
@@ -1009,7 +1009,7 @@ int PG_fset_use_pixmap(int i)
  * #bind PG_fget_res_scale_factor fortran() scheme(pg-get-resolution-scale-factor) python()
  */
 
-int PG_fget_res_scale_factor(PG_device *dev ARG(,in,cls))
+int PG_fget_res_scale_factor(const PG_device *dev ARG(,in,cls))
    {int rv;
 
     if (dev != NULL)
@@ -1048,7 +1048,7 @@ int PG_fset_res_scale_factor(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_border_width fortran() scheme(pg-get-border-width) python()
  */
 
-int PG_fget_border_width(PG_device *dev ARG(,in,cls))
+int PG_fget_border_width(const PG_device *dev ARG(,in,cls))
    {int rv;
 
     if (dev != NULL)
@@ -1086,7 +1086,7 @@ int PG_fset_border_width(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_viewport_pos fortran() scheme() python()
  */
 
-void PG_fget_viewport_pos(PG_device *dev ARG(,in,cls),
+void PG_fget_viewport_pos(const PG_device *dev ARG(,in,cls),
 			  double *x)
    {
 
@@ -1134,7 +1134,7 @@ void PG_fset_viewport_pos(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_viewport_shape fortran() scheme() python()
  */
 
-void PG_fget_viewport_shape(PG_device *dev ARG(,in,cls),
+void PG_fget_viewport_shape(const PG_device *dev ARG(,in,cls),
 			    double *dx, double *pa)
    {
 
@@ -1187,7 +1187,7 @@ void PG_fset_viewport_shape(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_line_color fortran() scheme(pg-get-line-color) python()
  */
 
-int PG_fget_line_color(PG_device *dev ARG(,in,cls))
+int PG_fget_line_color(const PG_device *dev ARG(,in,cls))
    {int rv;
 
     if (dev != NULL)
@@ -1226,7 +1226,7 @@ int PG_fset_line_color(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_text_color fortran() scheme(pg-get-text-color) python()
  */
 
-int PG_fget_text_color(PG_device *dev ARG(,in,cls))
+int PG_fget_text_color(const PG_device *dev ARG(,in,cls))
    {int rv;
 
     rv = dev->text_color;
@@ -1262,7 +1262,7 @@ int PG_fset_text_color(PG_device *dev ARG(,in,cls),
  * #bind PG_fget_fill_color fortran() scheme(pg-get-fill-color) python()
  */
 
-int PG_fget_fill_color(PG_device *dev ARG(,in,cls))
+int PG_fget_fill_color(const PG_device *dev ARG(,in,cls))
    {int rv;
 
     rv = dev->fill_color;
@@ -1998,7 +1998,7 @@ void PG_make_palette_current(PG_device *dev ARG(,in,cls), PG_palette *p)
  * #bind PG_get_image_n fortran() scheme() python()
  */
 
-void PG_get_image_n(PG_device *dev ARG(,in,cls),
+void PG_get_image_n(const PG_device *dev ARG(,in,cls),
 		    unsigned char *bf,
 		    PG_coord_sys cs, double *irg)
    {double ix[PG_SPACEDM], nx[PG_SPACEDM], pc[PG_BOXSZ];
