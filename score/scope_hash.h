@@ -91,32 +91,34 @@ extern hasharr
 extern haelem
  *SC_hasharr_install(hasharr *ha, const void *key, void *obj,
 		     const char *type, int64_t flags, int lookup),
- *SC_hasharr_lookup(hasharr *ha, const void *key);
+ *SC_hasharr_lookup(const hasharr *ha, const void *key);
 
 extern void
  SC_free_hasharr(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
- *SC_hasharr_def_lookup(hasharr *ha, const void *key),
- *SC_hasharr_get(hasharr *ha, long n);
+ *SC_hasharr_def_lookup(const hasharr *ha, const void *key),
+ *SC_hasharr_get(const hasharr *ha, long n);
 
 extern int
  SC_haelem_data(haelem *hp, char **pname, char **ptype, void **po, int svr),
  SC_hasharr_remove(hasharr *ha, const void *key),
  SC_hasharr_free_n(void *d, void *a),
  SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
- SC_hasharr_next(hasharr *ha, long *pi, char **pname, char **ptype, void **po),
+ SC_hasharr_next(const hasharr *ha, long *pi,
+		 char **pname, char **ptype, void **po),
  SC_hasharr_clear(hasharr *ha, int (*f)(haelem *hp, void *a), void *a),
  SC_hasharr_key(hasharr *ha, PFKeyHash hash, PFIntBinC comp),
  SC_hasharr_rekey(hasharr *ha, const char *method),
  SC_hasharr_sort(hasharr *ha, PFIntBinC pred);
 
 extern long
- SC_hasharr_get_n(hasharr *ha),
+ SC_hasharr_get_n(const hasharr *ha),
  SC_hasharr_prune(hasharr *ha,
 		  int (*pred)(hasharr *ha, haelem *hp, void *a),
 		  void *a);
 
 extern char
- **SC_hasharr_dump(hasharr *ha, const char *patt, const char *type, int sort);
+ **SC_hasharr_dump(const hasharr *ha,
+		   const char *patt, const char *type, int sort);
 
 
 /* for FORTRAN hasharr API */

@@ -85,7 +85,7 @@ static int _SC_addr_comp(const void *key, const void *s)
 
 /* _SC_MAKE_HAELEM - initialize and return a haelem */
 
-static haelem *_SC_make_haelem(hasharr *ha, const void *key)
+static haelem *_SC_make_haelem(const hasharr *ha, const void *key)
    {void *lkey;
     haelem *hp;
 
@@ -112,7 +112,7 @@ static haelem *_SC_make_haelem(hasharr *ha, const void *key)
 
 /* _SC_FREE_HAELEM - release an haelem */
 
-static void _SC_free_haelem(hasharr *ha, haelem *hp)
+static void _SC_free_haelem(const hasharr *ha, haelem *hp)
    {int addr;
 
 /* undo the MARK in SC_hasharr_install */
@@ -508,7 +508,7 @@ int SC_hasharr_foreach(hasharr *ha, int (*f)(haelem *hp, void *a), void *a)
  *                 - as are the name, type, and object
  */
 
-int SC_hasharr_next(hasharr *ha, long *pi,
+int SC_hasharr_next(const hasharr *ha, long *pi,
 		    char **pname, char **ptype, void **po)
    {int rv;
     long i, ne;
@@ -552,7 +552,7 @@ int SC_hasharr_next(hasharr *ha, long *pi,
  * #bind SC_hasharr_lookup fortran() scheme() python()
  */
 
-haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), const void *key)
+haelem *SC_hasharr_lookup(const hasharr *ha ARG(,,cls), const void *key)
    {int sz, lck;
     long iht;
     haelem *rv, *hp, **tb;
@@ -592,7 +592,7 @@ haelem *SC_hasharr_lookup(hasharr *ha ARG(,,cls), const void *key)
  * #bind SC_hasharr_def_lookup fortran() scheme() python()
  */
 
-void *SC_hasharr_def_lookup(hasharr *ha ARG(,,cls), const void *key)
+void *SC_hasharr_def_lookup(const hasharr *ha ARG(,,cls), const void *key)
    {haelem *hp;
     void *obj;
   
@@ -612,7 +612,7 @@ void *SC_hasharr_def_lookup(hasharr *ha ARG(,,cls), const void *key)
  * #bind SC_hasharr_get fortran() scheme() python()
  */
 
-void *SC_hasharr_get(hasharr *ha, long n)
+void *SC_hasharr_get(const hasharr *ha, long n)
    {void *rv;
 
     rv = NULL;
@@ -629,7 +629,7 @@ void *SC_hasharr_get(hasharr *ha, long n)
  * #bind SC_hasharr_get_n fortran() scheme() python()
  */
 
-long SC_hasharr_get_n(hasharr *ha)
+long SC_hasharr_get_n(const hasharr *ha)
    {long ne;
 
     ne = 0L;
@@ -779,7 +779,7 @@ int SC_hasharr_remove(hasharr *ha ARG(,,cls), const void *key)
  * #bind SC_hasharr_dump fortran() scheme() python()
  */
 
-char **SC_hasharr_dump(hasharr *ha, const char *patt, const char *type,
+char **SC_hasharr_dump(const hasharr *ha, const char *patt, const char *type,
 		       int sort)
    {int ie, ne, ns;
     char *s, **sa;

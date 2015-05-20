@@ -23,7 +23,7 @@ enum {SET, GET};
 
 /* _SC_ARRAY_ERR - look for problems */
 
-static INLINE void _SC_array_err(SC_array *a, const char *fmt, ...)
+static INLINE void _SC_array_err(const SC_array *a, const char *fmt, ...)
     {
 
 #ifdef DEBUG
@@ -269,7 +269,7 @@ void _SC_init_array(SC_array *a, const char *type, int bpi,
  *                - array has TYPE, BPI, and attributes
  */
 
-SC_array *_SC_make_array(char *type, int bpi,
+SC_array *_SC_make_array(const char *type, int bpi,
 			 void (*init)(void *a), const char *name, int flags)
     {SC_array *a;
 
@@ -528,7 +528,7 @@ void *SC_array_array(SC_array *a)
 
 /* SC_ARRAY_GET_N - return the number of items in A */
 
-long SC_array_get_n(SC_array *a)
+long SC_array_get_n(const SC_array *a)
     {long n;
 
      n = -1;
@@ -778,7 +778,7 @@ char **_SC_array_string_join(SC_array **psa)
 
 /* _SC_ARRAY_IS_MEMBER - return TRUE iff S is already in the array A */
 
-int _SC_array_is_member(SC_array *a, const char *s)
+int _SC_array_is_member(const SC_array *a, const char *s)
    {int i, n, rv;
     char **str;
 
@@ -800,7 +800,7 @@ int _SC_array_is_member(SC_array *a, const char *s)
 
 /* SC_ARRAY_COPY - return a copy of A */
 
-SC_array *SC_array_copy(SC_array *a)
+SC_array *SC_array_copy(const SC_array *a)
     {long nb, nx, bpi;
      void *arr;
      SC_array *ca;

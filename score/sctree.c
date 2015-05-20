@@ -372,7 +372,7 @@ void *SC_tree_install(const void *k, void *val, SC_ntree *tree)
  *                    - NULL otherwise
  */
 
-SC_tree_node *SC_tree_lookup_key(const void *k, SC_ntree *tree)
+SC_tree_node *SC_tree_lookup_key(const void *k, const SC_ntree *tree)
    {int ib, ok, nd;
     SC_tree_node *p, *q, **branch;
     PFIntBinC compare;
@@ -409,7 +409,7 @@ SC_tree_node *SC_tree_lookup_key(const void *k, SC_ntree *tree)
  *                  - NULL otherwise
  */
 
-SC_tree_node *SC_tree_lookup_n(int n, SC_ntree *tree)
+SC_tree_node *SC_tree_lookup_n(int n, const SC_ntree *tree)
    {int i, m, nd;
     SC_tree_node *p, **branch;
 

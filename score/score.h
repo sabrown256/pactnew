@@ -1334,8 +1334,8 @@ extern void
  SC_map_tree(SC_ntree *tr, void (*f)(SC_tree_node *pn, int depth, int idp));
 
 extern SC_tree_node
- *SC_tree_lookup_key(const void *k, SC_ntree *tree),
- *SC_tree_lookup_n(int n, SC_ntree *tree);
+ *SC_tree_lookup_key(const void *k, const SC_ntree *tree),
+ *SC_tree_lookup_n(int n, const SC_ntree *tree);
 
 
 /* SCTRK.C declarations */

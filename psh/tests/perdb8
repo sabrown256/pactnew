@@ -1,6 +1,9 @@
 #!/bin/csh -f
 #
 # PERDB8 - test authentication
+#        - NOTE: cannot do 'ls -l' on results because the formats
+#        - for ls are all over the place, even the permissions get
+#        - hosed with access list syntax
 #
 
 unalias *
@@ -57,7 +60,7 @@ foreach i ($lst)
    perdb $opt $as v1=$i
    @ err = $err + $status
 
-   ls -l $db.conn | awk '{printf("   %s  %s\n", $1, $NF);}'
+   ls -1 $db.conn
 
    set v1 = ( `perdb $opt $ac v1` )
    set xstatus = $status
@@ -71,7 +74,7 @@ foreach i ($lst)
 
    perdb $opt $as quit:
 #   sleep 1
-   ls -l $db.[cd]* | awk '{printf("   %s  %s\n", $1, $NF);}'
+   ls -1 $db.[cd]*
 
 end
 
@@ -93,7 +96,7 @@ sign -q db8
 ls-jobs
 
 perdb $opt v1=1
-ls -l $db.conn
+ls -1 $db.conn
 
 perdb $opt v1
 set v1 = ( `perdb $opt v1` )
@@ -101,7 +104,7 @@ echo "-> v1 = |$v1| ($status)"
 
 perdb $opt quit:
 sleep 1
-ls -l $db*
+ls -1 $db*
 
 echo "----------------"
 echo "   with authentication"
@@ -111,14 +114,14 @@ sign -q db8
 ls-jobs
 
 perdb $opt -a v1=2
-ls -l $db.conn
+ls -1 $db.conn
 
 set v1 = ( `perdb $opt -a v1` )
 echo "-> v1 = |$v1| ($status)"
 
 perdb $opt -a quit:
 sleep 1
-ls -l $db*
+ls -1 $db*
 
 echo "----------------"
 echo "   with authentication on server"
@@ -128,14 +131,14 @@ sign -q db8
 ls-jobs
 
 perdb $opt -a v1=3
-ls -l $db.conn
+ls -1 $db.conn
 
 set v1 = ( `perdb $opt v1` )
 echo "-> v1 = |$v1| ($status)"
 
 perdb $opt quit:
 sleep 1
-ls -l $db*
+ls -1 $db*
 
 echo "----------------"
 echo "   with authentication on client"
@@ -145,7 +148,7 @@ sign -q db8
 ls-jobs
 
 perdb $opt v1=4
-ls -l $db.conn
+ls -1 $db.conn
 
 #perdb $opt -a v1
 set v1 = ( `perdb $opt -a v1` )
@@ -153,7 +156,7 @@ echo "-> v1 = |$v1| ($status)"
 
 perdb $opt -a quit:
 sleep 1
-ls -l $db*
+ls -1 $db*
 rm -f db8* >& /dev/null
 
 echo "-----------------------------------"

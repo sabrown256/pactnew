@@ -133,10 +133,10 @@ extern void
 /* SCARRS.C declarations */
 
 extern SC_array
- *_SC_make_array(char *type, int bpi,
+ *_SC_make_array(const char *type, int bpi,
 		 void (*init)(void *a), const char *name, int flags),
  *_SC_string_array(const char *name),
- *SC_array_copy(SC_array *a),
+ *SC_array_copy(const SC_array *a),
  *SC_strings_array(int n, char **sa);
 
 extern void
@@ -165,11 +165,11 @@ extern long
  SC_array_set_n(SC_array *a, long n),
  SC_array_inc_n(SC_array *a, long n, int wh),
  SC_array_dec_n(SC_array *a, long n, int wh),
- SC_array_get_n(SC_array *a),
+ SC_array_get_n(const SC_array *a),
  SC_array_remove(SC_array *a, long n);
 
 extern int
- _SC_array_is_member(SC_array *a, const char *s),
+ _SC_array_is_member(const SC_array *a, const char *s),
  SC_array_free_n(void *a),
  SC_array_string_append(SC_array *out, SC_array *in),
  SC_array_sort(SC_array *a, PFIntBinC pred);
