@@ -2976,6 +2976,29 @@ char **file_text(int sort, const char *fname, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* MYKILL - wrap kill for diagnostics */
+
+int mykill(pid_t pid, int sig)
+   {int st;
+
+#if 0
+    if (sig != 0)
+       fprintf(stderr, "%8d> mykill     %8d %d ... ",
+               getpid(), pid, sig);
+#endif
+
+    st  = kill(pid, sig);
+
+#if 0
+    if (sig != 0)
+       fprintf(stderr, "%d\n", st);
+#endif
+
+    return(st);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* IS_RUNNING - return the TRUE iff PID is running process */
 
 int is_running(int pid)
@@ -2983,7 +3006,7 @@ int is_running(int pid)
 
     ok  = TRUE;
     err = 0;
-    st  = kill(pid, 0);
+    st  = mykill(pid, 0);
     if (st == -1)
        {err = errno;
 	if (err == EPERM)

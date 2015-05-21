@@ -21,6 +21,10 @@ Group OCV {
 include compilers/clang
 include os/osx
 
+Tool CC {
+   Flags += -fno-common
+}
+
 Tool MAKE {
    UseGNU = TRUE
 }

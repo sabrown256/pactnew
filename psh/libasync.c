@@ -1128,9 +1128,9 @@ int job_suspend(process_session *ps, pid_t pid, int all, int wh)
        pid = -pid;
 
     if (wh == TRUE)
-       rv |= kill(pid, SIGTSTP);
+       rv |= mykill(pid, SIGTSTP);
     else
-       rv |= kill(pid, SIGCONT);
+       rv |= mykill(pid, SIGCONT);
 
     if ((rv == FALSE) && (ispar == TRUE))
        {switch (ps->fg)
@@ -1162,11 +1162,12 @@ int job_signal(process *pp, int sig)
 
     if ((job_running(pp) == TRUE) && (sig > 0))
        {pid = pp->id;
-	st  = kill(pid, sig);
-        if (st == 0)
-	   {rv = TRUE;
-	    pp->status = JOB_SIGNALED;
-	    pp->reason = sig;};};
+        if (pid >= 0)
+           {st  = mykill(pid, sig);
+            if (st == 0)
+	       {rv = TRUE;
+		pp->status = JOB_SIGNALED;
+		pp->reason = sig;};};};
 
     return(rv);}
 

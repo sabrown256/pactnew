@@ -446,7 +446,7 @@ proc_bf job_foreground(process_group *pg, proc_bf bf)
 		 int st;
 
 		 st = tcsetattr(ps->terminal, TCSADRAIN, &attr);
-		 st = kill(-pgid, SIGCONT);
+		 st = mykill(-pgid, SIGCONT);
 		 if (st < 0)
 		    perror("SIGCONT");
 #endif
@@ -505,7 +505,7 @@ proc_bf job_background(process_group *pg, proc_bf bf)
 #else
 		 int st;
 
-		 st = kill(-pgid, SIGCONT);
+		 st = mykill(-pgid, SIGCONT);
 		 if (st < 0)
 		    perror("SIGCONT");
 #endif
@@ -1919,7 +1919,6 @@ void _post_info(process *pp)
    {int i, nw, nc, fd;
     char t[BFLRG];
     iodes *pio;
-    process *pd;
 
     for (i = IO_STD_STATUS; i <= IO_STD_RESOURCE; i++)
         {pio = pp->io + i;
@@ -1951,7 +1950,8 @@ void _post_info(process *pp)
 		      pio->gid, fd, pp->reason, nw);
 
 		 if (nw == nc)
-		    {pd = pp->pg->parents[pio->gid];
+		    {process *pd;
+		     pd = pp->pg->parents[pio->gid];
 		     job_done(pd, -1);};};};};
 
     return;}
@@ -2635,7 +2635,7 @@ process_session *init_session(void)
 	     tid  = tcgetpgrp(fin);
 	     if (tid == pgid)
 	        break;
-	     kill(-pgid, SIGTTIN);};
+	     mykill(-pgid, SIGTTIN);};
 #endif
 
 /* ignore interactive and job-control signals */
