@@ -11,7 +11,7 @@
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_chr(void *p, double f, int n)
+static int PM_find_index_chr(const void *p, double f, int n)
    {int indx;
     char *d, v;
     long i, j;
@@ -33,7 +33,7 @@ static int PM_find_index_chr(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_wchr(void *p, double f, int n)
+static int PM_find_index_wchr(const void *p, double f, int n)
    {int indx;
     wchar_t *d, v;
     long i, j;
@@ -55,7 +55,7 @@ static int PM_find_index_wchr(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_int8(void *p, double f, int n)
+static int PM_find_index_int8(const void *p, double f, int n)
    {int indx;
     int8_t *d, v;
     long i, j;
@@ -77,7 +77,7 @@ static int PM_find_index_int8(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_shrt(void *p, double f, int n)
+static int PM_find_index_shrt(const void *p, double f, int n)
    {int indx;
     short *d, v;
     long i, j;
@@ -99,7 +99,7 @@ static int PM_find_index_shrt(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_int(void *p, double f, int n)
+static int PM_find_index_int(const void *p, double f, int n)
    {int indx;
     int *d, v;
     long i, j;
@@ -121,7 +121,7 @@ static int PM_find_index_int(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_lng(void *p, double f, int n)
+static int PM_find_index_lng(const void *p, double f, int n)
    {int indx;
     long *d, v;
     long i, j;
@@ -143,7 +143,7 @@ static int PM_find_index_lng(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_ll(void *p, double f, int n)
+static int PM_find_index_ll(const void *p, double f, int n)
    {int indx;
     long long *d, v;
     long i, j;
@@ -165,7 +165,7 @@ static int PM_find_index_ll(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_flt(void *p, double f, int n)
+static int PM_find_index_flt(const void *p, double f, int n)
    {int indx;
     float *d, v;
     long i, j;
@@ -187,7 +187,7 @@ static int PM_find_index_flt(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_dbl(void *p, double f, int n)
+static int PM_find_index_dbl(const void *p, double f, int n)
    {int indx;
     double *d, v;
     long i, j;
@@ -209,7 +209,7 @@ static int PM_find_index_dbl(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int PM_find_index_ldbl(void *p, double f, int n)
+static int PM_find_index_ldbl(const void *p, double f, int n)
    {int indx;
     long double *d, v;
     long i, j;
@@ -231,7 +231,7 @@ static int PM_find_index_ldbl(void *p, double f, int n)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_chr(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_chr(const void *p, double f, int n, long *plast)
    {int last, indx;
     char *d, v;
     long imn, imx;
@@ -251,7 +251,7 @@ static int _PM_find_index_fast_chr(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_wchr(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_wchr(const void *p, double f, int n, long *plast)
    {int last, indx;
     wchar_t *d, v;
     long imn, imx;
@@ -271,7 +271,7 @@ static int _PM_find_index_fast_wchr(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_int8(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_int8(const void *p, double f, int n, long *plast)
    {int last, indx;
     int8_t *d, v;
     long imn, imx;
@@ -291,7 +291,7 @@ static int _PM_find_index_fast_int8(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_shrt(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_shrt(const void *p, double f, int n, long *plast)
    {int last, indx;
     short *d, v;
     long imn, imx;
@@ -311,7 +311,7 @@ static int _PM_find_index_fast_shrt(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_int(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_int(const void *p, double f, int n, long *plast)
    {int last, indx;
     int *d, v;
     long imn, imx;
@@ -331,7 +331,7 @@ static int _PM_find_index_fast_int(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_lng(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_lng(const void *p, double f, int n, long *plast)
    {int last, indx;
     long *d, v;
     long imn, imx;
@@ -351,7 +351,7 @@ static int _PM_find_index_fast_lng(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_ll(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_ll(const void *p, double f, int n, long *plast)
    {int last, indx;
     long long *d, v;
     long imn, imx;
@@ -371,7 +371,7 @@ static int _PM_find_index_fast_ll(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_flt(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_flt(const void *p, double f, int n, long *plast)
    {int last, indx;
     float *d, v;
     long imn, imx;
@@ -391,7 +391,7 @@ static int _PM_find_index_fast_flt(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_dbl(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_dbl(const void *p, double f, int n, long *plast)
    {int last, indx;
     double *d, v;
     long imn, imx;
@@ -411,7 +411,7 @@ static int _PM_find_index_fast_dbl(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static int _PM_find_index_fast_ldbl(void *p, double f, int n, long *plast)
+static int _PM_find_index_fast_ldbl(const void *p, double f, int n, long *plast)
    {int last, indx;
     long double *d, v;
     long imn, imx;
@@ -431,7 +431,7 @@ static int _PM_find_index_fast_ldbl(void *p, double f, int n, long *plast)
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_chr(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_chr(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -472,7 +472,7 @@ static void _PM_find_value_chr(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_wchr(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_wchr(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -513,7 +513,7 @@ static void _PM_find_value_wchr(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_int8(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_int8(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -554,7 +554,7 @@ static void _PM_find_value_int8(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_shrt(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_shrt(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -595,7 +595,7 @@ static void _PM_find_value_shrt(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_int(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_int(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -636,7 +636,7 @@ static void _PM_find_value_int(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_lng(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_lng(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -677,7 +677,7 @@ static void _PM_find_value_lng(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_ll(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_ll(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -718,7 +718,7 @@ static void _PM_find_value_ll(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_flt(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_flt(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -759,7 +759,7 @@ static void _PM_find_value_flt(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_dbl(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_dbl(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -800,7 +800,7 @@ static void _PM_find_value_dbl(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_ldbl(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_ldbl(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -841,7 +841,7 @@ static void _PM_find_value_ldbl(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_fcx(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_fcx(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -882,7 +882,7 @@ static void _PM_find_value_fcx(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_dcx(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_dcx(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -923,7 +923,7 @@ static void _PM_find_value_dcx(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void _PM_find_value_ldcx(int nx, void *x, int (*prd)(double u, double v),
+static void _PM_find_value_ldcx(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -964,7 +964,7 @@ static void _PM_find_value_ldcx(int nx, void *x, int (*prd)(double u, double v),
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_chr(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_chr(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     signed char *d, *pvn, *pvx, vn, vx, v;
     d   = (signed char *) p;
@@ -994,7 +994,7 @@ static void PM_min_max_chr(void *p, int n, void *pn, void *px, int *imn, int *im
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_wchr(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_wchr(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     wchar_t *d, *pvn, *pvx, vn, vx, v;
     d   = (wchar_t *) p;
@@ -1024,7 +1024,7 @@ static void PM_min_max_wchr(void *p, int n, void *pn, void *px, int *imn, int *i
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_int8(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_int8(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     int8_t *d, *pvn, *pvx, vn, vx, v;
     d   = (int8_t *) p;
@@ -1054,7 +1054,7 @@ static void PM_min_max_int8(void *p, int n, void *pn, void *px, int *imn, int *i
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_shrt(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_shrt(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     signed short *d, *pvn, *pvx, vn, vx, v;
     d   = (signed short *) p;
@@ -1084,7 +1084,7 @@ static void PM_min_max_shrt(void *p, int n, void *pn, void *px, int *imn, int *i
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_int(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_int(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     signed int *d, *pvn, *pvx, vn, vx, v;
     d   = (signed int *) p;
@@ -1114,7 +1114,7 @@ static void PM_min_max_int(void *p, int n, void *pn, void *px, int *imn, int *im
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_lng(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_lng(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     signed long *d, *pvn, *pvx, vn, vx, v;
     d   = (signed long *) p;
@@ -1144,7 +1144,7 @@ static void PM_min_max_lng(void *p, int n, void *pn, void *px, int *imn, int *im
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_ll(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_ll(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     signed long long *d, *pvn, *pvx, vn, vx, v;
     d   = (signed long long *) p;
@@ -1174,7 +1174,7 @@ static void PM_min_max_ll(void *p, int n, void *pn, void *px, int *imn, int *imx
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_flt(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_flt(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     float *d, *pvn, *pvx, vn, vx, v;
     d   = (float *) p;
@@ -1204,7 +1204,7 @@ static void PM_min_max_flt(void *p, int n, void *pn, void *px, int *imn, int *im
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_dbl(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_dbl(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     double *d, *pvn, *pvx, vn, vx, v;
     d   = (double *) p;
@@ -1234,7 +1234,7 @@ static void PM_min_max_dbl(void *p, int n, void *pn, void *px, int *imn, int *im
 
 /*--------------------------------------------------------------------------*/
 
-static void PM_min_max_ldbl(void *p, int n, void *pn, void *px, int *imn, int *imx)
+static void PM_min_max_ldbl(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     long double *d, *pvn, *pvx, vn, vx, v;
     d   = (long double *) p;
@@ -1264,7 +1264,7 @@ static void PM_min_max_ldbl(void *p, int n, void *pn, void *px, int *imn, int *i
 
 /*--------------------------------------------------------------------------*/
 
-typedef int (*PFPM_find_index)(void *p, double f, int n);
+typedef int (*PFPM_find_index)(const void *p, double f, int n);
 
 static PFPM_find_index
  PM_find_index_fnc[] = {
@@ -1342,7 +1342,7 @@ static PFPM_find_index
 
 /*--------------------------------------------------------------------------*/
 
-typedef int (*PF_PM_find_index_fast)(void *p, double f, int n, long *plast);
+typedef int (*PF_PM_find_index_fast)(const void *p, double f, int n, long *plast);
 
 static PF_PM_find_index_fast
  _PM_find_index_fast_fnc[] = {
@@ -1420,7 +1420,7 @@ static PF_PM_find_index_fast
 
 /*--------------------------------------------------------------------------*/
 
-typedef void (*PF_PM_find_value)(int nx, void *x, int (*prd)(double u, double v),
+typedef void (*PF_PM_find_value)(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt);
 
 static PF_PM_find_value
@@ -1501,7 +1501,7 @@ static PF_PM_find_value
 
 /*--------------------------------------------------------------------------*/
 
-typedef void (*PFPM_min_max)(void *p, int n, void *pn, void *px, int *imn, int *imx);
+typedef void (*PFPM_min_max)(const void *p, int n, void *pn, void *px, int *imn, int *imx);
 
 static PFPM_min_max
  PM_min_max_fnc[] = {

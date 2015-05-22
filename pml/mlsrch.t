@@ -10,7 +10,7 @@
 #--------------------------------------------------------------------------
 
 template<char|long double>
-int PM_find_index(void *p, double f, int n)
+int PM_find_index(const void *p, double f, int n)
    {int indx;
     <TYPE> *d, v;
     long i, j;
@@ -35,7 +35,7 @@ int PM_find_index(void *p, double f, int n)
 #--------------------------------------------------------------------------
 
 template<char|long double>
-int _PM_find_index_fast(void *p, double f, int n, long *plast)
+int _PM_find_index_fast(const void *p, double f, int n, long *plast)
    {int last, indx;
     <TYPE> *d, v;
     long imn, imx;
@@ -60,7 +60,7 @@ int _PM_find_index_fast(void *p, double f, int n, long *plast)
 #--------------------------------------------------------------------------
 
 template<char|long double _Complex>
-void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
+void _PM_find_value(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -106,7 +106,7 @@ void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
 #--------------------------------------------------------------------------
 
 template<quaternion|quaternion>
-void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
+void _PM_find_value(int nx, const void *x, int (*prd)(double u, double v),
 		    double v, int *nout, int **out, int nin, int *in, int ipt)
    {int i, no, init;
     int *oind;
@@ -152,7 +152,7 @@ void _PM_find_value(int nx, void *x, int (*prd)(double u, double v),
 #--------------------------------------------------------------------------
 
 template<char|long double>
-void PM_min_max(void *p, int n, void *pn, void *px, int *imn, int *imx)
+void PM_min_max(const void *p, int n, void *pn, void *px, int *imn, int *imx)
    {int i, in, ix;
     <SIGNED> *d, *pvn, *pvx, vn, vx, v;
 

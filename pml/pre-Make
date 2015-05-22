@@ -127,7 +127,7 @@ ${LibDep} : ${hdrf} ${Hdrs}
 
 ${IncDir}/mlsrch.h : mlsrch.t
 	@(echo "template mlsrch.t -o ${IncDir}/mlsrch.h" ;  \
-	  ${BinDir}/template mlsrch.t -o ${IncDir}/mlsrch.h)
+	  ${BinDir}/template mlsrch.t -t ${EtcDir}/types.db -o ${IncDir}/mlsrch.h)
 
 GenInc = ${PACTTmpDir}/gc-pml.h
 

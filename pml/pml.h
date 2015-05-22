@@ -838,42 +838,48 @@ extern long
 
 extern PM_polygon
  *PM_polygon_get(SC_array *a, int n),
- *PM_convex_hull(double *p1, double *p2, int nh);
+ *PM_convex_hull(const double *p1, const double *p2, int nh);
 
 extern SC_array
  *PM_polygon_array(void),
- *PM_intersect_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb),
- *PM_union_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb);
+ *PM_intersect_polygons(SC_array *a,
+			const PM_polygon *pa, const PM_polygon *pb),
+ *PM_union_polygons(SC_array *a,
+		    const PM_polygon *pa, const PM_polygon *pb);
 
 extern int
- PM_cross(double *x1, double *x2, double *x3, double *x4, double *x0),
- PM_cross_seg(double *x1, double *x2, double *x3, double *x4, double *x0),
- PM_cross_line_plane(double *x1, double *x2,
+ PM_cross(const double *x1, const double *x2,
+	  const double *x3, const double *x4, double *x0),
+ PM_cross_seg(const double *x1, const double *x2,
+	      const double *x3, const double *x4, double *x0),
+ PM_cross_line_plane(const double *x1, const double *x2,
 		     double **px, double *x0, int line),
  PM_colinear_nd(int nd, int n, double **x),
- PM_contains_nd(double *xc, PM_polygon *py),
+ PM_contains_nd(const double *xc, const PM_polygon *py),
  PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
-			   double *x1, double *x2, PM_polygon *py, int wh),
- PM_polygon_orient(PM_polygon *p);
+			   const double *x1, const double *x2,
+			   const PM_polygon *py, int wh),
+ PM_polygon_orient(const PM_polygon *p);
 
 extern void
  PM_polygon_push(SC_array *a, PM_polygon *py),
  PM_free_polygons(SC_array *a, int rl),
  PM_orient_polygon(PM_polygon *p),
- PM_nearest_point(PM_polygon *py, double *xs, double *xt, int *pi),
+ PM_nearest_point(const PM_polygon *py, const double *xs,
+		  double *xt, int *pi),
  PM_compute_quad_rot_volume(double *vol, int nc, int *indx, double **x),
  PM_compute_hex_volume(double *vol, int nc, int *indx, double **x),
  PM_vector_extrema(int nd, int n, double **x, double *extr),
  PM_vector_select_extrema(int nd, int n, double **x,
 			  char *map, double *extr),
- PM_scale_vectors(int nd, int n, double **x, double *s),
+ PM_scale_vectors(int nd, int n, double **x, const double *s),
  PM_translate_vectors(int nd, int n, double **x, const double *d),
  PM_rotate_vectors(int nd, int n, double **x,
 		   const double *x0, const double *a);
 
 extern double
- PM_distance(int nd, double *x1, double *x2, double *g),
- PM_polygon_area(PM_polygon *py),
+ PM_distance(int nd, const double *x1, const double *x2, const double *g),
+ PM_polygon_area(const PM_polygon *py),
  **PM_project_vectors(int nd, int n, double **x),
  **PM_convert_vectors(int nd, int n, void *v, const char *typ);
 
@@ -959,27 +965,29 @@ extern double
 /* MLMATH.C declarations */
 
 extern void
- PM_stats_mean(int n, double *x, double *pmn, double *pmdn,
+ PM_stats_mean(int n, const double *x, double *pmn, double *pmdn,
 	       double *pmod, double *pstd),
  PM_hasharr_stats(hasharr *ha, double *pmn, double *pmdn,
 		  double *pmod, double *pstd),
- PM_derivative(int n, double *fncx, double *fncy,
+ PM_derivative(int n, const double *fx, const double *fy,
 	       double *derx, double *dery),
  PM_array_scale(double *p, int n, double f),
  PM_array_shift(double *p, int n, double f),
  PM_array_set(double *p, int n, double f),
- PM_array_copy(double *s, double *t, int n),
+ PM_array_copy(double *d, const double *s, int n),
  PM_err(const char *fmt, ...);
 
 extern int
  PM_del_col(PM_matrix *a, long *col, long ncol),
- PM_array_equal(double *s, double *t, int n, double tol),
+ PM_array_equal(const double *s, const double *t, int n, double tol),
  PM_set_opers(PM_set *set),
- PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny,
+ PM_thin_1d_der(int n, const double *fx, const double *fy,
+		double *thnx, double *thny,
 		double toler),
- PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny,
+ PM_thin_1d_int(int n, const double *fx, const double *fy,
+		double *thnx, double *thny,
 		double toler),
- PM_filter_coeff(double *y, int n, double *coef, int nc),
+ PM_filter_coeff(double *y, int n, const double *coef, int nc),
  PM_smooth_int_ave(double *x, double *y, int n, int pts),
  PM_value_equal(double x1, double x2, double tol),
  PM_value_compare(double x1, double x2, double tol);
@@ -994,9 +1002,10 @@ extern int
 extern double
  PM_romberg(double (*func)(double x), double x0, double x1, double tol),
  PM_integrate_tzr(double xmn, double xmx, int *pn,
-		  double *fncx, double *fncy, double *intx, double *inty),
- PM_curve_len_2d(double *x, double *y, int n),
- PM_curve_len_3d(double *x, double *y, double *z, int n),
+		  const double *fx, const double *fy,
+		  double *intx, double *inty),
+ PM_curve_len_2d(const double *x, const double *y, int n),
+ PM_curve_len_3d(const double *x, const double *y, const double *z, int n),
  PM_machine_precision(void);
 
 
@@ -1340,20 +1349,20 @@ extern void
 /* MLSRCH.C declarations */
 
 extern void
- PM_minmax(void *p, int n, void *pn, void *px,
+ PM_minmax(const void *p, int n, void *pn, void *px,
 	   int *imin, int *imax),
- PM_maxmin(double *xp, double *xmin, double *xmax, int n),
+ PM_maxmin(const double *xp, double *xmin, double *xmax, int n),
  PM_sub_array(void *in, void *out, long *dims,
 	      long *reg, long bpi),
- PM_search(int nx, double *x, int ny, double *y, int offs,
+ PM_search(int nx, const double *x, int ny, const double *y, int offs,
 	   int *indx);
 
 extern int
- PM_find_index(void *p, double f, int n),
- PM_index_min(double *p, int n);
+ PM_find_index(const void *p, double f, int n),
+ PM_index_min(const double *p, int n);
 
 extern double
- PM_max_value(double *p, int imin, int n);
+ PM_max_value(const double *p, int imin, int n);
 
 
 /* MLSVD.C declarations */
@@ -1378,10 +1387,10 @@ extern double
 /* MLVECT.c declarations */
 
 extern int
- PM_vct_equal(int nd, double *x, double **v, int i, double tol);
+ PM_vct_equal(int nd, const double *x, double **v, int i, double tol);
 
 extern double
- PM_lnnorm(double *v, double *x, int n, int order);
+ PM_lnnorm(const double *v, const double *x, int n, int order);
 
 
 #ifdef __cplusplus

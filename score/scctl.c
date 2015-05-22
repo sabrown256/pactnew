@@ -77,7 +77,7 @@ SC_scope_private
 
 /* SC_BANNER - display a banner/header using the input string */
 
-void SC_banner(char *s)
+void SC_banner(const char *s)
    {
 
     io_printf(STDOUT, "\n     %s     %s", s, _SC.banner);
@@ -934,9 +934,10 @@ char *_SC_format_loc(char *d, int nc, const SC_srcloc *loc, int sf, int tail)
  *                - list associated with the given string
  */
 
-pcons *SC_assoc_entry(pcons *alist, const char *s)
+pcons *SC_assoc_entry(const pcons *alist, const char *s)
    {char *t;
-    pcons *pa, *c, *rv;
+    pcons *c, *rv;
+    const pcons *pa;
 
     rv = NULL;
 
@@ -956,7 +957,7 @@ pcons *SC_assoc_entry(pcons *alist, const char *s)
  *          - list associated with the given string
  */
 
-void *SC_assoc(pcons *alist, const char *s)
+void *SC_assoc(const pcons *alist, const char *s)
    {pcons *c;
     void *rv;
 
@@ -1136,10 +1137,11 @@ void SC_rl_pcons(pcons *cp, int level)
  *               - depending on the flag NULL out missing items
  */
 
-static int _SC_assoc_aux(pcons *alst, int flag, va_list SC_VA_VAR)
+static int _SC_assoc_aux(const pcons *alst, int flag, va_list SC_VA_VAR)
    {int count;
     char *name;
-    pcons *asc, *nxt, *ths;
+    pcons *nxt, *ths;
+    const pcons *asc;
     void **pv;
 
     count = 0;
@@ -1156,7 +1158,7 @@ static int _SC_assoc_aux(pcons *alst, int flag, va_list SC_VA_VAR)
              if (strcmp((char *) ths->car, name) == 0)
                 break;};
 
-        pv  = SC_VA_ARG(void **);
+        pv = SC_VA_ARG(void **);
         if (asc != NULL)
            *pv = ths->cdr;
            
@@ -1172,7 +1174,7 @@ static int _SC_assoc_aux(pcons *alst, int flag, va_list SC_VA_VAR)
  *               - key, value pairs from an association list
  */
 
-int SC_assoc_info(pcons *alst, ...)
+int SC_assoc_info(const pcons *alst, ...)
    {int count;
 
     SC_VA_START(alst);
@@ -1190,7 +1192,7 @@ int SC_assoc_info(pcons *alst, ...)
  *                   - match
  */
 
-int SC_assoc_info_alt(pcons *alst, ...)
+int SC_assoc_info_alt(const pcons *alst, ...)
    {int count;
 
     SC_VA_START(alst);
@@ -1219,8 +1221,9 @@ void SC_free_alist(pcons *alst, int level)
 
 /* SC_COPY_ALIST - make a copy of an association list */
 
-pcons *SC_copy_alist(pcons *alst)
-   {pcons *pc, *pa, *pb;
+pcons *SC_copy_alist(const pcons *alst)
+   {pcons *pc, *pb;
+    const pcons *pa;
 
     pc = NULL;
     for (pa = alst; pa != NULL; pa = (pcons *) pa->cdr)

@@ -15,7 +15,7 @@
 
 /* PM_VCT_EQUAL - return TRUE if X == V[I] to tolerance TOL */
 
-int PM_vct_equal(int nd, double *x, double **v, int i, double tol)
+int PM_vct_equal(int nd, const double *x, double **v, int i, double tol)
    {int id, ok;
 
     ok = TRUE;
@@ -29,7 +29,7 @@ int PM_vct_equal(int nd, double *x, double **v, int i, double tol)
 
 /* PM_LNNORM - calculate the ln norm of a vector */
 
-double PM_lnnorm(double *v, double *x, int n, int order)
+double PM_lnnorm(const double *v, const double *x, int n, int order)
    {double norm;
     int i;
 

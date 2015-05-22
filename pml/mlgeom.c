@@ -57,7 +57,8 @@ struct s_polywalk
  */
 
 static void _PM_order_segments(int nd, int *lf, double xs[4][PM_SPACEDM],
-			       double *x1, double *x2, double *x3, double *x4,
+			       const double *x1, const double *x2,
+			       const double *x3, const double *x4,
 			       int line1, int line2)
    {int i, id, wh;
     double dx1, dx2;
@@ -134,7 +135,8 @@ static void _PM_order_segments(int nd, int *lf, double xs[4][PM_SPACEDM],
  *           -     X1 + (X2-X1)t1 = X3   and    X1 + (X2-X1)t2 = X4
  */
 
-int _PM_cross(double *x1, double *x2, double *x3, double *x4,
+int _PM_cross(const double *x1, const double *x2,
+	      const double *x3, const double *x4,
 	      double *x0, int line1, int line2)
    {int cross;
     int lf[2];
@@ -275,7 +277,8 @@ int _PM_cross(double *x1, double *x2, double *x3, double *x4,
 
 /* PM_CROSS - test for the intersection of a line segment and a ray */
 
-int PM_cross(double *x1, double *x2, double *x3, double *x4, double *x0)
+int PM_cross(const double *x1, const double *x2,
+	     const double *x3, const double *x4, double *x0)
    {int rv;
 
     rv = _PM_cross(x1, x2, x3, x4, x0, 0, 1);
@@ -287,7 +290,8 @@ int PM_cross(double *x1, double *x2, double *x3, double *x4, double *x0)
 
 /* PM_CROSS_SEG - test for the intersection of a two line segments */
 
-int PM_cross_seg(double *x1, double *x2, double *x3, double *x4, double *x0)
+int PM_cross_seg(const double *x1, const double *x2,
+		 const double *x3, const double *x4, double *x0)
    {int rv;
 
     rv = _PM_cross(x1, x2, x3, x4, x0, 0, 0);
@@ -315,7 +319,7 @@ int PM_cross_seg(double *x1, double *x2, double *x3, double *x4, double *x0)
  *                     -
  */
 
-int PM_cross_line_plane(double *x1, double *x2,
+int PM_cross_line_plane(const double *x1, const double *x2,
 			double **px, double *x0, int line)
    {int cross;
     double a, b, t;
@@ -405,7 +409,7 @@ static int _PM_by_angle(const void *a, const void *b)
  *                - use the Graham scan algorithm
  */
 
-PM_polygon *PM_convex_hull(double *p1, double *p2, int nh)
+PM_polygon *PM_convex_hull(const double *p1, const double *p2, int nh)
    {int i, imn, np;
     double cp;
     double xc[PM_SPACEDM], xmn[PM_SPACEDM];
@@ -589,7 +593,7 @@ int PM_colinear_nd(int nd, int n, double **x)
  *                       -    -2  in the interior of negatively oriented
  */
 
-int PM_convex_contains_2d(double *xc, PM_polygon *py)
+int PM_convex_contains_2d(const double *xc, const PM_polygon *py)
    {int i, n, nm, np, rv;
     double cp, nrm, sc;
     double sx[PM_SPACEDM];
@@ -648,7 +652,7 @@ int PM_convex_contains_2d(double *xc, PM_polygon *py)
  *                 - space and the nodes of each edge of the polygon in turn
  */
 
-static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
+static int _PM_contains_2d(const double *xc, const PM_polygon *py, int *iy)
    {int i, n, nm, ic, in, rv;
     double x1[PM_SPACEDM], x2[PM_SPACEDM];
     double **xi;
@@ -736,7 +740,7 @@ static int _PM_contains_2d(double *xc, PM_polygon *py, int *iy)
  *                 -       -1 if XC is exterior to PY
  */
 
-static int _PM_contains_3d(double *xc, PM_polygon *py, int *iy)
+static int _PM_contains_3d(const double *xc, const PM_polygon *py, int *iy)
    {int i, id, jd, nd, rv, in, out;
     double tol, ds1, ds2, dx1c, dx2c, nrm;
     double x1[PM_SPACEDM], x2[PM_SPACEDM];
@@ -812,7 +816,7 @@ static int _PM_contains_3d(double *xc, PM_polygon *py, int *iy)
  *                -       -1 if XC is exterior to PY
  */
 
-int PM_contains_nd(double *xc, PM_polygon *py)
+int PM_contains_nd(const double *xc, const PM_polygon *py)
    {int nd, rv;
 
     rv = FALSE;
@@ -836,7 +840,7 @@ int PM_contains_nd(double *xc, PM_polygon *py)
  *                - if XC is a node of PY return its index in IY
  */
 
-int PM_boundary_nd(double *xc, PM_polygon *py, int *iy)
+int PM_boundary_nd(const double *xc, const PM_polygon *py, int *iy)
    {int nd, rv;
 
     rv = FALSE;
@@ -854,7 +858,7 @@ int PM_boundary_nd(double *xc, PM_polygon *py, int *iy)
 
 /* PM_POLYGON_AREA - compute the area of the polygon PY */
 
-double PM_polygon_area(PM_polygon *py)
+double PM_polygon_area(const PM_polygon *py)
    {int i, id, nd, np;
     double x1[PM_SPACEDM], x2[PM_SPACEDM], x3[PM_SPACEDM], ac;
     double **x;
@@ -884,9 +888,12 @@ double PM_polygon_area(PM_polygon *py)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_DISTANCE - return the distance between X1 and X2 according to metric G */
+/* PM_DISTANCE - return the distance between X1 and X2
+ *             - according to metric G
+ */
 
-double PM_distance(int nd, double *x1, double *x2, double *g)
+double PM_distance(int nd, const double *x1, const double *x2,
+		   const double *g)
    {int id, jd;
     double ds, dxs, dxc, dyc, gc;
 
@@ -912,7 +919,7 @@ double PM_distance(int nd, double *x1, double *x2, double *g)
 
 /* _PM_SORT_POINTS - order the points in XI by increasing distance from X1 */
 
-static void _PM_sort_points(int nd, double *x1, int n,
+static void _PM_sort_points(int nd, const double *x1, int n,
 			    double **xi, int *sides)
    {int i, j, id, gap, rv;
     double sa, sb;
@@ -961,7 +968,8 @@ static void _PM_sort_points(int nd, double *x1, int n,
  */
 
 int PM_intersect_line_polygon(int *pni, double ***pxi, int **psides,
-			      double *x1, double *x2, PM_polygon *py, int wh)
+			      const double *x1, const double *x2,
+			      const PM_polygon *py, int wh)
    {int i, n, ni, nd, nn, p1, p2, rv, acc;
     int *sides;
     double x0[PM_SPACEDM], x3[PM_SPACEDM], x4[PM_SPACEDM];
@@ -1121,8 +1129,8 @@ static INLINE int _PM_add_node(PM_polygon *pd, double *x, int *ps)
  *                     -       -1 if it is leaving
  */
 
-static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia,
-			       PM_polygon *pb)
+static int PM_polygon_entering(const double *xa, const PM_polygon *pa,
+			       int ia, const PM_polygon *pb)
    {int id, ib, na, nd, ok, rv;
     double x1c, x2c, eps;
     double x0[PM_SPACEDM];
@@ -1158,7 +1166,8 @@ static int PM_polygon_entering(double *xa, PM_polygon *pa, int ia,
  *                       - has the same orientation and area as PA
  */
 
-static polywalk *_PM_decompose_polygon(PM_polygon *pa, PM_polygon *pb)
+static polywalk *_PM_decompose_polygon(const PM_polygon *pa,
+				       const PM_polygon *pb)
    {int i, id, in, nb, nc, ni, nda, ndb, nn, nx;
     int *bnd, *sides;
     signed char *mk, *wh;
@@ -1251,7 +1260,7 @@ static void _PM_free_polywalk(polywalk *pw, int rel)
  */
 
 static void _PM_combine_polygons(SC_array *a,
-				 PM_polygon *p1, PM_polygon *p2,
+				 const PM_polygon *p1, const PM_polygon *p2,
 				 PM_binary_operation op)
    {int i, i1, ib, iba, ibb, id, l, na, nd, nx, nra, nrb;
     int add, same, more, closed, nin, nout, np, npx, inc, ok;
@@ -1440,7 +1449,8 @@ static void _PM_combine_polygons(SC_array *a,
  *                       - return the array of polygons
  */
 
-SC_array *PM_intersect_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb)
+SC_array *PM_intersect_polygons(SC_array *a,
+				const PM_polygon *pa, const PM_polygon *pb)
    {
 
     if (a == NULL)
@@ -1460,7 +1470,8 @@ SC_array *PM_intersect_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb)
  *                   - return the array of polygons
  */
 
-SC_array *PM_union_polygons(SC_array *a, PM_polygon *pa, PM_polygon *pb)
+SC_array *PM_union_polygons(SC_array *a,
+			    const PM_polygon *pa, const PM_polygon *pb)
    {
 
     if (a == NULL)
@@ -1509,7 +1520,7 @@ void PM_orient_polygon(PM_polygon *p)
  *                   -  -2 error
  */
 
-int PM_polygon_orient(PM_polygon *p)
+int PM_polygon_orient(const PM_polygon *p)
    {int i, n, nm, np, rv;
     double cp;
     double **x;
@@ -1544,7 +1555,8 @@ int PM_polygon_orient(PM_polygon *p)
  *                  - return it in XT
  */
 
-void PM_nearest_point(PM_polygon *py, double *xs, double *xt, int *pi)
+void PM_nearest_point(const PM_polygon *py, const double *xs,
+		      double *xt, int *pi)
    {int i, n, indx;
     double s, smn;
     double dx[PM_SPACEDM];
@@ -1752,7 +1764,7 @@ void PM_vector_select_extrema(int nd, int n, double **x,
 
 /* PM_SCALE_VECTORS - scale N ND vectors X by S */
 
-void PM_scale_vectors(int nd, int n, double **x, double *s)
+void PM_scale_vectors(int nd, int n, double **x, const double *s)
    {int i, id;
     double sc;
     double *px;

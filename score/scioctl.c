@@ -87,7 +87,8 @@ static void _SC_event_loop_handler(int sig)
 
 /* SC_MAKE_EVENT_LOOP - setup and return an event loop descriptor */
 
-SC_evlpdes *SC_make_event_loop(PFSignal_handler sigio, PFSignal_handler sigchld,
+SC_evlpdes *SC_make_event_loop(PFSignal_handler sigio,
+			       PFSignal_handler sigchld,
 			       int (*ex)(int *rv, void *a),
 			       int lwait, short acc, short rej)
    {int nfd;
@@ -144,13 +145,13 @@ void SC_free_event_loop(SC_evlpdes *pe)
  *                            - return the old value
  */
 
-SC_evlpdes *SC_make_event_loop_current(SC_evlpdes *pe)
+SC_evlpdes *SC_make_event_loop_current(const SC_evlpdes *pe)
    {SC_evlpdes *old, **ev;
 
     ev = _SC_get_ev_loop(-1);
 
     old = *ev;
-    *ev = pe;
+    *ev = (SC_evlpdes *) pe;
 
     return(old);}
 
@@ -176,7 +177,7 @@ void SC_event_loop_set_masks(SC_evlpdes *pe, int acc, int rej)
  *                         - the given event loop descriptor
  */
 
-void SC_event_loop_get_masks(SC_evlpdes *pe, int *pacc, int *prej)
+void SC_event_loop_get_masks(const SC_evlpdes *pe, int *pacc, int *prej)
    {
 
     *pacc = pe->maccpt;

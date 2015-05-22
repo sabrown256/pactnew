@@ -256,7 +256,7 @@ long darreq(double *p, int n, double f)
  *                - equal to within tolerance
  */
 
-int PM_array_equal(double *s, double *t, int n, double tol)
+int PM_array_equal(const double *s, const double *t, int n, double tol)
    {int i, ok;
 
     ok = TRUE;
@@ -269,15 +269,15 @@ int PM_array_equal(double *s, double *t, int n, double tol)
 /*--------------------------------------------------------------------------*/
 
 /* PM_ARRAY_COPY - copy one array to another
- *               - that is copy N double values from array T to array S
+ *               - that is copy N double values from array S to array D
  */
 
-void PM_array_copy(double *s, double *t, int n)
+void PM_array_copy(double *d, const double *s, int n)
    {int i;
 
-    if ((s != NULL) && (t != NULL))
+    if ((d != NULL) && (s != NULL))
        for (i = 0; i < n; i++)
-           *(s++) = *(t++);
+           *(d++) = *(s++);
 
     return;}
 
@@ -286,10 +286,10 @@ void PM_array_copy(double *s, double *t, int n)
 
 /* PM_CURVE_LEN_2D - return the length of the given curve in 2 space */
 
-double PM_curve_len_2d(double *x, double *y, int n)
+double PM_curve_len_2d(const double *x, const double *y, int n)
    {int i;
     double s;
-    double *px1, *px2, *py1, *py2;
+    const double *px1, *px2, *py1, *py2;
 
     px1 = x;
     px2 = x + 1;
@@ -305,10 +305,11 @@ double PM_curve_len_2d(double *x, double *y, int n)
 
 /* PM_CURVE_LEN_3D - return the length of the given curve in 3 space */
 
-double PM_curve_len_3d(double *x, double *y, double *z, int n)
+double PM_curve_len_3d(const double *x, const double *y,
+		       const double *z, int n)
    {int i;
     double dx, dy, dz, s;
-    double *px1, *px2, *py1, *py2, *pz1, *pz2;
+    const double *px1, *px2, *py1, *py2, *pz1, *pz2;
 
     px1 = x;
     px2 = x + 1;
@@ -335,7 +336,7 @@ double PM_curve_len_3d(double *x, double *y, double *z, int n)
  * #bind PM_stats_mean fortran() scheme() python()
  */
 
-void PM_stats_mean(int n, double *x, double *pmn, double *pmdn,
+void PM_stats_mean(int n, const double *x, double *pmn, double *pmdn,
 		   double *pmod, double *pstd)
    {int i, j, nh;
     double xc, xs, xsq, xmdn, xmn;
@@ -501,7 +502,8 @@ double PM_romberg(double (*func)(double x), double x0, double x1, double tol)
 /* PM_INTEGRATE_TZR - do simple trapezoid rule integeration of a data set */
 
 double PM_integrate_tzr(double xmn, double xmx, int *pn,
-			double *fncx, double *fncy, double *intx, double *inty)
+			const double *fx, const double *fy,
+			double *intx, double *inty)
    {int i, k, n;
     double sum, lasty, xta;
 
@@ -509,37 +511,37 @@ double PM_integrate_tzr(double xmn, double xmx, int *pn,
     i   = 0;
     sum = 0;
 
-    xta = fncx[n-1];
+    xta = fx[n-1];
     xmx = min(xmx, xta);
 
 /* first point */
-    if (xmn <= *fncx)
-       {lasty   = *fncy;
-        intx[0] = *fncx;
+    if (xmn <= *fx)
+       {lasty   = *fy;
+        intx[0] = *fx;
 
         i++;}
 
     else
-       {for (; (fncx[i] < xmn) && (i < n); ++i);
+       {for (; (fx[i] < xmn) && (i < n); ++i);
 
-        PM_interp(lasty, xmn, fncx[i-1], fncy[i-1], fncx[i], fncy[i]);
+        PM_interp(lasty, xmn, fx[i-1], fy[i-1], fx[i], fy[i]);
 
         intx[0] = xmn;};
 
     inty[0] = sum;
 
 /* interior */
-    for (k = 1; (i < (n - 1)) && (fncx[i] < xmx); i++, k++)
-       {sum += 0.5*(fncy[i] + lasty)*(fncx[i] - intx[k-1]);
+    for (k = 1; (i < (n - 1)) && (fx[i] < xmx); i++, k++)
+        {sum += 0.5*(fy[i] + lasty)*(fx[i] - intx[k-1]);
 
-        inty[k] = sum;
-        intx[k] = fncx[i];
+	 inty[k] = sum;
+	 intx[k] = fx[i];
 
-        lasty   = fncy[i];};
+	 lasty   = fy[i];};
 
 /* last point */
     if (i < n)
-       {PM_interp(inty[k], xmx, fncx[i-1], fncy[i-1], fncx[i], fncy[i]);
+       {PM_interp(inty[k], xmx, fx[i-1], fy[i-1], fx[i], fy[i]);
         sum += 0.5*(inty[k] + lasty)*(xmx - intx[k-1]);
 
         inty[k] = sum;
@@ -554,19 +556,20 @@ double PM_integrate_tzr(double xmn, double xmx, int *pn,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_DERIVATIVE - take df/dx from fncx and fnc and put the values in
+/* PM_DERIVATIVE - take df/dx from fx and f and put the values in
  *               - derx and dery
  */
 
-void PM_derivative(int n, double *fncx, double *fncy, double *derx, double *dery)
+void PM_derivative(int n, const double *fx, const double *fy,
+		   double *derx, double *dery)
    {int i;
     double x1[2], x2[2], yt;
 
-    x1[0] = *fncx++;
-    x1[1] = *fncy++;
+    x1[0] = *fx++;
+    x1[1] = *fy++;
     for (i = 1; i < n; i++)
-        {x2[0] = *fncx++;
-         x2[1] = *fncy++;
+        {x2[0] = *fx++;
+         x2[1] = *fy++;
          *derx++ = 0.5*(x1[0] + x2[0]);
          if (x2[0] != x1[0])
             *dery++ = (x2[1] - x1[1])/(x2[0] - x1[0]);
@@ -587,7 +590,8 @@ void PM_derivative(int n, double *fncx, double *fncy, double *derx, double *dery
  *                - this uses a differential measure criterion
  */
 
-int PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny,
+int PM_thin_1d_der(int n, const double *fx, const double *fy,
+		   double *thnx, double *thny,
 		   double toler)
    {int i, i0, j;
     double x1[2], x2[2], xt, dydx, odydx;
@@ -596,8 +600,8 @@ int PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny
        {toler = 10.0/((double) n);
         toler = min(toler, 0.1);};
 
-    x1[0] = *fncx++;
-    x1[1] = *fncy++;
+    x1[0] = *fx++;
+    x1[1] = *fy++;
     x2[0] = x1[0];
     x2[1] = x1[1];
 
@@ -606,8 +610,8 @@ int PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny
 
     odydx = -HUGE;
     for (i = 1; i < n; i++)
-        {x2[0] = *fncx++;
-         x2[1] = *fncy++;
+        {x2[0] = *fx++;
+         x2[1] = *fy++;
 
          if (x2[0] != x1[0])
             dydx = (x2[1] - x1[1])/(x2[0] - x1[0]);
@@ -647,14 +651,15 @@ int PM_thin_1d_der(int n, double *fncx, double *fncy, double *thnx, double *thny
  *                - this uses an integral measure criterion
  */
 
-int PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny,
+int PM_thin_1d_int(int n, const double *fx, const double *fy,
+		   double *thnx, double *thny,
 		   double toler)
    {int i, nth, nc, iamn, iamna, iamnb;
     double xc, yc, sm, b, ht, amn;
     double *area;
 
-    memcpy(thnx, fncx, n*sizeof(double));
-    memcpy(thny, fncy, n*sizeof(double));
+    memcpy(thnx, fx, n*sizeof(double));
+    memcpy(thny, fy, n*sizeof(double));
 
     nth = -1;
     xc  = 0.0;
@@ -746,9 +751,10 @@ int PM_thin_1d_int(int n, double *fncx, double *fncy, double *thnx, double *thny
  *                 - return TRUE iff successful
  */
 
-int PM_filter_coeff(double *y, int n, double *coef, int nc)
+int PM_filter_coeff(double *y, int n, const double *coef, int nc)
    {int i, k, nh, nm, nu, kn, kx;
-    double *ny, *py, *pc, lyn;
+    double *ny, *py, lyn;
+    const double *pc;
 
     nh = nc >> 1;
     nm = nh*(3*nh + 1) >> 1;
@@ -950,8 +956,9 @@ void PM_smooth_filter(complex *z, int n, double pts)
  *          - each curve is assumed to have the same fixed dx
  */
 
-int _PM_fold(int sgn, int na, double *xa, double *ya, int nb,
-	     double *xb, double *yb, double **pxf, double **pyf)
+int _PM_fold(int sgn, int na, const double *xa, const double *ya,
+	     int nb, const double *xb, const double *yb,
+	     double **pxf, double **pyf)
    {int i, j, ja, jb, nf, nm, nmn, nt;
     double *xf, *yf, *lyn;
     double Dxa, Dxb, dxa, dxb, xt, yt, xmn, xmx;

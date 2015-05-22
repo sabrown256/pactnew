@@ -21,7 +21,8 @@ SC_THREAD_LOCK(PM_search_lock); /* Lock around initialization */
  *           - for the given array
  */
 
-void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
+void PM_minmax(const void *p, int n,
+	       void *pn, void *px, int *imin, int *imax)
    {int id;
 
     id = SC_arrtype(p, -1);
@@ -38,7 +39,7 @@ void PM_minmax(void *p, int n, void *pn, void *px, int *imin, int *imax)
 
 /* PM_MAXMIN - return the max and min value of the given array */
 
-void PM_maxmin(double *xp, double *xmin, double *xmax, int n)
+void PM_maxmin(const double *xp, double *xmin, double *xmax, int n)
    {int i1, i2;
 
     PM_minmax(xp, n, xmin, xmax, &i1, &i2);
@@ -66,7 +67,7 @@ void dminmax(void *p, int n)
 
 /* PM_MAX_VALUE - return the maximum value from the given array of doubles */
 
-double PM_max_value(double *p, int imin, int n)
+double PM_max_value(const double *p, int imin, int n)
    {int i;
     double u, v;
 
@@ -87,7 +88,7 @@ double PM_max_value(double *p, int imin, int n)
  *              - given array of doubles
  */
 
-int PM_index_min(double *p, int n)
+int PM_index_min(const double *p, int n)
    {int i, j;
     double u, v;
 
@@ -111,7 +112,7 @@ int PM_index_min(double *p, int n)
  *               - return 0 if F <= P[0] and N if P[N-1] < F
  */
 
-int PM_find_index(void *p, double f, int n)
+int PM_find_index(const void *p, double f, int n)
    {int id, indx;
 
     indx = 0;
@@ -152,7 +153,8 @@ int PM_find_index(void *p, double f, int n)
  *           -           of each element of X in the Y table
  */
 
-void PM_search(int nx, double *x, int ny, double *y, int offs, int *indx)
+void PM_search(int nx, const double *x,
+	       int ny, const double *y, int offs, int *indx)
    {long ix, iy, my;
     PM_smp_state *ma;
     
@@ -294,8 +296,8 @@ long _PM_hyper_indices(long *dims, long *reg, long **pstart, long *chunk)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_SUB_ARRAY - given array in with dimensions dims, with bpi
- *                bytes per item, return a sub-array out, specified
+/* PM_SUB_ARRAY - given array IN with dimensions dims, with BPI
+ *                bytes per item, return a sub-array OUT, specified
  *                by reg.
  */
 
@@ -324,7 +326,7 @@ void PM_sub_array(void *in, void *out, long *dims, long *reg, long bpi)
  *                - which is NOUT long
  */
 
-int _PM_find_value(int *nout, int **out, int nx, char *type, void *x,
+int _PM_find_value(int *nout, int **out, int nx, char *type, const void *x,
 		   int (*prd)(double u, double v), double val,
 		   int nin, int *in)
    {int id, ipt, n;

@@ -1930,8 +1930,8 @@ static object *_SXI_mk_polygon(SS_psides *si, object *argl)
 
 static SC_array *_SX_polygon_pass(SC_array *a, PM_polygon *py,
 				  SC_array *(*op)(SC_array *a,
-						  PM_polygon *pa,
-						  PM_polygon *pb))
+						  const PM_polygon *pa,
+						  const PM_polygon *pb))
    {long ip, np;
     PM_polygon *pb;
     SC_array *an;
@@ -1954,8 +1954,8 @@ static SC_array *_SX_polygon_pass(SC_array *a, PM_polygon *py,
 
 static object *_SX_combine_polygons(SS_psides *si, object *argl,
 				    SC_array *(*op)(SC_array *a,
-						    PM_polygon *pa,
-						    PM_polygon *pb))
+						    const PM_polygon *pa,
+						    const PM_polygon *pb))
    {long ip, np, n;
     PM_polygon *pa, *pb;
     SC_array *a, *an;

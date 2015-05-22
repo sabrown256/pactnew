@@ -129,7 +129,8 @@ extern double
 /* MLGEOM.C declarations */
 
 extern int
- _PM_cross(double *x1, double *x2, double *x3, double *x4,
+ _PM_cross(const double *x1, const double *x2,
+	   const double *x3, const double *x4,
 	   double *x0, int line1, int line2);
 
 
@@ -153,8 +154,8 @@ extern PM_smp_state
 
 extern int
  _PM_find_value(int *nout, int **out,
-		int nx, char *type,
-		void *x, int (*prd)(double u, double v), double val,
+		int nx, char *type, const void *x,
+		int (*prd)(double u, double v), double val,
 		int nin, int *in);
 
 

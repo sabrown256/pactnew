@@ -709,8 +709,8 @@ extern SC_contextdes
 /* SCCTL.C declarations */
 
 extern void
- *SC_assoc(pcons *alist, const char *s),
- SC_banner(char *s),
+ *SC_assoc(const pcons *alist, const char *s),
+ SC_banner(const char *s),
  SC_set_banner(const char *fmt, ...),
  SC_pause(void),
  SC_save_argv_env(int argc, char **argv, char **env),
@@ -737,8 +737,8 @@ extern int
  SC_full_path(const char *name, char *path, int nc),
  SC_regx_match(const char *s, const char *patt),
  SC_remove(const char *s),
- SC_assoc_info(pcons *alst, ...),
- SC_assoc_info_alt(pcons *alst, ...);
+ SC_assoc_info(const pcons *alst, ...),
+ SC_assoc_info_alt(const pcons *alst, ...);
 
 extern char
  *SC_get_banner(void),
@@ -749,15 +749,17 @@ extern char
  *SC_getcwd(void);
 
 extern pcons
- *SC_assoc_entry(pcons *alist, const char *s),
+ *SC_assoc_entry(const pcons *alist, const char *s),
  *SC_make_pcons(const char *cat, int ma, void *ca,
 		const char *cdt, int md, void *cd),
  *SC_mk_pcons(const char *cat, void *ca, const char *cdt, void *cd),
- *SC_add_alist(pcons *alist, const char *name, const char *type, void *val),
- *SC_change_alist(pcons *alist, const char *name, const char *type, void *val),
+ *SC_add_alist(pcons *alist, const char *name,
+	       const char *type, void *val),
+ *SC_change_alist(pcons *alist, const char *name,
+		  const char *type, void *val),
  *SC_alist_map(pcons *alist, int (*fnc)(pcons *hp, void *arg), void *arg),
  *SC_rem_alist(pcons *alist, const char *name),
- *SC_copy_alist(pcons *alist),
+ *SC_copy_alist(const pcons *alist),
  *SC_append_alist(pcons *alist1, pcons *alist2);
 
 extern SC_array
@@ -907,13 +909,13 @@ extern SC_evlpdes
  *SC_make_event_loop(void (*sigio)(int sig), PFSignal_handler sigchld,
 		     int (*ex)(int *rv, void *a),
 		     int wait, short accept, short reject),
- *SC_make_event_loop_current(SC_evlpdes *pe);
+ *SC_make_event_loop_current(const SC_evlpdes *pe);
 
 extern void
  SC_catch_event_loop_interrupts(SC_evlpdes *pe, int flag),
  SC_free_event_loop(SC_evlpdes *pe),
  SC_event_loop_set_masks(SC_evlpdes *pe, int accept, int reject),
- SC_event_loop_get_masks(SC_evlpdes *pe, int *paccept, int *preject),
+ SC_event_loop_get_masks(const SC_evlpdes *pe, int *paccept, int *preject),
  SC_remove_event_loop_callback(SC_evlpdes *pe, int type, void *p),
  SC_set_poll_masks(int accept, int reject),
  SC_get_poll_masks(int *paccept, int *preject),
