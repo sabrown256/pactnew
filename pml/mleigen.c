@@ -138,7 +138,7 @@ PM_matrix *_PM_hrsymatr(PM_matrix *a, int cmv)
  *                  - following Numerical Recipes in C
  */
 
-static int _PM_ql_tri_eigen(PM_matrix *r, PM_matrix *z, int cmv)
+static int _PM_ql_tri_eigen(PM_matrix *r, const PM_matrix *z, int cmv)
    {int i, k, l, n, m, it;
     double b, c, d, f, g, p, s, t;
 

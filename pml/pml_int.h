@@ -115,15 +115,16 @@ extern PM_scope_private
 extern double
  _PM_iccg_v(int km, int lm, double eps, int ks, int maxit,
 	    double *a0, double *a1, double *b0, double *b1, double *bm1,
-	    double *x, double *y);
+	    double *x, const double *y);
 
 
 /* MLICGS.C declarations */
 
 extern double
  _PM_iccg_s(int km, int lm, double eps, int maxit,
-	    double *a0, double *a1, double *b0, double *b1, double *bm1,
-	    double *x, double *y, int neq, int method);
+	    const double *a0, const double *a1,
+	    const double *b0, const double *b1, const double *bm1,
+	    double *x, const double *y, int neq, int method);
 
 
 /* MLGEOM.C declarations */
@@ -137,11 +138,11 @@ extern int
 /* MLMATR.C declarations */
 
 extern PM_matrix
- *_PM_negative_times(PM_matrix *m, PM_matrix *a, PM_matrix *b),
- *_PM_times(PM_matrix *c, PM_matrix *a, PM_matrix *b),
- *_PM_plus(PM_matrix *c, PM_matrix *a, PM_matrix *b),
- *_PM_minus(PM_matrix *c, PM_matrix *a, PM_matrix *b),
- *_PM_transpose(PM_matrix *m, PM_matrix *a);
+ *_PM_negative_times(PM_matrix *m, const PM_matrix *a, const PM_matrix *b),
+ *_PM_times(PM_matrix *c, const PM_matrix *a, const PM_matrix *b),
+ *_PM_plus(PM_matrix *c, const PM_matrix *a, const PM_matrix *b),
+ *_PM_minus(PM_matrix *c, const PM_matrix *a, const PM_matrix *b),
+ *_PM_transpose(PM_matrix *m, const PM_matrix *a);
 
 
 /* MLSMP.C declarations */

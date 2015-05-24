@@ -88,7 +88,7 @@ PM_matrix *PM_zero(PM_matrix *a)
  *            - are within machine precision of 0.0
  */
 
-int PM_is_zero(PM_matrix *a)
+int PM_is_zero(const PM_matrix *a)
    {int i, n, nr, nc, ok;
     double tol;
     double *ar;
@@ -133,7 +133,7 @@ PM_matrix *PM_ident(PM_matrix *a)
  *             - negative of the matrix
  */
 
-PM_matrix *PM_negative(PM_matrix *m, PM_matrix *a)
+PM_matrix *PM_negative(PM_matrix *m, const PM_matrix *a)
    {int i, n, nr, nc;
     double *ar, *mr;
 
@@ -156,7 +156,7 @@ PM_matrix *PM_negative(PM_matrix *m, PM_matrix *a)
  *         - of the same size D
  */
 
-PM_matrix *PM_copy(PM_matrix *d, PM_matrix *s)
+PM_matrix *PM_copy(PM_matrix *d, const PM_matrix *s)
    {int i, n, nr, nc;
     double *sr, *dr;
 
@@ -177,7 +177,7 @@ PM_matrix *PM_copy(PM_matrix *d, PM_matrix *s)
 
 /* _PM_TRANSPOSE - transpose the given matrix */
 
-PM_matrix *_PM_transpose(PM_matrix *m, PM_matrix *a)
+PM_matrix *_PM_transpose(PM_matrix *m, const PM_matrix *a)
    {int i, j, nc, nr;
 
     if ((m == NULL) || (a == NULL))
@@ -223,7 +223,7 @@ PM_matrix *PM_transpose(PM_matrix *a)
 
 /* _PM_TIMES - multiply two matrices M = A.B */
 
-PM_matrix *_PM_times(PM_matrix *m, PM_matrix *a, PM_matrix *b)
+PM_matrix *_PM_times(PM_matrix *m, const PM_matrix *a, const PM_matrix *b)
    {int mr, mc, ar, ac, br, bc;
     double sum, ce, *va, *vb;
     int k, j, i;
@@ -262,7 +262,7 @@ PM_matrix *_PM_times(PM_matrix *m, PM_matrix *a, PM_matrix *b)
 
 /* PM_TIMES - multiply two matrices */
 
-PM_matrix *PM_times(PM_matrix *a, PM_matrix *b)
+PM_matrix *PM_times(const PM_matrix *a, const PM_matrix *b)
    {int ar, bc;
     PM_matrix *c;
 
@@ -282,7 +282,8 @@ PM_matrix *PM_times(PM_matrix *a, PM_matrix *b)
 
 /* _PM_NEGATIVE_TIMES - return negative product of two matrices, M = -AB  */
 
-PM_matrix *_PM_negative_times(PM_matrix *m, PM_matrix *a, PM_matrix *b)
+PM_matrix *_PM_negative_times(PM_matrix *m,
+			      const PM_matrix *a, const PM_matrix *b)
    {int mr, mc, ar, ac, br, bc;
     double sum, ce, *va, *vb;
     int k, j, i;
@@ -321,7 +322,7 @@ PM_matrix *_PM_negative_times(PM_matrix *m, PM_matrix *a, PM_matrix *b)
 
 /* PM_NEGATIVE_TIMES - multiply two matrices */
 
-PM_matrix *PM_negative_times(PM_matrix *a, PM_matrix *b)
+PM_matrix *PM_negative_times(PM_matrix *a, const PM_matrix *b)
    {int ar, bc;
     PM_matrix *c;
 
@@ -341,7 +342,7 @@ PM_matrix *PM_negative_times(PM_matrix *a, PM_matrix *b)
 
 /* _PM_PLUS - add the given matrices C = A + B */
 
-PM_matrix *_PM_plus(PM_matrix *c, PM_matrix *a, PM_matrix *b)
+PM_matrix *_PM_plus(PM_matrix *c, const PM_matrix *a, const PM_matrix *b)
    {int i, n, nr, nc;
     double *ar, *br, *cr;
 
@@ -367,7 +368,7 @@ PM_matrix *_PM_plus(PM_matrix *c, PM_matrix *a, PM_matrix *b)
 
 /* PM_PLUS - add the given matrices */
 
-PM_matrix *PM_plus(PM_matrix *a, PM_matrix *b)
+PM_matrix *PM_plus(const PM_matrix *a, const PM_matrix *b)
    {int nr, nc;
     PM_matrix *c;
 
@@ -387,7 +388,7 @@ PM_matrix *PM_plus(PM_matrix *a, PM_matrix *b)
 
 /* _PM_MINUS - subtract the given matrices C = A - B */
 
-PM_matrix *_PM_minus(PM_matrix *c, PM_matrix *a, PM_matrix *b)
+PM_matrix *_PM_minus(PM_matrix *c, const PM_matrix *a, const PM_matrix *b)
    {int i, n, nr, nc;
     double *ar, *br, *cr;
 
@@ -413,7 +414,7 @@ PM_matrix *_PM_minus(PM_matrix *c, PM_matrix *a, PM_matrix *b)
 
 /* PM_MINUS - subtract the given matrices */
 
-PM_matrix *PM_minus(PM_matrix *a, PM_matrix *b)
+PM_matrix *PM_minus(const PM_matrix *a, const PM_matrix *b)
    {int nr, nc;
     PM_matrix *c;
 
@@ -480,7 +481,7 @@ int PM_del_col(PM_matrix *a, long *col, long ncol)
  */
 
 
-double *_PM_get_col(PM_matrix *a, int col)
+double *_PM_get_col(const PM_matrix *a, int col)
    {int i, nr, nc;
     double *get, *nptr, *optr;
 

@@ -436,7 +436,7 @@ static object *_ULI_fit(SS_psides *si, object *obj, object *tok)
     wc[0] = SX_gs.dataset[j].wc[0];
     wc[1] = SX_gs.dataset[j].wc[1];
 
-    cf = PM_lsq_fit(2, n, x, wc, order);
+    cf = PM_lsq_fit(2, n, (const double **) x, wc, order);
     if (cf != NULL)
 
 /* display coefficients and cons up the return list */

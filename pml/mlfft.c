@@ -44,10 +44,11 @@ double *PM_uniform_real_x(int no, double xmin, double xmax, int flag)
  */
 
 double *PM_uniform_real_y(int no, double *xo,
-			int ni, double *xi, double *yi)
+			  int ni, const double *xi, const double *yi)
    {int i, j;
     double dx, xa, xb;
-    double *yo, *py;
+    double *yo;
+    const double *py;
 
     yo = CMAKE_N(double, no);
 
@@ -93,7 +94,7 @@ double *PM_uniform_real_y(int no, double *xo,
  */
 
 complex *PM_uniform_complex_y(int no, double *xo,
-			      int ni, double *xi, complex *yi)
+			      int ni, const double *xi, const complex *yi)
    {int i;
     double *yti, *yto;
     complex *yo;
@@ -386,7 +387,8 @@ complex *PM_fft_sc_real(double *x, int n, int flag)
  * #bind PM_fft_sc_real_data fortran() scheme() python()
  */
 
-int PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
+int PM_fft_sc_real_data(complex **pyo, double **pxo,
+			const double *xi, const double *yi,
 			int ni, double xmn, double xmx, int ordr)
    {int n, np, nr;
     double *x, *y;

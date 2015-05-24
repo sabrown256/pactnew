@@ -1,5 +1,6 @@
 /*
- * MLCG.C - Conjugate Gradient solver for symmetric sparse linear systems (PM_dscg)
+ * MLCG.C - Conjugate Gradient solver for
+ *        - symmetric sparse linear systems (PM_dscg)
  *        - and stabilized Bi-Conjugate Gradient method (PM_bicg) for
  *        - unsymmetric sparse linear systems
  *        - contributed by Mike Lambert of CASC at LLNL
@@ -136,7 +137,8 @@ static void _PM_sort_sp(PM_sp_lin_sys *sls)
 
 /* _PM_CG_CMP_AP - compute A.p for a sparse system */
 
-static void _PM_cg_cmp_Ap(double *Ax, PM_sp_lin_sys *sls, double *x)
+static void _PM_cg_cmp_Ap(double *Ax, const PM_sp_lin_sys *sls,
+			  const double *x)
    {int i, j, js, n, njs;
     double aij;
 
@@ -169,7 +171,8 @@ static void _PM_cg_cmp_Ap(double *Ax, PM_sp_lin_sys *sls, double *x)
 
 /* _PM_CG_CMP_LR - compute L.r for a sparse system */
 
-static void _PM_cg_cmp_Lr(double *Lr, PM_sp_lin_sys *sls, double *r)
+static void _PM_cg_cmp_Lr(double *Lr, const PM_sp_lin_sys *sls,
+			  const double *r)
    {int i, js, n, njs;
     double aij;
 
@@ -260,7 +263,7 @@ void PM_iccg_pre(PM_sp_lin_sys *sls)
  *                - matrix A (by the ICCG construction)
  */
 
-void PM_iccg_cmp_Lr(double *Lr, PM_sp_lin_sys *sls, double *r)
+void PM_iccg_cmp_Lr(double *Lr, const PM_sp_lin_sys *sls, const double *r)
    {int i, j, n, is, js, njs;
     int *diag, *pj, *pjt;
     double ri, li, lij, lji;
@@ -350,8 +353,9 @@ void PM_iccg_cmp_Lr(double *Lr, PM_sp_lin_sys *sls, double *r)
 PM_sp_lin_sys *PM_mk_sp_lin_sys(int n_ups, int n_rhs, int n_ods,
 				int sym, int trans,
 				void (*pre)(PM_sp_lin_sys *sls),
-				void (*clr)(double *Lr, PM_sp_lin_sys *sls,
-					    double *r))
+				void (*clr)(double *Lr,
+					    const PM_sp_lin_sys *sls,
+					    const double *r))
    {int i;
     PM_sp_lin_sys *sls;
 

@@ -15,12 +15,12 @@
 
 /* ICMATM - matrix multiply  Y = M*X */
 
-static void icmatm(double *a0, double *a1,
-		   double *b0, double *b1, double *bm1,
-                   double *x, double *y, int km, int lm)
+static void icmatm(const double *a0, const double *a1,
+		   const double *b0, const double *b1, const double *bm1,
+                   const double *x, double *y, int km, int lm)
    {int i, n;
-    double *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
-    double *x1, *x2, *x3, *x4, *x5, *x6, *x7, *x8;
+    const double *c1, *c2, *c3, *c4, *c5, *c6, *c7, *c8;
+    const double *x1, *x2, *x3, *x4, *x5, *x6, *x7, *x8;
 
 /* set pointers for left/right up/down ... etc */
     x1 = x - km + 1;
@@ -88,13 +88,13 @@ static void icmatm(double *a0, double *a1,
 
 /* ICDLDU - performs incomplete LDU decomposition of M */
  
-static void icdldu(double *a0, double *a1,
-		   double *b0, double *b1, double *bm1,
+static void icdldu(const double *a0, const double *a1,
+		   const double *b0, const double *b1, const double *bm1,
                    double *di, double *la1,
 		   double *lb0, double *lb1, double *lbm1,
                    double *z, int km, int lm, int neq, int method)
    {int i, n;
-    double *c1, *c2, *c3, *c4;
+    const double *c1, *c2, *c3, *c4;
     double *l1, *l2, *l3, *l4;
     double *l5, *l6, *l7, *l8;
     double *z1, *z2, *z3, *z4;
@@ -172,12 +172,12 @@ static void icdldu(double *a0, double *a1,
 
 /* ICILDU - solves LDU*X = Y for X given Y */
  
-static void icildu(double *di, double *la1,
-		   double *lb0, double *lb1, double *lbm1,
+static void icildu(const double *di, const double *la1,
+		   const double *lb0, const double *lb1, const double *lbm1,
                    double *x, double *y, int km, int lm, int neq, int method)
    {int i, n;
-    double *x1, *x2, *x3, *x4;
-    double *c1, *c2, *c3, *c4;
+    const double *x1, *x2, *x3, *x4;
+    const double *c1, *c2, *c3, *c4;
 
     n = km*lm;
 
@@ -256,12 +256,12 @@ static void icildu(double *di, double *la1,
 
 /* _PM_GCG_S - generalized conjugate gradient */
 
-static double _PM_gcg_s(double *a0, double *a1,
-			double *b0, double *b1, double *bm1,
-			double *x, double *y, double *di,
-			double *la1, double *lb0,
-			double *lb1, double *lbm1, double *r,
-			double *q, double *p,
+static double _PM_gcg_s(const double *a0, const double *a1,
+			const double *b0, const double *b1, const double *bm1,
+			double *x, const double *y, const double *di,
+			const double *la1, const double *lb0,
+			const double *lb1, const double *lbm1,
+			double *r, double *q, double *p,
 			int km, int lm, int neq, int method, int maxit,
 			double eps)
    {int i, iter, exflag;
@@ -392,8 +392,9 @@ static double _PM_gcg_s(double *a0, double *a1,
  */ 
  
 double _PM_iccg_s(int km, int lm, double eps, int maxit,
-		  double *a0, double *a1,
-		  double *b0, double *b1, double *bm1, double *x, double *y,
+		  const double *a0, const double *a1,
+		  const double *b0, const double *b1, const double *bm1,
+		  double *x, const double *y,
 		  int neq, int method)
    {int nkl;
     double *di, *la1, *lb0, *lb1, *lbm1, *p, *q, *r, *w;

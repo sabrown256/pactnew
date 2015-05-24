@@ -10,7 +10,7 @@
 
 #include "pml_int.h"
 
-#define SETA(ma, a, j) (ma).array = (a) + (j)*nss
+#define SETA(ma, a, j) (ma).array = (double *) (a) + (j)*nss
 #define SETV(mu, u, j) (mu).array = (u) + (j)*ns
 
 /*--------------------------------------------------------------------------*/
@@ -25,12 +25,13 @@
  *          - matrix singularity check
  *          - solves for a vector u the tridiagonal linear set given by
  *            M.u = r
- *          - M is tridiagonal with 'a' pointing to the subdiagonal, 'b'
- *            pointing to the diagonal, and 'c' pointing to the superdiagonal
- *          - 'a[0]' and 'c[n-1]' are unused
+ *          - M is tridiagonal with A pointing to the subdiagonal, B
+ *            pointing to the diagonal, and C pointing to the superdiagonal
+ *          - A[0] and C[n-1] are unused
  */
 
-int PM_tridi(double *a, double *b, double *c, double *r, double *u, int n)
+int PM_tridi(const double *a, const double *b, const double *c,
+	     const double *r, double *u, int n)
    {int j;
     double bc, *t;
 
@@ -72,33 +73,33 @@ int PM_tridi(double *a, double *b, double *c, double *r, double *u, int n)
  *                - from Numerical Recipes in C
  *                - solves for a vector u the tridiagonal linear set given by
  *                -    M.u = r
- *                - M is tridiagonal with a the sub diagonal, b the diagonal,
- *                - and c the super diagonal
- *                - a[0] and c[n-1] are unused
+ *                - M is tridiagonal with A the sub diagonal, B the diagonal,
+ *                - and C the super diagonal
+ *                - A[0] and C[n-1] are unused
  */
 
-int PM_block_tridi(double *a, double *b, double *c, double *u,
-		   int ns, int nb)
+int PM_block_tridi(const double *a, const double *b, const double *c,
+		   double *u, int ns, int nb)
    {int j, nss;
     PM_matrix ma, mb, mc, mu, *mx, *my, *mbi;
     extern PM_matrix *_PM_inverse(PM_matrix *b, PM_matrix *a);
 
     nss = ns*ns;
 
-    ma.nrow = ns;
-    ma.ncol = ns;
-    ma.array = a;
+    ma.nrow  = ns;
+    ma.ncol  = ns;
+    ma.array = (double *) a;
 
-    mb.nrow = ns;
-    mb.ncol = ns;
-    mb.array = b;
+    mb.nrow  = ns;
+    mb.ncol  = ns;
+    mb.array = (double *) b;
 
-    mc.nrow = ns;
-    mc.ncol = ns;
-    mc.array = c;
+    mc.nrow  = ns;
+    mc.ncol  = ns;
+    mc.array = (double *) c;
 
-    mu.nrow = ns;
-    mu.ncol = 1;
+    mu.nrow  = ns;
+    mu.ncol  = 1;
     mu.array = u;
 
     mbi = PM_create(ns, ns);
@@ -1051,7 +1052,7 @@ PM_matrix *PM_inverse(PM_matrix *a)
 
 /* PM_UPPER - return a matrix composed of the super diagonal part of a */
 
-PM_matrix *PM_upper(PM_matrix *a)
+PM_matrix *PM_upper(const PM_matrix *a)
    {int i, j, ncol, nrow;
     PM_matrix *u;
 
@@ -1079,7 +1080,7 @@ PM_matrix *PM_upper(PM_matrix *a)
 
 /* PM_LOWER - return a matrix composed of the sub diagonal part of a */
 
-PM_matrix *PM_lower(PM_matrix *a)
+PM_matrix *PM_lower(const PM_matrix *a)
    {int i, j, ncol, nrow;
     PM_matrix *l;
 
@@ -1131,8 +1132,8 @@ PM_matrix *PM_lower(PM_matrix *a)
  *          of the diagonal elements of U are stored.
  * ip    =  array of length n containing pivot information on output.
  *
- * The input arguments are: n, ml, mu, and B.
- * The output arguments are: B, ip.
+ * The input arguments are: N, ML, MU, and B.
+ * The output arguments are: B, IP.
  *
  *  reference: A. C. Hindmarsh, Banded Linear Systems with Pivoting,
  *  Lawrence Livermore Laboratory Report UCID-30060, rev. 1, May 1976.
@@ -1221,17 +1222,16 @@ PM_matrix *PM_decb(int n, int ml, int mu, PM_matrix *b, int *ip)
 
 /* PM_SOLB - banded solver with PM_DECB
  *
- *  this subroutine computes the solution of the banded linear system
- *  a*x = c , given the lu decomposition of the matrix a from decbr.
- *  y    =  right-hand vector c, of length n, on input,
- *       =  solution vector x on output.
+ *  compute the solution of the banded linear system
+ *  A*x = C , given the LU decomposition, B, of the matrix A from decbr.
+ *  y   =  right-hand vector C, of length n, on input,
+ *      =  solution vector x on output.
  *  all other arguments are as described in decbr.
  *  all the arguments are input arguments.
- *  the output argument is  y.
+ *  the output argument is Y.
  *
- *  reference.. a. c. hindmarsh, banded linear systems with pivoting,
- *  lawrence livermore laboratory report ucid-30060, rev. 1, may 1976.
- *
+ *  reference: A. C. Hindmarsh, Banded Linear Systems with Pivoting,
+ *  Lawrence Livermore Laboratory Report UCID-30060, rev. 1, May 1976.
  */
 
 PM_matrix *PM_solb(int n, int ml, int mu,
@@ -1240,11 +1240,14 @@ PM_matrix *PM_solb(int n, int ml, int mu,
     int i, nr, nb, ll, ip, kk;
     double dp, xx;
 
-    if (n != 1)
+    if (n == 1)
+       PM_element(y, 1, 1) = PM_element(y, 1, 1)*PM_element(b, 1, 1);
+
+    else
        {n1 = n - 1;
         ll = ml + mu + 1;
-/*
- * if ml = 0, skip the first backsolution phase.
+
+/* if ml = 0, skip the first backsolution phase.
  * apply permutation and l multipliers to y.
  */
         if (ml != 0)
@@ -1276,11 +1279,9 @@ PM_matrix *PM_solb(int n, int ml, int mu,
             for (i = 1; i <= kk; i++)
                 {idummy = idummy + i*i;
                  dp = dp + PM_element(b, i+1, nr)*PM_element(y, nr+i, 1);};
-            PM_element(y, nr, 1) = (PM_element(y, nr, 1) - dp) *
-                                  PM_element(b, 1, nr);};
-        return(y);};
 
-    PM_element(y, 1, 1) = PM_element(y, 1, 1)*PM_element(b, 1, 1);
+            PM_element(y, nr, 1) = (PM_element(y, nr, 1) - dp) *
+	                           PM_element(b, 1, nr);};}
 
     return(y);}
 
@@ -1289,7 +1290,7 @@ PM_matrix *PM_solb(int n, int ml, int mu,
 
 /* PM_PRINT - print the given matrix a */
 
-PM_matrix *PM_print(PM_matrix *a)
+const PM_matrix *PM_print(const PM_matrix *a)
    {int i, j, ncol, nrow;
 
     if (a == NULL)

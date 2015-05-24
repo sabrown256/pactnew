@@ -25,8 +25,8 @@
  *              - where A = UWV - the SVD decomposition of A
  */
 
-int PM_svd_solve(double *u, double *w, double *v, int m, int n,
-		 double *b, double *x)
+int PM_svd_solve(const double *u, const double *w, const double *v,
+		 int m, int n, const double *b, double *x)
    {int i, j, k, ij, jk;
     double s;
     double *t;
@@ -171,7 +171,8 @@ static void _PM_svd_reduce(double **prv1, double *panrm,
 
 /* _PM_SVD_V - compute V the right-hand transformations */
 
-static void _PM_svd_v(double *v, double *a, int m, int n, double *rv1)
+static void _PM_svd_v(double *v, const double *a,
+		      int m, int n, const double *rv1)
    {int i, j, k, l, ii, ij, ik, il, ji, ki, kj;
     double g, s;
 
@@ -221,7 +222,7 @@ static void _PM_svd_v(double *v, double *a, int m, int n, double *rv1)
  *           - return them in A
  */
 
-static void _PM_svd_u(double *a, double *w, int m, int n)
+static void _PM_svd_u(double *a, const double *w, int m, int n)
    {int i, j, k, l, ii, ij, ki, kj, ji;
     double f, g, s;
 
@@ -434,7 +435,7 @@ int PM_svd_decompose(double *a, int m, int n, double *w, double *v)
  *            -   CS      the Chi^2 of the fit
  */
 
-int PM_svd_fit(double *x, double *y, double *sig, int np,
+int PM_svd_fit(const double *x, const double *y, const double *sig, int np,
 	       double *a, int ma,
 	       double *u, double *v, double *w, double *pcs,
 	       void (*fnc)(double x, double *f, int n))
@@ -498,7 +499,8 @@ int PM_svd_fit(double *x, double *y, double *sig, int np,
  *                   -   (V,W)  decompostion from PM_svd_fit
  */
 
-int PM_svd_covariance(double **v, int ma, double *w, double **cvm)
+int PM_svd_covariance(const double **v, int ma,
+		      const double *w, double **cvm)
    {int i, j, k;
     double c, *wti;
 

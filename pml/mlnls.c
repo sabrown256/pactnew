@@ -16,7 +16,7 @@
 
 /* _PM_SETTOL - set the tolerances */
 
-static void _PM_settol(int neqns, double *tol, double *x,
+static void _PM_settol(int neqns, double *tol, const double *x,
 		       double latol, double lrtol)
    {int i;
 
@@ -30,7 +30,7 @@ static void _PM_settol(int neqns, double *tol, double *x,
 
 /* _PM_WVNORM - weighted vector norm */
 
-static double _PM_wvnorm(int neqns, double *x, double *tol)
+static double _PM_wvnorm(int neqns, const double *x, const double *tol)
    {int i;
     double val, t;
 
@@ -74,7 +74,8 @@ static double _PM_wvnorm(int neqns, double *x, double *tol)
 
 double PM_newtondl(int neqns, double *y, double *dy, double *tol,
 		   int maxiter, double latol, double lrtol,
-                   void (*linsolv)(int neqns, double *dy, double *y, int iter, void *arg),
+                   void (*linsolv)(int neqns, double *dy, double *y,
+				   int iter, void *arg),
 		   void *arg)
    {int i, n, iter, rv;
     double err;
@@ -134,9 +135,11 @@ double PM_newtondl(int neqns, double *y, double *dy, double *tol,
  *             - the last iteration.
  */
 
-double PM_newtonul(int neqns, double *yb, double *ya, double *tol, int maxiter,
+double PM_newtonul(int neqns, double *yb, double *ya,
+		   double *tol, int maxiter,
 		   double latol, double lrtol,
-                   void (*linsolv)(int neqns, double *dy, double *y, int iter, void *arg),
+                   void (*linsolv)(int neqns, double *dy, double *y,
+				   int iter, void *arg),
                    void *arg)
    {int i, iter, n;
     double err, rv;

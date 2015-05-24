@@ -16,7 +16,7 @@
 
 /* _PM_LSQ - find least squares fit */
 
-PM_matrix *_PM_lsq(PM_matrix *a, PM_matrix *ay)
+PM_matrix *_PM_lsq(PM_matrix *a, const PM_matrix *ay)
    {PM_matrix *at, *b, *by;
 
     at = PM_transpose(a);
@@ -40,7 +40,8 @@ PM_matrix *_PM_lsq(PM_matrix *a, PM_matrix *ay)
  *            - ORDER is the order of the polynomial fit
  */
 
-double *PM_lsq_fit(int nd, int n, double **x, double *dextr, int order)
+double *PM_lsq_fit(int nd, int n, const double **x,
+		   const double *dextr, int order)
    {int i, k, aord;
     double acc, xc;
     PM_matrix *a, *ay, *cf;
@@ -78,7 +79,8 @@ double *PM_lsq_fit(int nd, int n, double **x, double *dextr, int order)
  *                   - on the domain defined by DEXTR
  */
 
-double **PM_lsq_polynomial(int n, int ord, double *cf, double *dextr)
+double **PM_lsq_polynomial(int n, int ord, const double *cf,
+			   const double *dextr)
    {int i, ic, nc;
     double xc, dxc, xpi, acc;
     double **p;

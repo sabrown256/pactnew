@@ -15,8 +15,9 @@
 
 /* MATMUL - computes w = M.x */
  
-static void matmul(double *a0, double *a1, double *b0, double *b1,
-		   double *bm1, double *x, double *w, int km, int lm)
+static void matmul(const double *a0, double *a1,
+		   const double *b0, double *b1, double *bm1,
+		   const double *x, double *w, int km, int lm)
    {int i, klm;
     double a10, bm10, b10;
 
@@ -52,8 +53,8 @@ static void matmul(double *a0, double *a1, double *b0, double *b1,
 
 /* FORWARD - solves L*w = y */
 
-static void forward(double *d, double *a1, double *y, double *w,
-		    int nblocks, int step, int km)
+static void forward(const double *d, const double *a1, const double *y,
+		    double *w, int nblocks, int step, int km)
    {int i, j, lastbl;
 
 /* pointer to beginning of last block to be processed */
@@ -75,8 +76,8 @@ static void forward(double *d, double *a1, double *y, double *w,
 
 /* BACKWARD - solves DLt*x = w */
 
-static void backward(double *d, double *a1, double *w, double *x,
-		     int nblocks, int step, int km)
+static void backward(const double *d, const double *a1, const double *w,
+		     double *x, int nblocks, int step, int km)
    {int i, j, jmax, lastbl;
 
 /* pointer to beginning of last block to be processed */
@@ -99,10 +100,11 @@ static void backward(double *d, double *a1, double *w, double *x,
 
 /* ALTWS - compute next level of w's, the wtildes, for the solve */
  
-static void altws(double *wk, double *b0km1, double *b1km1, double *bm1km1,
-		  double *tkm1, double *b0k, double *b1k, double *bm1k,
-		  double *tkp1, double *wtilde, int nblkslo,
-		  int nblkshi, int km)
+static void altws(const double *wk, const double *b0km1, double *b1km1,
+		  const double *bm1km1,
+		  const double *tkm1, const double *b0k, const double *b1k,
+		  double *bm1k, const double *tkp1, double *wtilde,
+		  int nblkslo, int nblkshi, int km)
    {int i, j, jj, kmt, lastnblo, lastnbhi;
     double b1km10, bm1k0;
 
@@ -140,7 +142,7 @@ static void altws(double *wk, double *b0km1, double *b1km1, double *bm1km1,
  *        - of xk (=x at level kq), for k even
  */
  
-static void movexe(double *xk, double *xtilde, int nblocks, int km)
+static void movexe(double *xk, const double *xtilde, int nblocks, int km)
    {int i, j, jj, kmt, lastnewb;
 
 /* pointer to beginning of last new block */
@@ -159,9 +161,11 @@ static void movexe(double *xk, double *xtilde, int nblocks, int km)
 
 /* FORMT1 - compute intermediate term in backward solve */
  
-static void formt1(double *b0k, double *b1k, double *bm1k, double *xkp1,
-		   double *b0km1, double *b1km1, double *bm1km1,
-		   double *xkm1, double *q, int nblocks, int km)
+static void formt1(const double *b0k, const double *b1k,
+		   double *bm1k, const double *xkp1,
+		   const double *b0km1, double *b1km1,
+		   const double *bm1km1, const double *xkm1,
+		   double *q, int nblocks, int km)
    {int i, j, lastbl, kmt;
     double b1km10, bm1k0;
 
@@ -202,8 +206,9 @@ static void formt1(double *b0k, double *b1k, double *bm1k, double *xkp1,
  *         - kept distinct here for purposes of clarity.
  */
 
-static void tssolve(double *x, double *y, double *d, double *a1,
-		    double *b0, double *b1, double *bm1, double *w, double *q,
+static void tssolve(double *x, const double *y, const double *d,
+		    const double *a1, const double *b0,
+		    double *b1, double *bm1, double *w, double *q,
 		    int ks, int km, int lm)
    {int nob[15], neb[15], ibo[15], ibe[15], inl[15];
     int i, kq, nevenb, inextlev, levlen, noddb, ibegino, ibegine;
@@ -305,9 +310,12 @@ static void tssolve(double *x, double *y, double *d, double *a1,
 
 /* _PM_GCG - do generalized conjugate gradient solution phase */
 
-static double _PM_gcg(double *a0, double *a1, double *b0, double *b1, double *bm1,
-		      double *x, double *y, double *w, double *d, double *r,
-		      double *q, double *p, int km, int lm, int neq,
+static double _PM_gcg(const double *a0, double *a1,
+		      const double *b0, double *b1, double *bm1,
+		      double *x, const double *y,
+		      double *w, const double *d, double *r,
+		      double *q, double *p,
+		      int km, int lm, int neq,
 		      int ks, int maxit, double eps)
    {int i, iter, exflag;
     double yabsum, dotr, dotp, dotprev, aa, pnorm, rerr, xerr, b;
@@ -400,7 +408,8 @@ static double _PM_gcg(double *a0, double *a1, double *b0, double *b1, double *bm
  *          - no check is made for small denominators.
  */
 
-static void tsdecomp(double *a0, double *a1, double *d, int nblocks,
+static void tsdecomp(const double *a0, const double *a1,
+		     double *d, int nblocks,
 		     int step, int km)
    {int i, j, lastbl;
 
@@ -424,8 +433,9 @@ static void tsdecomp(double *a0, double *a1, double *d, int nblocks,
 
 /* GENCEES - generate the arrays c0 and cm1 */
 
-static void gencees(double *b0, double *b1, double *bm1,
-		    double *a1, double *d, double *c0, double *cm1,
+static void gencees(const double *b0, const double *b1, const double *bm1,
+		    const double *a1, const double *d,
+		    double *c0, double *cm1,
 		    int nblocks, int km)
    {int i, j, lastbl, kmt;
 
@@ -456,10 +466,12 @@ static void gencees(double *b0, double *b1, double *bm1,
 
 /* ALTEVENS - */
 
-static void altevens(double *a0k, double *a1k, double *c0km1,
-		     double *c1km1, double *cm1km1, double *dkm1,
-		     double *c0k, double *c1k, double *cm1k,
-		     double *dkp1, double *a0tild, double *a1tild,
+static void altevens(const double *a0k, const double *a1k,
+		     const double *c0km1, const double *c1km1,
+		     const double *cm1km1, const double *dkm1,
+		     const double *c0k, const double *c1k,
+		     const double *cm1k, const double *dkp1,
+		     double *a0tild, double *a1tild,
 		     int nbkm1, int nbkkp1, int km)
    {int i, j, jj, lastnewb, lastaltb, kmt;
 
@@ -526,10 +538,12 @@ static void altevens(double *a0k, double *a1k, double *c0km1,
 
 /* GENBEES - generate the arrays b0tild, b1tild, and bm1tild */
 
-static void genbees(double *c0kp1, double *c1kp1, double *cm1kp1,
-		    double *c0k, double *c1k, double *cm1k,
-		    double *dkp1, double *b0tild, double *b1tild,
-		    double *bm1tild, int nblocks, int km)
+static void genbees(const double *c0kp1, const double *c1kp1,
+		    const double *cm1kp1,
+		    const double *c0k, const double *c1k,
+		    const double *cm1k, const double *dkp1,
+		    double *b0tild, double *b1tild, double *bm1tild,
+		    int nblocks, int km)
    {int i, j, jj, lastnewb, kmt;
 
     kmt = 2*km;
@@ -642,7 +656,7 @@ static int _PM_icd_cr(double *a0, double *a1, double *b0, double *b1,
  *        - this is outside of the matrix package style presently
  */
 
-double PM_dot(double *x, double *y, int n)
+double PM_dot(const double *x, const double *y, int n)
    {int i;
     double dot;
 
@@ -658,7 +672,7 @@ double PM_dot(double *x, double *y, int n)
 
 double _PM_iccg_v(int km, int lm, double eps, int ks, int maxit,
 		  double *a0, double *a1, double *b0, double *b1, double *bm1,
-		  double *x, double *y)
+		  double *x, const double *y)
    {int j, numaux, neq, nw;
     double *a0s, *d, *p, *r, *q;
     double *di, *c1, *cm1;
@@ -798,8 +812,9 @@ double _PM_iccg_v(int km, int lm, double eps, int ks, int maxit,
  */
  
 double PM_iccg(int km, int lm, double eps, int ks, int maxit,
-	       double *a0, double *a1, double *b0, double *b1, double *bm1,
-	       double *x, double *y)
+	       const double *a0, const double *a1,
+	       const double *b0, const double *b1, const double *bm1,
+	       double *x, const double *y)
    {double rv;
 
 #ifdef CRAY

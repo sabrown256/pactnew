@@ -156,11 +156,13 @@ struct s_complex
 /* MLFFT.C declarations */
 
 extern complex
- *PM_uniform_complex_y(int no, double *xo, int ni, double *xi, complex *yi),
+ *PM_uniform_complex_y(int no, double *xo,
+		       int ni, const double *xi, const complex *yi),
  *PM_fft_sc_real(double *x, int n, int flag);
 
 extern int
- PM_fft_sc_real_data(complex **pyo, double **pxo, double *xi, double *yi,
+ PM_fft_sc_real_data(complex **pyo, double **pxo,
+		     const double *xi, const double *yi,
 		     int ni, double xmn, double xmx, int ordr),
  PM_fft_sc_complex_data(complex **pyo, double **pxo, double *xi,
 			complex *yi, int ni, double xmn, double xmx,

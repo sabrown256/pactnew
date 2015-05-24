@@ -326,8 +326,8 @@ struct s_PM_sp_lin_sys
     double **x;
     PM_sp_lin_sys *next;
     void (*pre)(PM_sp_lin_sys *sls);
-    void (*cmp_Ap)(double *Ax, PM_sp_lin_sys *sls, double *x);
-    void (*cmp_Lr)(double *Lr, PM_sp_lin_sys *sls, double *r);};
+    void (*cmp_Ap)(double *Ax, const PM_sp_lin_sys *sls, const double *x);
+    void (*cmp_Lr)(double *Lr, const PM_sp_lin_sys *sls, const double *r);};
 
 
 /* C_ARRAY - define an encapulated vector/array type
@@ -717,11 +717,12 @@ extern PM_scope_public
 extern PM_sp_lin_sys
  *PM_mk_sp_lin_sys(int sz, int n_rhs, int n_ods, int sym, int trans,
 		   void (*pre)(PM_sp_lin_sys *sls),
-		   void (*clr)(double *Lr, PM_sp_lin_sys *sls, double *r));
+		   void (*clr)(double *Lr, const PM_sp_lin_sys *sls,
+			       const double *r));
 
 extern void
  PM_iccg_pre(PM_sp_lin_sys *sls),
- PM_iccg_cmp_Lr(double *Lr, PM_sp_lin_sys *sls, double *r),
+ PM_iccg_cmp_Lr(double *Lr, const PM_sp_lin_sys *sls, const double *r),
  PM_set_sls_coef(PM_sp_lin_sys *sls, int i, int j, double a),
  PM_rl_sp_lin_sys(PM_sp_lin_sys *sls);
 
@@ -798,16 +799,19 @@ extern int
 
 extern double
  *PM_uniform_real_x(int no, double xmin, double xmax, int flag),
- *PM_uniform_real_y(int no, double *xo, int ni, double *xi, double *yi);
+ *PM_uniform_real_y(int no, double *xo,
+		    int ni, const double *xi, const double *yi);
 
 extern int
  PM_near_power(int n, int a),
  PM_next_exp_two(int n),
  PM_next_power_two(int n),
- PM_fft_sc_real_simul(double *fx1, double *fx2, double *fw1, double *fw2, int n),
+ PM_fft_sc_real_simul(double *fx1, double *fx2,
+		      double *fw1, double *fw2, int n),
  PM_convolve(double *gx, double *gy, int gn, double *hx, double *hy, int hn,
 	     double dt, double **pxr, double **pyr, int *pnr),
- PM_convolve_logical(double *g, int n, double *h, int m, int isign, double *cnv);
+ PM_convolve_logical(double *g, int n, double *h, int m,
+		     int isign, double *cnv);
 
 
 /* MLFPE.C declarations */
@@ -888,9 +892,10 @@ extern double
 
 extern double
  PM_iccg(int km, int lm, double eps, int ks, int maxit,
-	 double *a0, double *a1, double *b0, double *b1, double *bm1,
-	 double *x, double *y),
- PM_dot(double *x, double *y, int n);
+	 const double *a0, const double *a1,
+	 const double *b0, const double *b1, const double *bm1,
+	 double *x, const double *y),
+ PM_dot(const double *x, const double *y, int n);
 
 
 /* MLINTM.C declarations */
@@ -958,8 +963,8 @@ extern double
 /* MLLSQ.C declarations */
 
 extern double
- *PM_lsq_fit(int nd, int n, double **x, double *dextr, int ord),
- **PM_lsq_polynomial(int n, int ord, double *cf, double *dextr);
+ *PM_lsq_fit(int nd, int n, const double **x, const double *dextr, int ord),
+ **PM_lsq_polynomial(int n, int ord, const double *cf, const double *dextr);
 
 
 /* MLMATH.C declarations */
@@ -1014,19 +1019,21 @@ extern double
 extern PM_matrix
  *PM_create(int nrow, int ncol),
  *PM_transpose(PM_matrix *a),
- *PM_times(PM_matrix *a, PM_matrix *b),
- *PM_plus(PM_matrix *a, PM_matrix *b),
- *PM_minus(PM_matrix *a, PM_matrix *b),
+ *PM_times(const PM_matrix *a, const PM_matrix *b),
+ *PM_plus(const PM_matrix *a, const PM_matrix *b),
+ *PM_minus(const PM_matrix *a, const PM_matrix *b),
  *PM_zero(PM_matrix *a),
  *PM_ident(PM_matrix *a),
- *PM_copy(PM_matrix *to, PM_matrix *from),
- *PM_print(PM_matrix *a);
+ *PM_copy(PM_matrix *to, const PM_matrix *from);
+
+extern const PM_matrix
+ *PM_print(const PM_matrix *a);
 
 extern double
  *PM_matrix_done(PM_matrix *mp);
 
 extern int
- PM_is_zero(PM_matrix *a),
+ PM_is_zero(const PM_matrix *a),
  PM_destroy(PM_matrix *mp),
  PM_sort_on_col(PM_matrix *a, int col);
 
@@ -1317,8 +1324,10 @@ extern int
  PM_block_tridi_nf(double *af, double *a, double *b, double *c,
 		   double *cl, double *u,
 		   int nf, int nb, int nl, int ns, int *lnbrs),
- PM_block_tridi(double *a, double *b, double *c, double *u, int ns, int nb),
- PM_tridi(double *a, double *b, double *c, double *r, double *u, int n);
+ PM_block_tridi(const double *a, const double *b, const double *c,
+		double *u, int ns, int nb),
+ PM_tridi(const double *a, const double *b, const double *c,
+	  const double *r, double *u, int n);
 
 extern double
  PM_determinant(PM_matrix *a);
@@ -1329,8 +1338,8 @@ extern PM_matrix
  *PM_decompose(PM_matrix *a, int *ips, int flag),
  *PM_sol(PM_matrix *ul, PM_matrix *b, int *ips, int flag),
  *PM_inverse(PM_matrix *a),
- *PM_upper(PM_matrix *a),
- *PM_lower(PM_matrix *a),
+ *PM_upper(const PM_matrix *a),
+ *PM_lower(const PM_matrix *a),
  *PM_decb(int n, int ml, int mu, PM_matrix *b, int *ip),
  *PM_solb(int n, int ml, int mu, 
 	  PM_matrix *b, PM_matrix *y, int *ips);
@@ -1368,14 +1377,14 @@ extern double
 /* MLSVD.C declarations */
 
 extern int
- PM_svd_solve(double *u, double *w, double *v, int m, int n,
-	      double *b, double *x),
+ PM_svd_solve(const double *u, const double *w, const double *v,
+	      int m, int n, const double *b, double *x),
  PM_svd_decompose(double *a, int m, int n, double *w, double *v),
- PM_svd_fit(double *x, double *y, double *sig, int np,
+ PM_svd_fit(const double *x, const double *y, const double *sig, int np,
 	    double *a, int ma,
 	    double *u, double *v, double *w, double *pcs,
 	    void (*fnc)(double x, double *f, int n)),
- PM_svd_covariance(double **v, int ma, double *w, double **cvm);
+ PM_svd_covariance(const double **v, int ma, const double *w, double **cvm);
 
 
 /* MLVND.c declarations */
