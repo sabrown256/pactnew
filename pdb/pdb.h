@@ -940,7 +940,7 @@ extern int
  PD_autofix_denorm(PDBfile *file, int flag);
  
 extern pboolean
- PD_copy_type(PDBfile *sf, PDBfile *df, const char *type),
+ PD_copy_type(const PDBfile *sf, PDBfile *df, const char *type),
  PD_write(PDBfile *file, const char *name, const char *type, void *vr),
  PD_write_as(PDBfile *file, const char *name,
              const char *intype, const char *outtype, void *vr),
@@ -1008,13 +1008,13 @@ extern int
 /* PDBMM.C declarations */
 
 extern syment
- *PD_copy_syment(syment *osym);
+ *PD_copy_syment(const syment *osym);
 
 extern memdes
- *PD_copy_members(memdes *desc);
+ *PD_copy_members(const memdes *desc);
 
 extern dimdes
- *PD_copy_dims(dimdes *odims);
+ *PD_copy_dims(const dimdes *odims);
 
 extern void
  *PD_alloc_entry(PDBfile *file, char *name);
@@ -1196,7 +1196,7 @@ extern int
 /* PDLOW.C declarations */
 
 extern dimdes
- *PD_entry_dimensions(syment *ep);
+ *PD_entry_dimensions(const syment *ep);
 
 extern defstr
  *PD_inquire_type(const PDBfile *file, const char *name),
@@ -1204,7 +1204,7 @@ extern defstr
 
 extern char
  *PD_get_file_name(const PDBfile *file),
- *PD_entry_type(syment *ep),
+ *PD_entry_type(const syment *ep),
  *PD_get_error(void);
 
 extern PD_major_op
@@ -1219,7 +1219,7 @@ extern int64_t
  PD_get_buffer_size(void),
  PD_set_buffer_size(int64_t v),
  PD_entry_set_address(syment *ep, int64_t a),
- PD_entry_address(syment *ep),
+ PD_entry_address(const syment *ep),
  PD_get_file_length(const PDBfile *file),
  PD_get_max_file_size(const PDBfile *file),
  PD_set_max_file_size(PDBfile *file, int64_t v);
@@ -1237,8 +1237,8 @@ extern int
  PD_set_track_pointers(PDBfile *file, int v),
  PD_get_fmt_version(void),
  PD_set_fmt_version(int v),
- PD_entry_number(syment *ep),
- PD_entry_n_dimensions(syment *ep),
+ PD_entry_number(const syment *ep),
+ PD_entry_n_dimensions(const syment *ep),
  PD_type_size(defstr *dp),
  PD_type_alignment(defstr *dp),
  PD_type_n_indirects(defstr *dp);

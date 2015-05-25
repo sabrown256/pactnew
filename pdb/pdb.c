@@ -197,7 +197,7 @@ PDBfile *PD_open_vif(const char *name)
  * #bind PD_copy_type fortran() scheme() python()
  */
 
-pboolean PD_copy_type(PDBfile *sf, PDBfile *df, const char *type)
+pboolean PD_copy_type(const PDBfile *sf, PDBfile *df, const char *type)
    {int rv;
     defstr *dp;
     memdes *lst;

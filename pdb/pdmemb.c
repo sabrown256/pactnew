@@ -320,9 +320,9 @@ long _PD_member_items(const char *s)
  *              - of a variable
  */
 
-long _PD_comp_num(dimdes *dims)
+long _PD_comp_num(const dimdes *dims)
    {long acc;
-    dimdes *lst;
+    const dimdes *lst;
 
     for (acc = 1L, lst = dims; lst != NULL; lst = lst->next)
         {acc *= (long) (lst->number);};

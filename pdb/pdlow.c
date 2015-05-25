@@ -848,7 +848,7 @@ int64_t PD_entry_set_address(syment *ep, int64_t addr)
  * #bind PD_entry_address fortran() scheme() python()
  */
 
-int64_t PD_entry_address(syment *ep)
+int64_t PD_entry_address(const syment *ep)
    {int64_t addr;
 
     addr = _PD_entry_get_address(ep, 0);
@@ -1850,7 +1850,7 @@ char *PD_get_file_name(const PDBfile *file ARG(,,cls))
  * #bind PD_entry_type fortran() scheme() python()
  */
 
-char *PD_entry_type(syment *ep)
+char *PD_entry_type(const syment *ep)
    {char *rv;
 
     if (ep != NULL)
@@ -1868,7 +1868,7 @@ char *PD_entry_type(syment *ep)
  * #bind PD_entry_number fortran() scheme() python()
  */
 
-int PD_entry_number(syment *ep)
+int PD_entry_number(const syment *ep)
    {int rv;
 
     if (ep != NULL)
@@ -1886,7 +1886,7 @@ int PD_entry_number(syment *ep)
  * #bind PD_entry_n_dimensions fortran() scheme() python()
  */
 
-int PD_entry_n_dimensions(syment *ep)
+int PD_entry_n_dimensions(const syment *ep)
    {int nd;
     dimdes *pd;
 
@@ -1907,7 +1907,7 @@ int PD_entry_n_dimensions(syment *ep)
  * #bind PD_entry_dimensions fortran() scheme() python()
  */
 
-dimdes *PD_entry_dimensions(syment *ep)
+dimdes *PD_entry_dimensions(const syment *ep)
    {dimdes *rv;
 
     if (ep != NULL)

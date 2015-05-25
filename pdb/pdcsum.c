@@ -250,7 +250,7 @@ int _PD_cksum_block_read(PDBfile *file, const char *name,
  *                       - return the TRUE iff successful
  */ 
  
-int _PD_cksum_block_write(PDBfile *file, syment *ep, long n)
+int _PD_cksum_block_write(PDBfile *file, const syment *ep, long n)
    {int rv;
     inti ni;
     intb bpi;

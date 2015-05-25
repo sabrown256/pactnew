@@ -388,7 +388,7 @@ data_standard *_PD_mk_standard(PDBfile *file)
  *                   - return a copy of the given data_standard
  */
 
-data_standard *_PD_copy_standard(data_standard *src)
+data_standard *_PD_copy_standard(const data_standard *src)
    {int i, j, n;
     int *ostd, *osrc;
     long *fstd, *fsrc;
@@ -457,7 +457,7 @@ void _PD_rl_standard(data_standard *std)
  *                    - return a copy of a data_alignment
  */
 
-data_alignment *_PD_copy_alignment(data_alignment *src)
+data_alignment *_PD_copy_alignment(const data_alignment *src)
    {data_alignment *align;
 
     align = CMAKE(data_alignment);
@@ -487,8 +487,9 @@ void _PD_rl_alignment(data_alignment *align)
  * #bind PD_copy_dims fortran() scheme() python()
  */
 
-dimdes *PD_copy_dims(dimdes *odims)
-   {dimdes *od, *ndims, *prev, *next;
+dimdes *PD_copy_dims(const dimdes *odims)
+   {dimdes *ndims, *prev, *next;
+    const dimdes *od;
 
     prev  = NULL;
     ndims = NULL;
@@ -516,7 +517,7 @@ dimdes *PD_copy_dims(dimdes *odims)
  * #bind PD_copy_syment fortran() scheme() python()
  */
 
-syment *PD_copy_syment(syment *osym)
+syment *PD_copy_syment(const syment *osym)
    {char *ntype;
     syment *nsym;
     dimdes *ndims;
@@ -706,7 +707,7 @@ defstr *_PD_mk_defstr(hasharr *chrt, const char *type, SC_kind kind,
 
 /* _PD_DEFSTR_COPY - make a deep copy of a defstr */
 
-defstr* _PD_defstr_copy(defstr *dp)
+defstr* _PD_defstr_copy(const defstr *dp)
    {int *order;
     long *format;
     defstr *copy;
@@ -820,7 +821,7 @@ multides *_PD_make_tuple(const char *type, int ni, int *ord)
 
 /* _PD_COPY_TUPLE - copy a multides */
 
-multides *_PD_copy_tuple(multides *tuple)
+multides *_PD_copy_tuple(const multides *tuple)
    {multides *ntuple;
 
     ntuple = CMAKE(multides);
@@ -858,9 +859,10 @@ void _PD_free_tuple(multides *tuple)
  * #bind PD_copy_members fortran() scheme() python()
  */
 
-memdes *PD_copy_members(memdes *desc)
+memdes *PD_copy_members(const memdes *desc)
    {inti is, ns;
-    memdes *newm, *nnxt, *thism, *prevm;
+    memdes *newm, *nnxt, *prevm;
+    const memdes *thism;
     char *ms, *ts, *bs, *ss, *cs;
     dimdes *nd;
 

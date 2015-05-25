@@ -280,7 +280,7 @@ extern PD_block_type
 extern void
  _PD_block_free(SC_array *bl),
  _PD_block_rel(syment *ep),
- _PD_block_copy(syment *nsym, syment *osym),
+ _PD_block_copy(syment *nsym, const syment *osym),
  _PD_block_switch(syment *ep, SC_array *bln),
  _PD_block_truncate(syment *ep, inti ni),
  _PD_block_get_desc(int64_t *paddr, inti *pni, SC_array *bl, inti n),
@@ -292,16 +292,15 @@ extern int
  _PD_block_set_valid(SC_array *bl, inti n, PD_block_type vl),
  _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, int64_t addr),
  _PD_block_define(PDBfile *file),
- _PD_block_cksum_write(PDBfile *file, syment *ep, char *name),
+ _PD_block_cksum_write(PDBfile *file, const syment *ep, const char *name),
  _PD_block_cksum_read(PDBfile *file);
 
 extern inti
- _PD_effective_addr(int64_t *paddr, inti *pni,
-		    intb bpi, SC_array *da),
+ _PD_effective_addr(int64_t *paddr, inti *pni, intb bpi, SC_array *da),
  _PD_block_get_number(SC_array *bl, inti n),
  _PD_block_set_number(SC_array *bl, inti n, inti ni),
- _PD_n_blocks(syment *ep),
- _PD_block_find(PDBfile *file, syment *ep, int64_t addr);
+ _PD_n_blocks(const syment *ep),
+ _PD_block_find(PDBfile *file, const syment *ep, int64_t addr);
 
 extern int64_t
  _PD_block_get_address(SC_array *bl, inti n),
@@ -315,10 +314,10 @@ extern PDBfile
 	     sys_layer *sys, tr_layer *tr);
 
 extern data_standard
- *_PD_copy_standard(data_standard *std);
+ *_PD_copy_standard(const data_standard *std);
 
 extern data_alignment
- *_PD_copy_alignment(data_alignment *align);
+ *_PD_copy_alignment(const data_alignment *align);
 
 extern data_standard
  *_PD_mk_standard(PDBfile *file);
@@ -328,7 +327,7 @@ extern syment
 		symindir *indr, dimdes *dims);
 
 extern defstr
- *_PD_defstr_copy(defstr *dp),
+ *_PD_defstr_copy(const defstr *dp),
  *_PD_mk_defstr(hasharr *chrt, const char *type, SC_kind kind,
 		memdes *lst, multides *tuple,
 		long sz, int align, PD_byte_order ord, int conv,
@@ -336,7 +335,7 @@ extern defstr
 
 extern multides
  *_PD_make_tuple(const char *type, int ni, int *ord),
- *_PD_copy_tuple(multides *tuple);
+ *_PD_copy_tuple(const multides *tuple);
 
 extern memdes
  *_PD_mk_descriptor(char *member, int defoff);
@@ -427,7 +426,7 @@ extern int
 		   syment *ep, void *vr),
  _PD_cksum_var_write(PDBfile *file, char *name, syment *ef),
  _PD_cksum_block_read(PDBfile *file, const char *name, syment *ep, long n),
- _PD_cksum_block_write(PDBfile *file, syment *ep, long n),
+ _PD_cksum_block_write(PDBfile *file, const syment *ep, long n),
  _PD_cksum_reserve(PDBfile *file),
  _PD_cksum_file_write(PDBfile *file);
 
@@ -579,7 +578,7 @@ extern defstr
 
 extern long
  _PD_member_items(const char *s),
- _PD_comp_num(dimdes *dims),
+ _PD_comp_num(const dimdes *dims),
  _PD_comp_nind(int nd, long *ind, int str),
  _PD_str_size(memdes *str, hasharr *tab),
  _PD_lookup_size(const char *s, hasharr *tab);

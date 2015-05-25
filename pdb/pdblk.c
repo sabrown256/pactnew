@@ -294,7 +294,7 @@ int _PD_block_set_valid(SC_array *bl, inti n, PD_block_type vl)
 
 /* _PD_N_BLOCKS - return the number of blocks for the entry EP */
 
-inti _PD_n_blocks(syment *ep)
+inti _PD_n_blocks(const syment *ep)
    {inti n;
 
     n = SC_array_get_n(ep->blocks);
@@ -305,7 +305,7 @@ inti _PD_n_blocks(syment *ep)
 /*--------------------------------------------------------------------------*/
 
 /* _PD_BLOCK_GET_CKSUM - return the checksum of the Nth block of BL in DIG
- *                    - return TRUE iff successful
+ *                     - return TRUE iff successful
  */
 
 int _PD_block_get_cksum(SC_array *bl, inti n, unsigned char *dig)
@@ -355,9 +355,11 @@ int _PD_block_set_cksum(SC_array *bl, inti n, unsigned char *dig)
  *                     - the changing dimension
  */
    
-static int _PD_consistent_dims(PDBfile *file, syment *ep, dimdes *ndims)
+static int _PD_consistent_dims(PDBfile *file, syment *ep,
+			       const dimdes *ndims)
    {int rv;
-    dimdes *odims, *od, *nd;
+    dimdes *odims, *od;
+    const dimdes *nd;
 
     if ((file == NULL) || (ep == NULL) || (ndims == NULL))
        rv = FALSE;
@@ -462,7 +464,7 @@ int _PD_block_add(PDBfile *file, syment *ep, dimdes *dims, int64_t addr)
  *                - contains the address ADDR
  */
 
-inti _PD_block_find(PDBfile *file, syment *ep, int64_t addr)
+inti _PD_block_find(PDBfile *file, const syment *ep, int64_t addr)
    {inti i, n, start, stop;
     intb bpi;
     SC_array *bl;
@@ -511,7 +513,7 @@ SC_array *_PD_block_copy_seg(SC_array *bl, long imn, long imx)
 
 /* _PD_BLOCK_COPY - copy the block list of EPO into EPN */
 
-void _PD_block_copy(syment *epn, syment *epo)
+void _PD_block_copy(syment *epn, const syment *epo)
    {SC_array *spn, *spo;
 
     spo = epo->blocks;
@@ -646,7 +648,7 @@ int _PD_block_define(PDBfile *file)
  *                       - for the Checksums extra when closing the file
  */
 
-int _PD_block_cksum_write(PDBfile *file, syment *ep, char *name)
+int _PD_block_cksum_write(PDBfile *file, const syment *ep, const char *name)
    {int ok, st, ne;
     inti j, n;
     unsigned char dig[PD_CKSUM_LEN];
