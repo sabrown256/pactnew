@@ -542,7 +542,7 @@ Note $Log ""
       flog $Log pushd $tmpd
       Note $Log "DB_TYPES = `printenv DB_TYPES`"
 
-      flog $Log blang $opt -b $cbind:t -c $cproto:t -dv $cder:t $cdoc:t -f $fproto:t -w $fwrap:t -t $DB_TYPES
+      flog $Log blang $opt -b $cbind:t -c $cproto:t -dv $cder:t -d $cdoc:t -f $fproto:t -w $fwrap:t -t $DB_TYPES
       set xstatus = $status
 
 # move all fortran stuff to the fortran package

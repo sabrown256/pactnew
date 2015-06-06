@@ -22,8 +22,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CREATE - create a PDB file and return an initialized PDBfile
- *           - if successful else NULL
+/* PD_CREATE - Create a PDB file named NAME.
+ *           - Return an initialized PDBfile instance if successful
+ *           - otherwise return NULL.
  *
  * #bind PD_create fortran() scheme() python()
  */
@@ -45,9 +46,12 @@ PDBfile *PD_create(const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_OPEN - open an existing PDB file, extract the symbol table and
- *         - structure chart, and return a pointer to the PDB file
- *         - if successful else NULL
+/* PD_OPEN - Open an existing PDB file named NAME, extract the symbol table
+ *         - and structure chart.
+ *         - The file is opened in MODE which can be one of "r", "w", or "a"
+ *         - corresponding to read-only, write-only, or append respectively.
+ *         - Return a pointer to a PDBfile instance if successful
+ *         - otherwise return NULL.
  *
  * #bind PD_open scheme() python()
  */
@@ -69,8 +73,11 @@ PDBfile *PD_open(const char *name, const char *mode)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_OPEN_F - open a PDBfile, set the major_order and default_offset
- *           - appropriately for Fortran
+/* PD_OPEN_F - Open an existing PDB file named NAME, extract the symbol table
+ *           - and structure chart, and set the major_order and default_offset
+ *           - appropriately for Fortran usage.
+ *           - Return a pointer to a PDBfile instance if successful
+ *           - otherwise return NULL.
  *
  * #bind PD_open_f fortran(pd_open_f)
  */
@@ -88,8 +95,13 @@ PDBfile *PD_open_f(const char *name, const char *mode)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_FAMILY - return the next member of the file family if the given
- *           - file exceeds its maximum size
+/* PD_FAMILY - If the PDBfile OF exceeds its maximum size open the
+ *           - the next member of the file family.
+ *           - If FLAG is TRUE and a new file is opened, then the old
+ *           - file will be closed.
+ *           - Return a pointer to a PDBfile instance, either OF or the
+ *           - next file in the family sequence, if successful
+ *           - otherwise return NULL.
  *
  * #bind PD_family fortran() scheme() python()
  */
@@ -152,8 +164,9 @@ PDBfile *PD_family(PDBfile *of ARG(,,cls), int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_OPEN_VIF - open a virtual internal PDB file
- *             - return the VIF iff successful
+/* PD_OPEN_VIF - Open a virtual internal PDB file named NAME.
+ *             - Return an initialized PDBfile instance if successful
+ *             - otherwise return NULL.
  *
  * #bind PD_open_vif fortran() scheme() python()
  */
@@ -190,9 +203,9 @@ PDBfile *PD_open_vif(const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_COPY_TYPE - copy a TYPE definition from source file SF to
- *              - destination file DF
- *              - return TRUE iff successful
+/* PD_COPY_TYPE - Copy a data type, TYPE, definition from source file SF to
+ *              - destination file DF.
+ *              - Return TRUE iff successful.
  *
  * #bind PD_copy_type fortran() scheme() python()
  */
@@ -264,7 +277,7 @@ static int64_t _PD_close_wrk(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CLOSE - Close a PDB file after writing out the symbol table and
+/* PD_CLOSE - Close PDBfile FILE after writing out the symbol table and
  *          - structure chart.
  *          - Return TRUE if successful and FALSE otherwise.
  *
@@ -283,7 +296,7 @@ pboolean PD_close(PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CLOSE_N - Close a PDB file after writing out the symbol table and
+/* PD_CLOSE_N - Close PDBfile FILE after writing out the symbol table and
  *            - structure chart.
  *            - Return the file length if successful
  *            - and -1 otherwise.
@@ -301,13 +314,13 @@ int64_t PD_close_n(PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_FLUSH - dump the data description tables containing the current
- *          - state of the PDB file
- *          - the tables are:
+/* PD_FLUSH - Dump the metadata describing the contents of the PDBfile FILE.
+ *          - The metadata tables are:
  *          -    structure chart
  *          -    symbol table
  *          -    extras table
- *          - the table addresses are also updated
+ *          - The table addresses are also updated.
+ *          - Return TRUE iff successful.
  *          - NOTE: do not invoke PD_error in here because we do not
  *          - know whether we came in on a write or a close and therefore
  *          - do not know which jmpbuf to use
@@ -388,9 +401,9 @@ int _PD_read(PDBfile *file, char *fullpath, const char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_READ - read an entry from the PDB file pointed to by the
- *         - symbol table into the location pointed to by vr
- *         - return the number of item successfully read
+/* PD_READ - Read entry NAME from the PDBfile FILE
+ *         - into the location pointed to by VR.
+ *         - Return the number of items successfully read.
  *         -
  *         - NOTE: VR must be a pointer to an object with the type
  *         - given by TYPE (PDBLib will allocated space if necessary)!
@@ -408,10 +421,10 @@ int PD_read(PDBfile *file ARG(,,cls), const char *name, void *vr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_READ_AS - read an entry from the PDB file pointed to by the
- *            - symbol table into the location pointed to by vr
- *            - convert to type TYPE regardless of symbol entry type
- *            - return the number of item successfully read
+/* PD_READ_AS - Read entry NAME from the PDBfile FILE
+ *            - into the location pointed to by VR.
+ *            - Convert to type TYPE regardless of entry type.
+ *            - Return the number of items successfully read.
  *            -
  *            - NOTE: VR must be a pointer to an object with the type
  *            - given by TYPE (PDBLib will allocate space if necessary)!
@@ -456,18 +469,17 @@ int PD_read_as(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_READ_AS_DWIM - do a special PD_read_as on the variable NAME
- *                 - if the variable is a direct type read it normally
- *                 - if it is indirect do a PD_read_as but copy what
- *                 - PDB returns into the space provided by the caller
- *                 - this frees the caller from having to worry about
- *                 - indirections
- *                 - provided the number of items to be read and
- *                 - hence the size
- *                 - of SPACE is large enough to hold the data
- *                 - return the number of items successfully read
+/* PD_READ_AS_DWIM - A special variant of PD_read_as on the variable NAME.
+ *                 - If the variable is a direct type read it normally.
+ *                 - If it is indirect do a PD_read_as but copy what
+ *                 - the returned values into the space, SPACE.
+ *                 - This frees the caller from having to worry about
+ *                 - indirections provided the number of items to be read and
+ *                 - hence the size of SPACE is large enough to hold the data.
+ *                 - Return the number of items successfully read
  *                 - if less than NIX otherwise read NIX items and
- *                 - return -(number of items)
+ *                 - return minus the actual number of items.
+ *                 -
  *                 - NOTE: SPACE must be an object with the type
  *                 - given by TYPE (potenitally differs from the
  *                 - conventional PDB rule)
@@ -568,11 +580,11 @@ int PD_read_as_dwim(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_READ_ALT - read part of an entry from the PDB file pointed to by
- *             - the symbol table into the location pointed to by VR
+/* PD_READ_ALT - Read part of entry NAME from PDBfile FILE
+ *             - into the location pointed to by VR.
  *             - IND contains one triplet of long ints per variable
- *             - dimension specifying start, stop, and step for the index
- *             - return the number of item successfully read
+ *             - dimension specifying start, stop, and step for the index.
+ *             - Return the number of item successfully read.
  *             -
  *             - NOTE: VR must be a pointer to an object with the type
  *             - given by TYPE (PDBLib will allocated space if necessary)!
@@ -591,11 +603,12 @@ int PD_read_alt(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_READ_AS_ALT - read part of an entry from the PDB file pointed to by
- *                - the symbol table into the location pointed to by VR
+/* PD_READ_AS_ALT - Read part of entry NAME from the PDBfile FILE
+ *                - into the location pointed to by VR.
  *                - IND contains one triplet of long ints per variable
- *                - dimension specifying start, stop, and step for the index
- *                - return the number of item successfully read
+ *                - dimension specifying start, stop, and step for the index.
+ *                - Convert to type TYPE regardless of entry type.
+ *                - Return the number of items successfully read.
  *                -
  *                - NOTE: the entry MUST be an array (either a static
  *                - array or a pointer)
@@ -704,11 +717,11 @@ syment *_PD_defent(PDBfile *file, const char *name, const char *outtype,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFENT - define an entry in the PDB file symbol table and
- *           - stake out the disk space but write nothing
- *           - any dimensional information is the NAME string
- *           - return the new symbol table entry if successful, and
- *           - return NULL otherwise
+/* PD_DEFENT - Define an entry in the PDBfile, FILE, symbol table and
+ *           - reserve the disk space but write nothing out.
+ *           - All dimensional information is in the NAME string.
+ *           - Return the new symbol table entry if successful, and
+ *           - return NULL otherwise.
  *
  * #bind PD_defent fortran() scheme() python()
  */
@@ -733,13 +746,13 @@ syment *PD_defent(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFENT_ALT - define an entry in the PDB file symbol table and
- *               - stake out the disk space but write nothing
- *               - dimensional information is specified by the number
+/* PD_DEFENT_ALT - Define an entry in the PDBfile, FILE, symbol table and
+ *               - reserve the disk space but write nothing out.
+ *               - All dimensional information is specified by the number
  *               - of dimensions, ND, and the array of (min, max)
- *               - pairs of long ints in IND
- *               - return the new symbol table entry if successful, and
- *               - return NULL otherwise
+ *               - pairs of long ints in IND.
+ *               - Return the new symbol table entry if successful, and
+ *               - return NULL otherwise.
  *
  * #bind PD_defent_alt fortran() scheme() python()
  */
@@ -976,9 +989,10 @@ syment *_PD_write(PDBfile *file, const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE - write NUMBER VAR's of type TYPE to the PDB file, FILE
- *          - make an entry in the file's symbol table
- *          - return TRUE iff successful
+/* PD_WRITE - Make an entry in the symbol table of PDBfile FILE
+ *          - under NAME and write the data of type, TYPE, pointed to by VR
+ *          - to the file.
+ *          - Return TRUE iff successful.
  *          -
  *          - NOTE: VR must be a pointer to an object with the type
  *          - given by TYPE!!!!
@@ -997,10 +1011,11 @@ pboolean PD_write(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_AS - write NUMBER VAR's of type INTYPE to the PDB file, FILE
- *             - as type OUTTYPE
- *             - make an entry in the file's symbol table
- *             - return TRUE iff successful
+/* PD_WRITE_AS - Make an entry in the symbol table of PDBfile FILE
+ *             - under NAME, convert the data pointed to by VR from
+ *             - type INTYPE to type OUTTYPE and write the resulting data
+ *             - to the file.
+ *             - Return TRUE iff successful.
  *             -
  *             - NOTE: VR must be a pointer to an object with the type
  *             - given by TYPE!!!!
@@ -1054,13 +1069,13 @@ pboolean PD_write_as(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_ALT - write an entry of type TYPE to the PDB file, FILE
- *              - make an entry in the file's symbol table
- *              - return TRUE iff successful
- *              - the entry is named by NAME has ND dimensions and IND
- *              - contains the min and max (pairwise) of each dimensions
- *              - range
- *              - return the new syment if successful and NULL otherwise
+/* PD_WRITE_ALT - Make an entry in the symbol table of PDBfile FILE
+ *              - under NAME and write the data of type, TYPE, pointed
+ *              - to by VR to the file.
+ *              - The entry is named by NAME has ND dimensions and IND
+ *              - contains the min and max (pairwise) of each dimension's
+ *              - range.
+ *              - Return TRUE iff successful.
  *              -
  *              - NOTE: VR must be a pointer to an object with the type
  *              - given by TYPE!!!!
@@ -1079,13 +1094,13 @@ pboolean PD_write_alt(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_AS_ALT - write an entry of type INTYPE to the PDB file, FILE
- *                 - as type OUTTYPE
- *                 - make an entry in the file's symbol table
- *                 - return TRUE iff successful
- *                 - the entry has name, NAME, ND dimensions, and the ranges
- *                 - of the dimensions are given (min, max) pairwise in IND
- *                 - if successful and otherwise return NULL
+/* PD_WRITE_AS_ALT - Make an entry in the symbol table of PDBfile FILE
+ *                 - under NAME, convert the data pointed to by VR from
+ *                 - type INTYPE to type OUTTYPE and write the resulting data
+ *                 - to the file.
+ *                 - The entry has name, NAME, ND dimensions, and the ranges
+ *                 - of the dimensions are given (min, max) pairwise in IND.
+ *                 - Return TRUE iff successful.
  *                 -
  *                 - NOTE: VR must be a pointer to an object with the type
  *                 - given by TYPE!!!!
@@ -1165,7 +1180,10 @@ pboolean PD_write_as_alt(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_APPEND - append a new block of data to an existing entry
+/* PD_APPEND - Append a new block of data pointed to by VR
+ *           - to an existing entry named by NAME in PDBfile FILE .
+ *           - The dimensions of the new data are specified in NAME.
+ *           -
  *           - NOTE: VR must be a pointer to an object with the type
  *           - of the existing entry
  *
@@ -1187,8 +1205,12 @@ pboolean PD_append(PDBfile *file ARG(,,cls), const char *name, void *vr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_APPEND_AS - append a new block of data to an existing entry
- *              - convert from INTYPE to the type of the existing data
+/* PD_APPEND_AS - Append a new block of data pointed to by VR
+ *              - to an existing entry named by NAME in PDBfile FILE .
+ *              - The dimensions of the new data are specified in NAME.
+ *              - Convert the data from INTYPE to the type of the
+ *              - existing data in FILE.
+ *              -
  *              - NOTE: VR must be a pointer to an object with the type
  *              - of the existing entry
  *
@@ -1211,7 +1233,11 @@ pboolean PD_append_as(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_APPEND_ALT - append a new block of data to an existing entry
+/* PD_APPEND_ALT - Append a new block of data pointed to by VR
+ *               - to an existing entry named by NAME in PDBfile FILE .
+ *               - The new data has ND dimensions, and the ranges
+ *               - of the dimensions are given (min, max) pairwise in IND.
+ *               -
  *               - NOTE: VR must be a pointer to an object with the type
  *               - of the existing entry
  *
@@ -1234,8 +1260,13 @@ pboolean PD_append_alt(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_APPEND_AS_ALT - append a new block of data to an existing entry
- *                  - convert from INTYPE to the type of the existing data
+/* PD_APPEND_AS_ALT - Append a new block of data pointed to by VR
+ *                  - to an existing entry named by NAME in PDBfile FILE.
+ *                  - Convert the data from INTYPE to the type of the
+ *                  - existing data before writing to FILE.
+ *                  - The new data has ND dimensions, and the ranges
+ *                  - of the dimensions are given (min, max) pairwise in IND.
+ *                  -
  *                  - NOTE: VR must be a pointer to an object with the type
  *                  - of the existing entry
  *
@@ -1279,7 +1310,8 @@ void PD_set_io_hooks(int which)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ERROR - signal an error
+/* PD_ERROR - On error print the message S and longjmp to
+ *          - the recovery point specified by N.
  *
  * #bind PD_error fortran() scheme() python()
  */
@@ -1322,7 +1354,9 @@ void PD_error(const char *s, PD_major_op n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_FREE - free allocated memory recursively
+/* PD_FREE - Recursively free memory allocated by PDBLib.
+ *         - Such memory typically results from PD_read variant calls
+ *         - involving indirectly referenced data).
  *
  * #bind PD_free fortran() scheme() python()
  */
@@ -1401,9 +1435,10 @@ pboolean PD_free(PDBfile *file ARG(,,cls), const char *type, void *var)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_REMOVE_ENTRY - remove a syment from the given hash table
- *                 - return FALSE if the NAME'd entry does not exist
- *                 - return TRUE if successful
+/* PD_REMOVE_ENTRY - Remove the entry specified by NAME from symbol table
+ *                 - of the PDBfile FILE.
+ *                 - Return FALSE if the entry does not exist and
+ *                 - return TRUE if successful.
  *
  * #bind PD_remove_entry fortran() scheme() python()
  */
@@ -1434,10 +1469,12 @@ pboolean PD_remove_entry(PDBfile *file ARG(,,cls), const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_AUTOFIX_DENORM - if flag is TRUE, turn it on
+/* PD_AUTOFIX_DENORM - Set the fix denorm flag in PDBfile FILE.
+ *                   - If flag is TRUE, turn it on
  *                   - otherwise turn it off.
- *                   - return the old flag value
- *                   - PD_read calls then call PD_fix_denorm automagically
+ *                   - Return the old flag value.
+ *                   - If the fix denorm flag is on PD_read variants
+ *                   - call PD_fix_denorm automatically.
  *
  * #bind PD_autofix_denorm fortran() scheme() python()
  */
@@ -1454,27 +1491,27 @@ int PD_autofix_denorm(PDBfile *file ARG(,,cls), int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_FIX_DENORM - mutate given floating point array VR so that all
+/* PD_FIX_DENORM - Change the given floating point array VR so that all
  *               - instances of denormalized floating point values are
- *               - set to zero 
- *               - return TRUE iff successful
- *               - return FALSE if not a floating point type
+ *               - set to zero.
+ *               - Return TRUE iff successful and
+ *               - return FALSE if not a floating point type.
+ *               -
+ *               - Infinities          32 bit                 64 bit
+ *               - Positive Inf:     7f80 0000         7ff0 0000 0000 0000
+ *               - Negative Inf:     ff80 0000         fff0 0000 0000 0000
  *
- * Infinities          32 bit                        64 bit
- * Positive Inf:     7f80 0000                7ff0 0000 0000 0000
- * Negative Inf:     ff80 0000                fff0 0000 0000 0000
- *
- * NaNs                      32 bit
- * Signalling Nan:   7f80 0001 - 7fbf ffff
- *     or            ff80 0001 - ffbf ffff
- * Quiet Nan:        7fc0 0000 - 7fff ffff
- *     or            ffc0 0000 - ffff ffff
- *
- * NaNs                                64 bit
- * Signalling Nan:   7ff0 0000 0000 0001 - 7ff7 ffff ffff ffff
- *     or            fff0 0000 0000 0001 - fff7 ffff ffff ffff
- * Quiet Nan:        7ff8 0000 0000 0000 - 7fff ffff ffff ffff
- *     or            fff8 0000 0000 0000 - ffff ffff ffff ffff
+ *               - NaNs                      32 bit
+ *               - Signalling Nan:   7f80 0001 - 7fbf ffff
+ *               -     or            ff80 0001 - ffbf ffff
+ *               - Quiet Nan:        7fc0 0000 - 7fff ffff
+ *               -     or            ffc0 0000 - ffff ffff
+ *               -
+ *               - NaNs                                64 bit
+ *               - Signalling Nan:   7ff0 0000 0000 0001 - 7ff7 ffff ffff ffff
+ *               -     or            fff0 0000 0000 0001 - fff7 ffff ffff ffff
+ *               - Quiet Nan:        7ff8 0000 0000 0000 - 7fff ffff ffff ffff
+ *               -     or            fff8 0000 0000 0000 - ffff ffff ffff ffff
  *
  * #bind PD_fix_denorm fortran() scheme() python()
  */

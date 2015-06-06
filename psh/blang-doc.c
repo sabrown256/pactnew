@@ -268,7 +268,7 @@ static int bind_doc(bindes *bd)
         {dcl = dcls + ib;
 	 if (dcl->error == FALSE)
 	    {html_wrap(fp, dcl, NULL, ndc, cdc);
-	      man_wrap(st, dcl, NULL, pck, ndc, cdc);};};
+	     man_wrap(st, dcl, NULL, pck, ndc, cdc);};};
 
     return(rv);}
 
