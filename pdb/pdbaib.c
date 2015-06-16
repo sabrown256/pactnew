@@ -13,14 +13,14 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_VERIFY_WRITES - set global flag that will verify all file writes
+/* PD_VERIFY_WRITES - Set the global flag that will verify all file writes
  *                  - by reading the data back after the write
- *                  - and comparing the results
- *                  - on failure 0 is returned as the number of items written
- *                  - this a global operation, not per file, because
- *                  - you want to do this with flaky hardware of file systems
- *                  - as such all files are likely to be effected
- *                  - return the old value of the flag
+ *                  - and comparing the results.
+ *                  - On failure 0 is returned as the number of items written.
+ *                  - This a global operation, not per file, because
+ *                  - you want to do this with flaky hardware or file systems
+ *                  - as such all files are likely to be effected.
+ *                  - Return the old value of the flag.
  *
  * #bind PD_verify_writes fortran() scheme() python()
  */
@@ -37,10 +37,10 @@ int PD_verify_writes(int st)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CONTENTS - dump the contents of the structure chart, symbol table,
- *             - and the extras of any PDBfile *file to the file OUT
- *             - if FH == 0 write the file chart and if 1
- *             - write the host chart
+/* PD_CONTENTS - Dump the contents of the structure chart, symbol table,
+ *             - and the extras of the PDBfile FILE to the file OUT.
+ *             - If FH == 0 write the file chart and if 1
+ *             - write the host chart. VERS is currently ignored.
  *
  * #bind PD_contents fortran() scheme() python()
  */
@@ -56,14 +56,14 @@ void PD_contents(PDBfile *file ARG(,,cls), FILE *out, int fh, int vers)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TYPEDEF - define an alias for a type which exists in the host chart
- *            - the intended use is to provide a correspondence
+/* PD_TYPEDEF - Define an alias for a type which exists in the host chart.
+ *            - The intended use is to provide a correspondence
  *            - between a type that has been defined to PDBLib (ONAME)
- *            - and a typedef'd type in programs (TNAME)
- *            - can be used in conjunction with PD_defix and PD_defloat
- *            - to have a primitive type known to both charts
- *            - return a pointer to the original type's defstr if
- *            - successful and NULL otherwise
+ *            - and a typedef'd type in programs (TNAME).
+ *            - This can be used in conjunction with PD_defix and PD_defloat
+ *            - to have a primitive type known to both charts.
+ *            - Return a pointer to the original type's defstr if
+ *            - successful and NULL otherwise.
  *
  * #bind PD_typedef fortran() scheme() python()
  */
@@ -98,7 +98,9 @@ defstr *PD_typedef(PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFENUM - define an enum as a typedef of the appropriate size fixnum
+/* PD_DEFENUM - Define an enum NAME as a typedef of the
+ *            - appropriate size fixed point number.
+ *            - Return the new defstr if successful otherwise return NULL.
  *
  * #bind PD_defenum fortran() scheme() python()
  */
@@ -124,8 +126,11 @@ defstr *PD_defenum(PDBfile *file ARG(,,cls), const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFNCV - define a primitive type that will not be format converted
- *           - do it in both charts
+/* PD_DEFNCV - Define a primitive type NAME to PDBfile NAME
+ *           - that will not be format converted when reading and writing.
+ *           - The new type has BPI bytes per item and alignment ALIGN.
+ *           - Do this in both the host and file structure charts.
+ *           - Return the new defstr if successful otherwise return NULL.
  *
  * #bind PD_defncv fortran() scheme() python()
  */
@@ -149,9 +154,13 @@ defstr *PD_defncv(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFCHR - define a primitive character based type
- *           - this is needed in connection with TEXT
- *           - e.g. SQL date and time types
+/* PD_DEFCHR - Define a primitive character based type NAME to
+ *           - PDBfile FILE.
+ *           - The new type has BPI bytes per item, alignment ALIGN,
+ *           - byte order ORD and unsigned property UNSGNED.
+ *           - This is needed in connection with TEXT
+ *           - e.g. SQL date and time types.
+ *           - Return the new defstr if successful otherwise return NULL.
  *
  * #bind PD_defchr fortran() scheme() python()
  */
@@ -176,7 +185,12 @@ defstr *PD_defchr(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFIXNUM - define an new integer primitive type for the file chart
+/* PD_DEFIXNUM - Define a new integer primitive type NAME
+ *             - for the PDBfile FILE.
+ *             - The new type has BPI bytes per item, alignment ALIGN,
+ *             - byte order ORD, unsigned property UNSGNED, and
+ *             - ones complement ONESCMP.
+ *             - Return the new defstr if successful otherwise return NULL.
  *
  * #bind PD_defixnum fortran() scheme() python()
  */
@@ -200,7 +214,11 @@ defstr *PD_defixnum(PDBfile *file ARG(,,cls), const char *name, long bpi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFIX - define an new integer primitive type
+/* PD_DEFIX - Define a new integer primitive type NAME
+ *          - for the PDBfile FILE.
+ *          - The new type has BPI bytes per item, alignment ALIGN,
+ *          - byte order ORD.
+ *          - Return the new defstr if successful otherwise return NULL.
  *
  * #bind PD_defix fortran() scheme() python()
  */
@@ -216,7 +234,17 @@ defstr *PD_defix(PDBfile *file ARG(,,cls), const char *name, long bpi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFLOAT - define an new floating point primitive type
+/* PD_DEFLOAT - Define an new floating point primitive type NAME
+ *            - for PDBfile FILE.
+ *            - The new type has BPI bytes per item, alignment ALIGN,
+ *            - byte order ORDR.
+ *            - EXPB and MANTB are the bit length of the exponent
+ *            - and mantissa respectively.
+ *            - SBS, SBE, and SBM are the 0 based start bits of the
+ *            - sign, exponent, and mantissa respectively.
+ *            - HMB is the high order mantissa bit and BIAS is
+ *            - the exponent bias.
+ *            - Return the new defstr if successful otherwise return NULL.
  *
  * #bind PD_defloat fortran() scheme() python()
  */
@@ -257,14 +285,12 @@ defstr *PD_defloat(PDBfile *file ARG(,,cls), const char *name, long bpi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFSTR_ALT - an alternate structure definition mechanism for PDBLib
- *               -
- *               - sample syntax:
- *               -
- *               -   PD_defstr_alt(<PDB file>, "<struct name>", n_members,
- *               -                 <member-array>);
- *               - the member array elements have the same syntax as for
- *               - PD_defstr
+/* PD_DEFSTR_ALT - Define an new derived type NAME for PDBfile FILE.
+ *               - The struct has NMEMB members whose C-style
+ *               - specification is given in the array of strings MEMBERS.
+ *               - The member array elements have the same syntax as for
+ *               - PD_defstr.
+ *               - Return the new defstr if successful otherwise return NULL.
  *
  * #bind PD_defstr_alt fortran() scheme() python()
  */
@@ -323,15 +349,12 @@ defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFSTR - a structure definition mechanism for PDBLib
- *           -
- *           - sample syntax:
- *           -
- *           -   PD_defstr(<PDB file>, "<struct name>",
- *           -                         "<member1>", "<member2>",
- *           -                 ...     "<membern>", LAST);
- *           -
- *           - where
+/* PD_DEFSTR - Define an new derived type NAME for PDBfile FILE.
+ *           - The remaining arguments are strings each of which
+ *           - specifies a member of the struct.
+ *           - The list is terminated by the special token LAST.
+ *           - Return the new defstr if successful otherwise return NULL.
+ *           - The syntax of a member is:
  *           - 
  *           -   <member> := <primitive type> <member name>[(<dimensions>)] |
  *           -               <derived type> <member name>[(<dimensions>)]
@@ -347,14 +370,10 @@ defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), const char *name,
  *           - 
  *           -   <derived type> := any defstr'd type | any defstr'd type *
  *           -
- *           - LAST is a pointer to a integer zero and is specifically
- *           - allocated by PDBLib to be used to terminate argument lists
- *           - which consist of pointers
- *           -
- *           - Returns NULL if member types are unknown
+ *           - Returns NULL if member types are unknown.
  *           -
  *           - NOTE: PD_defstr returns the defstr and PD_defstr_i
- *           - return a status of the operation
+ *           - return a status of the operation.
  *
  * #bind PD_defstr python()
  */
@@ -385,7 +404,11 @@ defstr *PD_defstr(PDBfile *file ARG(,,cls), const char *name, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFSTR_I - define a new type and return TRUE iff successful
+/* PD_DEFSTR_I - Define an new derived type NAME for PDBfile FILE.
+ *             - The remaining arguments are strings each of which
+ *             - specifies a member of the struct.
+ *             - The list is terminated by the special token LAST.
+ *             - Return the TRUE if successful otherwise return FALSE.
  *             - NOTE: PD_defstr returns the defstr and PD_defstr_i
  *             - return a status of the operation
  */
@@ -418,14 +441,11 @@ int PD_defstr_i(PDBfile *file ARG(,,cls), const char *name, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEFSTR_S - define a struct from a string
- *             -
- *             - sample syntax:
- *             -
- *             -   PD_defstr_s(<PDB file>, "<struct name>", n_members,
- *             -               <text>);
- *             - the text consists of semicolon delimited member specifications
- *             - as the individual members in PD_defstr
+/* PD_DEFSTR_S - Define an new derived type NAME for PDBfile FILE.
+ *             - MEMBERS is a single string containing ';' delimited
+ *             - member specifications.
+ *             - The member syntax is as specified in PD_defstr.
+ *             - Return the new defstr if successful otherwise return NULL.
  *
  * #bind PD_defstr_s fortran() scheme() python()
  */
@@ -451,8 +471,14 @@ defstr *PD_defstr_s(PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CHANGE_PRIMITIVE - change the description of a primitive type
- *                     - the type is known by index
+/* PD_CHANGE_PRIMITIVE - Change the description of a primitive type ITYP
+ *                     - in PDBfile FILE.  ITYP is the SCORE type
+ *                     - manager index for the primitive type to be changed.
+ *                     - NB is the new number of bytes, ALGN the new
+ *                     - alignmnet, FPFMT the new floating format
+ *                     - information, and FPORD, the new floating point
+ *                     - byte order.
+ *                     - Return TRUE if successful otherwise return FALSE.
  *
  * #bind PD_change_primitive fortran() scheme() python()
  */
@@ -529,9 +555,9 @@ int PD_change_primitive(PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_FP_TOLER - fill array of tolerances for
- *             - floating point type comparisons
- *             - this is mainly test support
+/* PD_FP_TOLER - Fill array of tolerances FPTOL from the values in
+ *             - PDBfile FILE.  These can be used for
+ *             - floating point type comparisons.
  *
  * #bind PD_fp_toler scheme() python()
  */

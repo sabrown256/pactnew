@@ -282,7 +282,9 @@ int _PD_safe_flush(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_TYPE - lookup and return the file chart entry for NAME
+/* PD_INQUIRE_TYPE - Lookup and return the file chart entry for NAME
+ *                 - in the PDBfile FILE.
+ *                 - Return NULL if not found.
  *
  * #bind PD_inquire_type fortran() scheme() python()
  */
@@ -302,7 +304,9 @@ defstr *PD_inquire_type(const PDBfile *file ARG(,,cls), const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_HOST_TYPE - lookup and return the host chart entry for NAME
+/* PD_INQUIRE_HOST_TYPE - Lookup and return the host chart entry for NAME
+ *                      - in the PDBfile FILE.
+ *                      - Return NULL if not found.
  *
  * #bind PD_inquire_host_type fortran() scheme() python()
  */
@@ -663,8 +667,8 @@ void _PD_defstr_prim_rd(PDBfile *file, char *type, char *origtype,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TYPEDEF_PRIMITIVE_TYPES - make typedefs for user-defined primitives
- *                            - in the file chart
+/* PD_TYPEDEF_PRIMITIVE_TYPES - Make typedefs for user-defined primitive
+ *                            - types in the file chart of PDBfile FILE.
  *
  * #bind PD_typedef_primitive_types fortran() scheme() python()
  */
@@ -828,7 +832,9 @@ int64_t _PD_eod(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ENTRY_SET_ADDRESS - return the address of the first block of EP
+/* PD_ENTRY_SET_ADDRESS - Set the disk address of the first block of
+ *                      - the symbol table entry EP to ADDR.
+ *                      - Return the disk address ADDR.
  *
  * #bind PD_entry_set_address fortran() scheme(pd-entry-set-address!) python()
  */
@@ -843,7 +849,8 @@ int64_t PD_entry_set_address(syment *ep, int64_t addr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ENTRY_ADDRESS - return the address of the first block of EP
+/* PD_ENTRY_ADDRESS - Return the disk address of the first block of
+ *                  - the symbol table entry EP.
  *
  * #bind PD_entry_address fortran() scheme() python()
  */
@@ -1103,7 +1110,8 @@ int _PD_rev_chrt(hasharr *ch)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_ERROR - fetch the current error message for this thread
+/* PD_GET_ERROR - Return the current PDBLib error message for
+ *              - the current thread.
  *
  * #bind PD_get_error fortran() scheme() python()
  */
@@ -1118,7 +1126,7 @@ char *PD_get_error(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_BUFFER_SIZE - fetch PD_gs.buffer_size
+/* PD_GET_BUFFER_SIZE - Return the current global PDBLib buffer size.
  *
  * #bind PD_get_buffer_size fortran() scheme() python()
  */
@@ -1141,7 +1149,8 @@ int64_t PD_get_buffer_size(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_BUFFER_SIZE - set PD_gs.buffer_size
+/* PD_SET_BUFFER_SIZE - Set the global PDBLib buffer size to V.
+ *                    - Return the buffer size.
  *
  * #bind PD_set_buffer_size fortran() scheme(pd-set-buffer-size!) python()
  */
@@ -1163,7 +1172,7 @@ int64_t PD_set_buffer_size(int64_t v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_SYSTEM_VERSION - return the file system_version
+/* PD_GET_SYSTEM_VERSION - Return the PDB system version of PDBfile FILE.
  *
  * #bind PD_get_system_version fortran() scheme() python()
  */
@@ -1181,7 +1190,7 @@ int PD_get_system_version(const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_FILE_LENGTH - return the current file length
+/* PD_GET_FILE_LENGTH - Return the current length of PDBfile FILE.
  *
  * #bind PD_get_file_length fortran() scheme() python()
  */
@@ -1215,8 +1224,12 @@ char *PD_set_text_delimiter(PDBfile *file, char *d)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_ENTRY_INFO - return the type, number of items, number of dimensions
- *                   - and dimensions
+/* PD_GET_ENTRY_INFO - Return the type, number of items, number of dimensions
+ *                   - and dimensions of the symbol table entry EP.
+ *                   - Return the type in PTYP, the number of items in PNI,
+ *                   - the number of dimensions in PND, and the dimensions
+ *                   - in PDIM.
+ *                   - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_get_entry_info fortran() scheme() python()
  */
@@ -1264,7 +1277,7 @@ int PD_get_entry_info(syment *ep, char **ptyp, long *pni,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_FREE_ENTRY_INFO - free the info allocated by PD_get_entry
+/* PD_FREE_ENTRY_INFO - Free TYP and PDIM, values allocated by PD_get_entry.
  *
  * #bind PD_free_entry_info fortran() scheme() python()
  */
@@ -1280,7 +1293,8 @@ void PD_free_entry_info(char *typ, long *pdim)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_REL_ENTRY_INFO - release the info allocated by PD_get_entry
+/* PD_REL_ENTRY_INFO - Free EP, TYP, and PDIM, values
+ *                   - allocated by PD_get_entry.
  *
  * #bind PD_rel_entry_info fortran() scheme() python()
  */
@@ -1576,7 +1590,7 @@ void _PD_request_unset(PDBfile *file)
 
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_MODE - return the file mode
+/* PD_GET_MODE - Return the file mode of PDBfile FILE.
  *
  * #bind PD_get_mode fortran() scheme() python()
  */
@@ -1594,7 +1608,8 @@ PD_major_op PD_get_mode(const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_MODE - set the file mode and return the old file mode
+/* PD_SET_MODE - Set the file mode of PDBfile FILE to V
+ *             - and return the old file mode.
  *
  * #bind PD_set_mode fortran() scheme(pd-set-mode!) python()
  */
@@ -1613,7 +1628,7 @@ PD_major_op PD_set_mode(PDBfile *file ARG(,,cls), PD_major_op v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_OFFSET - return the file default offset
+/* PD_GET_OFFSET - Return the file default offset of PDBfile FILE.
  *
  * #bind PD_get_offset fortran() scheme() python()
  */
@@ -1631,7 +1646,8 @@ int PD_get_offset(const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_OFFSET - set the file default offset and return the old offset
+/* PD_SET_OFFSET - Set the file default offset of PDBfile FILE to V
+ *               - and return the old offset.
  *
  * #bind PD_set_offset fortran() scheme(pd-set-offset!) python()
  */
@@ -1650,7 +1666,7 @@ int PD_set_offset(PDBfile *file ARG(,,cls), int v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_MAJOR_ORDER - return the file major_order
+/* PD_GET_MAJOR_ORDER - Return the file major_order of PDBfile FILE.
  *
  * #bind PD_get_major_order fortran() scheme() python()
  */
@@ -1668,7 +1684,8 @@ PD_major_order PD_get_major_order(const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_MAJOR_ORDER - set the file major_order and return the old value
+/* PD_SET_MAJOR_ORDER - Set the file major_order of PDBfile FILE to V
+ *                    - and return the old value.
  *
  * #bind PD_set_major_order fortran() scheme(pd-set-major_order!) python()
  */
@@ -1687,7 +1704,7 @@ PD_major_order PD_set_major_order(PDBfile *file ARG(,,cls), PD_major_order v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_TRACK_POINTERS - return the file track_pointers
+/* PD_GET_TRACK_POINTERS - Return the pointer tracking flag of PDBfile FILE.
  *
  * #bind PD_get_track_pointers fortran() scheme() python()
  */
@@ -1705,8 +1722,8 @@ int PD_get_track_pointers(const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_TRACK_POINTERS - set the file pointer tracking flag and
- *                       - return the old value
+/* PD_SET_TRACK_POINTERS - Set the pointer tracking flag of PDBfile FILE to V
+ *                       - and return the old value.
  *
  * #bind PD_set_track_pointers fortran() scheme(pd-set-track_pointers!) python()
  */
@@ -1725,7 +1742,7 @@ int PD_set_track_pointers(PDBfile *file ARG(,,cls), int v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_MAX_FILE_SIZE - return the file max_file_size
+/* PD_GET_MAX_FILE_SIZE - Return the maximum file size of PDBfile FILE.
  *
  * #bind PD_get_max_file_size fortran() scheme() python()
  */
@@ -1743,8 +1760,8 @@ int64_t PD_get_max_file_size(const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_MAX_FILE_SIZE - set the maximum file size and
- *                      - return the old value
+/* PD_SET_MAX_FILE_SIZE - Set the maximum file size of PDBfile FILE to V
+ *                      - and return the old value.
  *
  * #bind PD_set_max_file_size fortran() scheme(pd-set-max_file_size!) python()
  */
@@ -1763,7 +1780,8 @@ int64_t PD_set_max_file_size(PDBfile *file ARG(,,cls), int64_t v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_FMT_VERSION - return the file format version
+/* PD_GET_FMT_VERSION - Return the format version to be used when
+ *                    - creating subsequent PDBfiles.
  *
  * #bind PD_get_fmt_version fortran() scheme() python()
  */
@@ -1778,8 +1796,9 @@ int PD_get_fmt_version(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_FMT_VERSION - set the file format version and
- *                      - return the old value
+/* PD_SET_FMT_VERSION - Set the format version to be used when
+ *                    - creating subsequent PDBfiles.
+ *                    - Return the old value.
  *
  * #bind PD_set_fmt_version fortran() scheme(pd-set-fmt_version!) python()
  */
@@ -1795,8 +1814,8 @@ int PD_set_fmt_version(int v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_POINTER_SIZE - return the current initial size of the
- *                     - pointer table
+/* PD_GET_POINTER_SIZE - Return the global value of the initial size of the
+ *                     - pointer table in PDBfiles.
  *
  * #bind PD_get_pointer_size fortran() scheme(pd-get-pointer-size) python()
  */
@@ -1811,7 +1830,8 @@ long PD_get_pointer_size(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_POINTER_SIZE - set the initial size of the pointer table
+/* PD_SET_POINTER_SIZE - Set the global value of the initial size of the
+ *                     - pointer table in PDBfiles to N.
  *
  * #bind PD_set_pointer_size fortran() scheme(pd-set-pointer-size!) python()
  */
@@ -1827,7 +1847,7 @@ long PD_set_pointer_size(long n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_FILE_NAME - return the file name
+/* PD_GET_FILE_NAME - Return the file name of PDBfile FILE.
  *
  * #bind PD_get_file_name fortran() scheme() python()
  */
@@ -1845,7 +1865,7 @@ char *PD_get_file_name(const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ENTRY_TYPE - return the type of the syment EP
+/* PD_ENTRY_TYPE - Return the type of the symbol table entry EP.
  *
  * #bind PD_entry_type fortran() scheme() python()
  */
@@ -1863,7 +1883,7 @@ char *PD_entry_type(const syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ENTRY_NUMBER - return the number of items of the syment EP
+/* PD_ENTRY_NUMBER - Return the number of items of the symbol table entry EP.
  *
  * #bind PD_entry_number fortran() scheme() python()
  */
@@ -1881,7 +1901,8 @@ int PD_entry_number(const syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ENTRY_N_DIMENSIONS - return the number of dimensions of the syment EP
+/* PD_ENTRY_N_DIMENSIONS - Return the number of dimensions of the
+ *                       - symbol table entry EP.
  *
  * #bind PD_entry_n_dimensions fortran() scheme() python()
  */
@@ -1902,7 +1923,7 @@ int PD_entry_n_dimensions(const syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ENTRY_DIMENSIONS - return the dimensions of the syment EP
+/* PD_ENTRY_DIMENSIONS - Return the dimensions of the symbol table entry EP.
  *
  * #bind PD_entry_dimensions fortran() scheme() python()
  */
@@ -1920,7 +1941,7 @@ dimdes *PD_entry_dimensions(const syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TYPE_SIZE - return byte size of the defstr DP
+/* PD_TYPE_SIZE - Return the byte size of the type specified by DP.
  *
  * #bind PD_type_size fortran() scheme() python()
  */
@@ -1938,7 +1959,7 @@ int PD_type_size(defstr *dp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TYPE_ALIGNMENT - return byte alignment of the defstr DP
+/* PD_TYPE_ALIGNMENT - Return the byte alignment of the type specified by DP.
  *
  * #bind PD_type_alignment fortran() scheme() python()
  */
@@ -1956,7 +1977,8 @@ int PD_type_alignment(defstr *dp)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TYPE_N_INDIRECTS - return number of indirects of the defstr DP
+/* PD_TYPE_N_INDIRECTS - Return number of indirects of the
+ *                     - type specified by DP.
  *
  * #bind PD_type_n_indirects fortran() scheme() python()
  */

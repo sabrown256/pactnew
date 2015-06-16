@@ -1667,9 +1667,16 @@ static object *_SXI_pdbdata_array(SS_psides *si, object *arg)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SX_REP_TO_AC - map a the given connectivity representation into
+/* SX_REP_TO_AC - Map the given connectivity representation into
  *              - the PACT mesh topology representation
- *              - and return a domain set
+ *              - and return a domain set.
+ *              - NAME is the name to be given to the new domain set.
+ *              - RX and RY are the node coordinate arrays.
+ *              - N_NODES is the number of nodes while N_ZONES
+ *              - is the number of zones in the new domain set.
+ *              - ZONES is a list of nodes defining each zone.
+ *              - Each zone is specified by a sequence of nodes in
+ *              - counter-clockwise order and terminated by -1.
  *
  * #bind SX_rep_to_ac fortran()
  */
@@ -1713,7 +1720,7 @@ PM_set *SX_rep_to_ac(const char *name, double *rx, double *ry,
     pcell = bnd[1];
     pzone = zones;
     for (iz = 0; iz < n_zones; iz++)
-        {incr  = 0;
+        {incr = 0;
          while (pzone[incr] != -1)
             incr++;
          for (j = 0; j < incr; j++)
@@ -1722,7 +1729,7 @@ PM_set *SX_rep_to_ac(const char *name, double *rx, double *ry,
 	      pcell[BND_CELL_MIN] = pzone[ja];
 	      pcell[BND_CELL_MAX] = pzone[jb];
               pcell += 2;};
-         pzone   += incr + 1;};
+         pzone += (incr + 1);};
 
     bnd[0] = NULL;
 

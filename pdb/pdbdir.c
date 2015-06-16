@@ -25,13 +25,14 @@ int
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CD - change the current working directory
- *       - the directory may be specified by an absolute or relative path.
+/* PD_CD - Change the current working directory in PDBfile FILE to DIR.
+ *       - DIR may be an absolute or relative path.
+ *       - Return TRUE if successful otherwise return FALSE.
  *
  * #bind PD_cd fortran() scheme() python()
  */
 
-int PD_cd(PDBfile *file ARG(,,cls), const char *dirname)
+int PD_cd(PDBfile *file ARG(,,cls), const char *dir)
    {int rv, ok;
     char name[MAXLINE];
     char *acc, *rej;
@@ -46,16 +47,16 @@ int PD_cd(PDBfile *file ARG(,,cls), const char *dirname)
        {PD_error("BAD FILE ID - PD_CD", PD_GENERIC);
         return(FALSE);};
      
-    if (dirname == NULL)
+    if (dir == NULL)
        SC_strncpy(name, MAXLINE, "/", -1);
     else
-       {SC_strncpy(name, MAXLINE, _PD_fixname(file, dirname), -1);
+       {SC_strncpy(name, MAXLINE, _PD_fixname(file, dir), -1);
         if (SC_LAST_CHAR(name) != '/')
            SC_strcat(name, MAXLINE, "/");};
 
     ep = PD_inquire_entry(file, name, FALSE, NULL);
     if (ep == NULL)
-       {if (dirname == NULL)
+       {if (dir == NULL)
            return(FALSE);
 
         else
@@ -67,12 +68,12 @@ int PD_cd(PDBfile *file ARG(,,cls), const char *dirname)
             if (ep == NULL)
                {snprintf(pa->err, MAXLINE,
 			 "ERROR: DIRECTORY %s NOT FOUND - PD_CD\n",
-			 dirname);
+			 dir);
                 return(FALSE);};};};
 
     if (strcmp(ep->type, "Directory") != 0)
        {snprintf(pa->err, MAXLINE,
-		 "ERROR: BAD DIRECTORY %s - PD_CD\n", dirname);
+		 "ERROR: BAD DIRECTORY %s - PD_CD\n", dir);
         return(FALSE);}
 
     else
@@ -95,9 +96,12 @@ int PD_cd(PDBfile *file ARG(,,cls), const char *dirname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_LN - create a link to a variable
+/* PD_LN - Create a symbolic link from NEWNAME to entry OLDNAME in
+ *       - PDBfile FILE.
  *       - This function simply installs a new symbol table entry. The new
- *       - syment is a copy of an already existing one, but with a new name.
+ *       - syment is a copy of the existing one under OLDNAME,
+ *       - but with a name NEWNAME.
+ *       - Return TRUE if successful otherwise return FALSE.
  *
  * #bind PD_ln fortran() scheme() python()
  */
@@ -421,10 +425,14 @@ char **_PD_ls_extr(const PDBfile *file, const char *path, const char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_LS - return a list of all variables and directories of the specified
- *       - type in the specified directory. If TYPE is NULL, all types are
+/* PD_LS - List of all the variables and directories of the specified
+ *       - type TYPE in the specified directory PATH of the PDBfile FILE.
+ *       - If TYPE is NULL, all types are
  *       - returned. If PATH is NULL, the root directory is searched.
  *       - Directories are terminated with a slash.
+ *       - Return the number of items found in NUM.
+ *       - Return a NULL terminated array of strings if successful
+ *       - and NULL otherwise.
  *
  * #bind PD_ls fortran() scheme() python()
  */
@@ -441,13 +449,18 @@ char **PD_ls(const PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_LS_ALT - return a list of all variables and directories of the specified
- *           - type in the specified directory. If TYPE is NULL, all types are
+/* PD_LS_ALT - List of all the variables and directories of the specified
+ *           - type TYPE in the specified directory PATH of the PDBfile FILE.
+ *           - If TYPE is NULL, all types are
  *           - returned. If PATH is NULL, the root directory is searched.
- *           - Directories are terminated with a slash.  
- *           - Flags argument: -a  specifies that all entries, including
- *           -                     hidden ones (first char == &) should be 
- *           -                     returned. 
+ *           - Directories are terminated with a slash.
+ *           - Return the number of items found in NUM.
+ *           - FLAGS modify the search:
+ *           -    -a  specifies that all entries, including
+ *           -        hidden ones (first char == &) should be 
+ *           -        returned. 
+ *           - Return a NULL terminated array of strings if successful
+ *           - and NULL otherwise.
  *
  * #bind PD_ls_alt fortran() scheme() python()
  */
@@ -487,8 +500,8 @@ static int _PD_wr_dir(PDBfile *file, const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEF_DIR - define and initialize the directory machinery for
- *            - the given FILE
+/* PD_DEF_DIR - Define and initialize the directory machinery for
+ *            - PDBfile FILE.
  *
  * #bind PD_def_dir fortran() scheme() python()
  */
@@ -545,7 +558,8 @@ static int _PD_exist_path(const PDBfile *file, const char *path)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ISDIR - return TRUE iff DIR is a directory of FILE
+/* PD_ISDIR - Return TRUE if DIR is a directory of PDBfile FILE
+ *          - and otherwise return FALSE.
  *
  * #bind PD_isdir fortran() scheme() python()
  */
@@ -583,8 +597,9 @@ int PD_isdir(const PDBfile *file ARG(,,cls), const char *dir)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MKDIR - create a directory
- *          - the directory may be specified by an absolute or relative path
+/* PD_MKDIR - Create a directory DIR in PDBfile FILE.
+ *          - The directory may be specified by an absolute or relative path.
+ *          - Return TRUE successful and otherwise return FALSE.
  *
  * #bind PD_mkdir fortran() scheme() python()
  */
@@ -636,7 +651,8 @@ int PD_mkdir(PDBfile *file ARG(,,cls), const char *dir)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PWD - return the current working directory
+/* PD_PWD - Return the current working directory of the PDBfile FILE
+ *        - if successful and return FALSE otherwise.
  *
  * #bind PD_pwd fortran() scheme() python()
  */

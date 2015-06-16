@@ -775,8 +775,12 @@ object *SS_eval_form(SS_psides *si, object *first, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SS_CALL_SCHEME - make a C level call to a SCHEME level function
- *                - return the SCHEME result object
+/* SS_CALL_SCHEME - Make a C level call to a SCHEME level function.
+ *                - FUNC is the name of the SCHEME function.
+ *                - Arguments are specified in type, value pairs.
+ *                - The argument list is terminated by the special
+ *                - token, LAST.
+ *                - Return the SCHEME object which results from the call.
  *
  * #bind SS_call_scheme  fortran()
  */
