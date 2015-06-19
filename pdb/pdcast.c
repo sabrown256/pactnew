@@ -261,11 +261,12 @@ inti _PD_cast_size(memdes *meml, void *svr, memdes *desc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CAST - tell PDBLib that the type of a particular member MEMB
- *         - (which must be a pointer) is specified by another member CONTR
- *         - (which must be a character pointer).
- *         - Put this information into the FILE chart.
- *         - return TRUE iff successful
+/* PD_CAST - Tell PDBLib that the type of a particular member MEMB
+ *         - of struct TYPE in PDBfile FILE is specified by another
+ *         - member CONTR.
+ *         - Both members, MEMB and CONTR, must be character pointers.
+ *         - This information is kept in the structure charts of FILE.
+ *         - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_cast fortran() scheme() python()
  */
@@ -307,12 +308,14 @@ int PD_cast(PDBfile *file ARG(,,cls), const char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SIZE_FROM - tell PDBLib that the size of a particular member MEMB
- *              - (which must be a pointer) is specified by a
- *              - comma delimited list of other members CONTR
- *              - (which must be fixed point or pointers to fixed point)
- *              - Put this information into the FILE chart.
- *              - return TRUE iff successful
+/* PD_SIZE_FROM - Tell PDBLib that the size of a particular member MEMB
+ *              - of struct TYPE is specified by the product of a comma
+ *              - delimited list of other members CONTR.
+ *              - MEMB must be a character pointer and the members
+ *              - specified by CONTR must be fixed point or pointers
+ *              - to fixed point types.
+ *              - This information is kept in the structure charts of FILE.
+ *              - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_size_from fortran() scheme() python()
  */

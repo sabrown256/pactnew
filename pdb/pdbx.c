@@ -20,8 +20,9 @@ char
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MK_ATTRIBUTE - initialize an attribute with identifier AT and
- *                 - type TYPE
+/* PD_MK_ATTRIBUTE - Make a PDB attribute named AT with type TYPE.
+ *                 - Return the attribute if successful and
+ *                 - return NULL otherwise.
  *
  * #bind PD_mk_attribute fortran() scheme() python()
  */
@@ -31,15 +32,15 @@ attribute *PD_mk_attribute(const char *at, const char *type)
     attribute *attr;
 
     attr = CMAKE(attribute);
+    if (attr != NULL)
+       {attr->name = CSTRSAVE(at);
+	attr->type = CSTRSAVE(type);
+	attr->data = CMAKE_N(void *, 50L);
+	attr->size = 50L;
+	attr->indx = 0L;
 
-    attr->name = CSTRSAVE(at);
-    attr->type = CSTRSAVE(type);
-    attr->data = CMAKE_N(void *, 50L);
-    attr->size = 50L;
-    attr->indx = 0L;
-
-    for (i = 0; i < attr->size; i++)
-        attr->data[i] = NULL;
+	for (i = 0; i < attr->size; i++)
+	    attr->data[i] = NULL;};
 
     return(attr);}
 
@@ -113,7 +114,12 @@ static void _PD_rl_attribute_value(attribute_value *avl)
 
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_ATTRIBUTE - look up the table entry for the named attribute
+/* PD_INQUIRE_ATTRIBUTE - Look up the attribute NAME in attribute table
+ *                      - of the PDBfile FILE.
+ *                      - Return the full path name of the attribute
+ *                      - in the attribute table in PATH.
+ *                      - Return the attribute if successful and
+ *                      - return NULL otherwise.
  *
  * #bind PD_inquire_attribute fortran() scheme() python()
  */
@@ -132,9 +138,13 @@ attribute *PD_inquire_attribute(const PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_ATTRIBUTE_VALUE - look up the table entry for
- *                            - the named attribute value
- *
+/* PD_INQUIRE_ATTRIBUTE_VALUE - Look up the attribute NAME in attribute table
+ *                            - of the PDBfile FILE.
+ *                            - Return the full path name of the attribute
+ *                            - in the attribute table in PATH.
+ *                            - Return the attribute value if successful and
+ *                            - return NULL otherwise.
+
  * #bind PD_inquire_attribute_value fortran() scheme() python()
  */
 
@@ -175,8 +185,8 @@ static int _PD_rel_attr(haelem *hp, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_REL_ATTR_TABLE - release the attribute table of FILE
- *                   - if it exists
+/* PD_REL_ATTR_TABLE - Free the attribute table of PDBfile FILE
+ *                   - if it exists.
  *
  * #bind PD_rel_attr_table fortran() scheme() python()
  */
@@ -193,8 +203,9 @@ void PD_rel_attr_table(PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEF_ATTRIBUTE - define an attribute by specifying its type
- *                  - return TRUE if successful and FALSE otherwise
+/* PD_DEF_ATTRIBUTE - Define a PDB attribute AT of type TYPE in the
+ *                  - PDBfile FILE.
+ *                  - Return TRUE if successful and return FALSE otherwise.
  *
  * #bind PD_def_attribute fortran() scheme() python()
  */
@@ -231,13 +242,14 @@ int PD_def_attribute(PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_REM_ATTRIBUTE - remove an attribute and all variables values for
- *                  - the specified attribute
- *                  - return TRUE if successful and FALSE otherwise
- *                  - NOTE: do not actually remove the attribute from the
- *                  -       table the NULL data pointer is used to tell the
- *                  -       attribute value lookup operation that the
- *                  -       attribute no longer exists
+/* PD_REM_ATTRIBUTE - Remove a PDB attribute AT and all variables values for
+ *                  - the specified attribute from PDBfile FILE.
+ *                  - Return TRUE if successful and FALSE otherwise.
+ *                  -
+ *                  - NOTE: Does not actually remove the attribute from the
+ *                  - attribute table.  The NULL data pointer is used to
+ *                  - tell the attribute value lookup operation that the
+ *                  - attribute no longer exists.
  *
  * #bind PD_rem_attribute fortran() scheme() python()
  */
@@ -260,9 +272,9 @@ int PD_rem_attribute(PDBfile *file ARG(,,cls), const char *at)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SET_ATTRIBUTE - set the value of the specified attribute for the
- *                  - specified variable
- *                  - return TRUE if successful and FALSE otherwise
+/* PD_SET_ATTRIBUTE - Set the value of the PDB attribute AT for the
+ *                  - variable VR to the value VL in the PDBfile FILE.
+ *                  - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_set_attribute fortran() scheme(pd-set-attribute!) python()
  */
@@ -325,10 +337,10 @@ int PD_set_attribute(PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GET_ATTRIBUTE - get the value of the specified attribute for the
- *                  - specified variable
- *                  - return a pointer to the attribute value if successful
- *                  - and NULL otherwise
+/* PD_GET_ATTRIBUTE - Get the value of the attribute AT for
+ *                  - variable VR in PDBfile FILE.
+ *                  - Return a pointer to the attribute value if successful
+ *                  - and NULL otherwise.
  *
  * #bind PD_get_attribute fortran() scheme() python()
  */
@@ -382,7 +394,7 @@ void *PD_get_attribute(const PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEF_PDB_TYPES - define in one place PDB data types for PDB files
+/* PD_DEF_PDB_TYPES - Define in one place PDB data types for PDBfile FILE.
  *
  * #bind PD_def_pdb_types fortran() scheme() python()
  */
@@ -448,10 +460,11 @@ int PD_def_pdb_types(PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEF_HASH_TYPES - define in one place hash table types for PDB files
+/* PD_DEF_HASH_TYPES - Define in one place hash table types for PDBfile FILE.
  *                   - FLAG controls which structs get defined
  *                   -  bit 1   define haelem
  *                   -  bit 2   define hasharr
+ *                   - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_def_hash_types fortran() scheme() python()
  */
@@ -473,8 +486,9 @@ int PD_def_hash_types(PDBfile *file ARG(,,cls), int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEF_ATTR_STR - define hashing, attribute, attribute value
- *                 - structures
+/* PD_DEF_ATTR_STR - Define hashing, attribute, attribute value
+ *                 - structures for PDBfile FILE.
+ *                 - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_def_attr_str fortran() scheme() python()
  */
@@ -665,11 +679,15 @@ int _PD_contains_indirections(hasharr *tab, char *type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_READ_PDB_CURVE - read an Ultra curve
- *                   - fill the label
- *                   - set the number of points
- *                   - fill the x and y extrema values
- *                   - fill the x and y arrays depending on value of flag
+/* PD_READ_PDB_CURVE - Read an ULTRA curve from PDBfile FP.
+ *                   - Fill the label, LABEL; the number of points, PN;
+ *                   - the x and y extrema values: PXMN, PXMX, PYMN, and PYMX;
+ *                   - and the x and y arrays, PXP and PYP depending on
+ *                   - value of FLAG.  Values of FLAG are:
+ *                   -    X_AND_Y  read in both x and y values
+ *                   -    X_ONLY   read in only x values
+ *                   -    Y_ONLY   read in only y values
+ *                   - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_read_pdb_curve fortran() scheme() python()
  */
@@ -800,12 +818,13 @@ int PD_read_pdb_curve(PDBfile *fp ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRT_PDB_CURVE - write the curve as specified by a label,
- *                  - number of points, x values, and y values
- *                  - out to the given file
- *                  - as the icurve'th curve in the file
- *                  - NOTE: the order of the writes is crucial for
- *                  - performance for remote files
+/* PD_WRT_PDB_CURVE - Write an ULTRA curve as specified by: a label, LABL;
+ *                  - number of points, N; x values PX; and y values PY.
+ *                  - The curve is written out to the PDBfile FP as
+ *                  - as the ICURVE'th curve in the file.
+ *                  - NOTE: the order of the writes can be important for
+ *                  - performance with certain files, e.g. remote files.
+ *                  - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_wrt_pdb_curve fortran() scheme() python()
  */
@@ -892,17 +911,16 @@ int PD_wrt_pdb_curve(PDBfile *fp ARG(,,cls), const char *labl, int n,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRT_PDB_CURVE_Y - write the curve as specified by a label,
- *                    - number of points, and y values
- *                    - out to the given file
- *                    - as the icurve'th curve in the file
- *                    - the x values are to be taken from the specified
- *                    - curve
- *                    - GOTCHA: at this point no checking is done to
- *                    - see whether the number of points for the specified
- *                    - x values is correct
- *                    - NOTE: the order of the writes is crucial for
- *                    - performance for remote files
+/* PD_WRT_PDB_CURVE_Y - Write an ULTRA curve as specified by: a label, LABL;
+ *                    - number of points, N; y values, PY; and x values
+ *                    - from curve IX in the file.
+ *                    - The curve is written out to the PDBfile FP as
+ *                    - as the ICURVE'th curve in the file.
+ *                    - NOTE: no checking is done to see whether the number
+ *                    - of points for the specified x values is correct.
+ *                    - NOTE: the order of the writes can be important for
+ *                    - performance with certain files, e.g. remote files.
+ *                    - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_wrt_pdb_curve_y fortran() scheme() python()
  */
@@ -967,8 +985,10 @@ int PD_wrt_pdb_curve_y(PDBfile *fp ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PUT_MAPPING - write a mapping F to the PDBfile, FILE, with index
- *                - MAPPING
+/* PD_PUT_MAPPING - Write a mapping F to the PDBfile FILE with index
+ *                - MAPPING.
+ *                - The name of the mapping is used as the file entry name.
+ *                - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_put_mapping fortran() scheme() python()
  */
@@ -988,8 +1008,9 @@ int PD_put_mapping(PDBfile *file ARG(,,cls), PM_mapping *f, int mapping)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PUT_IMAGE - write an image F to the PDBfile, FILE, with index IMAGE
- *              - do a slight fudge because PG_image isn't defined
+/* PD_PUT_IMAGE - Write an image F to the PDBfile FILE with index IMAGE.
+ *              - The name of the image is used as the file entry name.
+ *              - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_put_image fortran() scheme() python()
  */
@@ -1009,8 +1030,9 @@ int PD_put_image(PDBfile *file ARG(,,cls), void *f, int image)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PUT_SET - write a set S to the PDBfile, FILE, under the name of 
- *            - the set
+/* PD_PUT_SET - Write a set S to the PDBfile FILE.
+ *            - The name of the set is used as the file entry name.
+ *            - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_put_set fortran() scheme() python()
  */
@@ -1032,10 +1054,11 @@ int PD_put_set(PDBfile *file ARG(,,cls), PM_set *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PROCESS_SET_NAME - replace '.' with '!' in set names so that
+/* PD_PROCESS_SET_NAME - Replace '.' with '!' in set names so that
  *                     - PDBLib doesn't mistake the variable for
- *                     - a structure
- *                     - the input string, DNAME, will be mangled!!!
+ *                     - a structure.
+ *                     - The input string, DNAME, will be mangled!
+ *                     - Return pointer to DNAME.
  *
  * #bind PD_process_set_name fortran() scheme() python()
  */
@@ -1055,7 +1078,8 @@ char *PD_process_set_name(char *dname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MESH_STRUCT - define types for mesh generation
+/* PD_MESH_STRUCT - Define types for mesh generation in PDBfile FILE.
+ *                - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_mesh_struct fortran() scheme() python()
  */
@@ -1074,9 +1098,9 @@ int PD_mesh_struct(PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEF_MAPPING - define PM_set and PM_mapping to 
- *                - a PDB file thereby preparing it for mappings
- *                - return TRUE iff successful
+/* PD_DEF_MAPPING - Define PM_set and PM_mapping types to 
+ *                - a PDBfile FP thereby preparing it for mappings and sets.
+ *                - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_def_mapping fortran() scheme() python()
  */
@@ -1113,7 +1137,16 @@ int PD_def_mapping(PDBfile *fp ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MAKE_IMAGE - create and return a PD_IMAGE
+/* PD_MAKE_IMAGE - Create a PD_IMAGE.
+ *               - NAME is the name of the image.
+ *               - KMAX and LMAX are the number of columns and rows
+ *               - of the image respectively.
+ *               - BPP is the number bits per pixel.
+ *               - XMIN, XMAX, YMIN, and YMAX are the physical limits of
+ *               - the domain of the image.
+ *               - ZMIN and ZMAX are the limits of the range values of
+ *               - the image.
+ *               - Return the image if successful and NULL otherwise.
  *
  * #bind PD_make_image fortran() scheme() python()
  */
@@ -1148,7 +1181,7 @@ PD_image *PD_make_image(const char *name, const char *type, void *data,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_REL_IMAGE - release a PD_IMAGE
+/* PD_REL_IMAGE - Release a PD_image IM.
  *
  * #bind PD_rel_image fortran() scheme() python()
  */

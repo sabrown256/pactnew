@@ -278,8 +278,8 @@ void _PD_ones_complement(char *out, inti ni, intb nbo, int *order)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_BYTE_REVERSE - byte reverse NI words
- *                 - each word is NB bytes long where NB is even
+/* PD_BYTE_REVERSE - Byte reverse the NI words of OUT.
+ *                 - Each word is NB bytes long where NB is even.
  *
  * #bind PD_byte_reverse fortran() scheme() python()
  */
@@ -2437,8 +2437,9 @@ int PD_n_bit_char_std(PD_character_standard cstd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CONVERT_ASCII - convert character bit-stream in IN
+/* PD_CONVERT_ASCII - Convert the character bit-stream in IN
  *                  - to standard 7-bit ASCII bytestream OUT
+ *                  - which must be long enough to hold the characters.
  *                  - IN is NB bytes long (NOTE: not characters long)
  *                  - CSTD is one of:
  *                  -   PD_ITA2_UPPER     upper case ITA2
@@ -2448,6 +2449,9 @@ int PD_n_bit_char_std(PD_character_standard cstd)
  *                  -   PD_ASCII_7        7-bit ASCII (no-op)
  *                  -   PD_UTF_8          8-bit UTF (no-op)
  *                  -   PD_EBCDIC         IBM EBCDIC 8-bit
+ *                  - Return OUT which will contain the converted
+ *                  - characters if successful or undetermined bytes
+ *                  - otherwise.
  *
  * #bind PD_convert_ascii fortran() scheme() python()
  */
@@ -2484,9 +2488,10 @@ char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CONV_FROM_ASCII - convert character bit-stream in IN
- *                    - to standard 7-bit ASCII bytestream OUT
- *                    - IN is NB bytes long (NOTE: not characters long)
+/* PD_CONV_FROM_ASCII - Convert the ASCII characters in IN
+ *                    - to the standard specified by CSTD putting the results
+ *                    - in OUT which is NC bytes long.
+ *                    - IN is is NB bytes long.
  *                    - CSTD is one of:
  *                    -   PD_ITA2_UPPER     upper case ITA2
  *                    -   PD_ITA2_LOWER     lower case ITA2
@@ -2495,6 +2500,9 @@ char *PD_convert_ascii(char *out, int nc, PD_character_standard cstd,
  *                    -   PD_ASCII_7        7-bit ASCII (no-op)
  *                    -   PD_UTF_8          8-bit UTF (no-op)
  *                    -   PD_EBCDIC         IBM EBCDIC 8-bit
+ *                    - Return OUT which will contain the converted
+ *                    - characters if successful or undetermined bytes
+ *                    - otherwise.
  *
  * #bind PD_conv_from_ascii fortran() scheme() python()
  */
