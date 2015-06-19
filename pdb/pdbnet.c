@@ -412,16 +412,18 @@ static int _PN_sizeof(const char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_CONV_IN - convert from one machine format to another after input
- *            - from a remote host with different architecture
- *            - NI of type, TYPE, from IN and put them in OUT
- *            - all additional information comes from OUT_CHART
+/* PN_CONV_IN - Convert the data IN after input from a remote host and
+ *            - place the results in OUT.
+ *            - The space OUT must be large enough to receive that converted
+ *            - data.
+ *            - The data IN has NI items of type, TYPE as defined by
+ *            - the structure chart CHI.
  *
  * #bind PN_conv_in fortran() scheme() python()
  */
 
 void PN_conv_in(void *out, void *in, const char *type, int64_t ni,
-		hasharr *in_chart)
+		hasharr *chi)
    {data_standard *istd;
     PD_smp_state *pa;
 
@@ -436,27 +438,29 @@ void PN_conv_in(void *out, void *in, const char *type, int64_t ni,
 	     memset(pa->err, 0, MAXLINE);
 	     break;};
 
-    istd = (data_standard *) SC_hasharr_def_lookup(in_chart, "standard");
+    istd = (data_standard *) SC_hasharr_def_lookup(chi, "standard");
 
     PD_convert((char **) &out, (char **) &in, type, type, ni,
                istd, pa->host_std, pa->host_std,
-               in_chart, pa->host_chart, 0, PD_TRACE);
+               chi, pa->host_chart, 0, PD_TRACE);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_CONV_OUT - convert from one machine format to another before output
- *             - to a remote host with different architecture
- *             - NI of type, TYPE, from IN and put them in OUT
- *             - all additional information comes from OUT_CHART
+/* PN_CONV_OUT - Convert the data IN before output to a remote host
+ *             - with different architecture and place the results in OUT.
+ *             - The space OUT must be large enough to receive that converted
+ *             - data.
+ *             - The data IN has NI of type, TYPE, as defined by
+ *             - the structure chart CHO.
  *
  * #bind PN_conv_out fortran() scheme() python()
  */
 
 void PN_conv_out(void *out, void *in, const char *type, int64_t ni,
-		 hasharr *out_chart)
+		 hasharr *cho)
    {data_standard *ostd;
     PD_smp_state *pa;
 
@@ -471,20 +475,21 @@ void PN_conv_out(void *out, void *in, const char *type, int64_t ni,
 	     memset(pa->err, 0, MAXLINE);
 	     break;};
 
-    ostd = (data_standard *) SC_hasharr_def_lookup(out_chart, "standard");
+    ostd = (data_standard *) SC_hasharr_def_lookup(cho, "standard");
 
     PD_convert((char **) &out, (char **) &in, type, type, ni,
                pa->host_std, ostd, pa->host_std,
-               pa->host_chart, out_chart, 0, PD_TRACE);
+               pa->host_chart, cho, 0, PD_TRACE);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_TARGET - allocate, initialize, and return a structure chart
- *           - for the associated standard and alignment
- *           - for network PDB
+/* PN_TARGET - Make a new structure chart for the associated data
+ *           - standard, STD, and data alignment, ALIGN, to be used
+ *           - by PDBLib for network rather than file I/O.
+ *           - Return the new chart if successful and return NULL otherwise.
  *
  * #bind PN_target fortran() scheme() python()
  */
@@ -519,35 +524,15 @@ hasharr *PN_target(data_standard *std, data_alignment *align)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_DEFSTR - a structure definition mechanism for PDBLib
- *           -
- *           - sample syntax:
- *           -
- *           -   PN_defstr(<PDB file>, "<struct name>",
- *           -                         "<member1>", "<member2>",
- *           -                 ...     "<membern>", LAST);
- *           -
- *           - where
- *           - 
- *           -   <member> := <primitive type> <member name>[(<dimensions>)] |
- *           -               <derived type> <member name>[(<dimensions>)]
- *           -
- *           -   <dimensions> := <non-negative int> |
- *           -                   <non-negative int>,<dimensions> |
- *           -                   <non-negative int>, <dimensions> |
- *           -                   <non-negative int> <dimensions>
- *           -
- *           -   <primitive type> := short | integer | long | float |
- *           -                       double | char | short * | integer *
- *           -                       long * | float * | double * | char *
- *           - 
- *           -   <derived type> := any defstr'd type | any defstr'd type *
- *           -
- *           - LAST is a pointer to a integer zero and is specifically
- *           - allocated by PDBLib to be used to terminate argument lists
- *           - which consist of pointers
- *           -
- *           - Returns NULL if member types are unknown
+/* PN_DEFSTR - Define an new derived type NAME for structure chart, CHART.
+ *           - Use the data alignment, ALIGN, and the default offset, DEFOFF
+ *           - to completely define the new type.
+ *           - The remaining arguments are strings each of which
+ *           - specifies a member of the struct.
+ *           - The list is terminated by the special token LAST.
+ *           - Unknown member types result in failure to define a new type.
+ *           - Return the new defstr if successful otherwise return NULL.
+ *           - The syntax of a member is the same as that of PD_defstr.
  *
  * #bind PN_defstr fortran() scheme() python()
  */
@@ -612,8 +597,14 @@ defstr *PN_defstr(hasharr *chart, const char *name, data_alignment *align,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_OPEN - create a special pseudo PDBfile and set all the
- *         - io hooks appropriately
+/* PN_OPEN - Create a special pseudo PDBfile FM that is to be used
+ *         - for data transmission across networks rather than storage
+ *         - in a file.
+ *         - BF is a buffer used for data conversion in I/O operations
+ *         - using the pseudo PDBfile and must be at least as large as
+ *         - the largest data tree to be read or written.
+ *         - The io hooks are set appropriately for network I/O.
+ *         - Return the PDBfile if successful and return NULL otherwise.
  *
  * #bind PN_open fortran() scheme() python()
  */
@@ -696,8 +687,8 @@ PDBfile *PN_open(PDBfile *fm, char *bf)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_CLOSE - close the special pseudo PDBfile and reset all the
- *          - io hooks
+/* PN_CLOSE - Close the pseudo PDBfile FILE and reset all the io hooks.
+ *          - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PN_close fortran() scheme() python()
  */
@@ -729,7 +720,12 @@ int PN_close(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_WRITE - write the given data to the special pseudo PDBfile
+/* PN_WRITE - Write the data VR of type, TYPE, and number of items NI
+ *          - to the pseudo PDBfile FILE.
+ *          - Return TRUE if successful and FALSE otherwise.
+ *          -
+ *          - NOTE: VR must be a pointer to an object with the type
+ *          - given by TYPE!!!!
  *
  * #bind PN_write fortran() scheme() python()
  */
@@ -749,7 +745,12 @@ int PN_write(PDBfile *file, const char *type, int64_t ni, void *vr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PN_READ - read the given data from the special pseudo PDBfile
+/* PN_READ - Read the data VR of type, TYPE, and number of items NI
+ *         - from the pseudo PDBfile FILE.
+ *         - Return the number of items successfully read.
+ *         -
+ *         - NOTE: VR must be a pointer to an object with the type
+ *         - given by TYPE (PDBLib will allocated space if necessary)!
  *
  * #bind PN_read fortran() scheme() python()
  */

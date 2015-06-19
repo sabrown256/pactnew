@@ -17,9 +17,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MP_SET_SERIAL - set the file->mpi_file field to
- *                  - the input value
- *                  - returns the old value
+/* PD_MP_SET_SERIAL - Set the mpi_file field of PDBfile FILE to
+ *                  - the value FLAG.
+ *                  - Return the old value.
  *
  * #bind PD_mp_set_serial fortran() scheme(pd-mp-set-serial!) python()
  */
@@ -35,8 +35,12 @@ int PD_mp_set_serial(PDBfile *file ARG(,,cls), int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MP_SET_COLLECTIVE - set the I/O (write right now)
- *                      - operations to be collective
+/* PD_MP_SET_COLLECTIVE - Set the value of the global I/O
+ *                      - collective operations flag.
+ *                      - If FLAG is TRUE then collective I/O operations
+ *                      - are done and if FALSE then non-collective I/O
+ *                      - operations are done.
+ *                      - Return the old value.
  *
  * #bind PD_mp_set_collective fortran() scheme(pd-mp-set-collective!) python()
  */
@@ -44,18 +48,18 @@ int PD_mp_set_serial(PDBfile *file ARG(,,cls), int flag)
 int PD_mp_set_collective(int flag)
    {int ret;
 
-    ret = _PD_set_collective(flag);
+    ret = _PD.mp_collective;
+    _PD_set_collective(flag);
 
     return(ret);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MP_CREATE - create a PDB file in mp parallel mode 
- *              - and return an initialized PDBfile
- *              - if successful else NULL
- *              - if comm == SC_COMM_SELF the file is opened only on the
- *              - local processor
+/* PD_MP_CREATE - Create a PDBfile NAME in distributed parallel mode.
+ *              - If COMM equals SC_COMM_SELF the file is opened only
+ *              - on the local processor.
+ *              - Return the PDBfile if successful otherwise return NULL.
  *
  * #bind PD_mp_create fortran() scheme() python()
  */
@@ -75,12 +79,13 @@ PDBfile *PD_mp_create(const char *name, SC_communicator *comm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_MP_OPEN - open an existing PDB file in mp parallel mode, 
- *            - extract the symbol table and
- *            - structure chart, and return a pointer to the PDB file
- *            - if successful else NULL
- *            - if comm == SC_COMM_SELF the file is opened only on the
- *            - local processor
+/* PD_MP_OPEN - Open the existing PDB file NAME in distributed parallel mode.
+ *            - As with PD_open MODE is the read/write/append mode
+ *            - specification.
+ *            - If COMM equals SC_COMM_SELF the file is opened only on the
+ *            - local processor.
+ *            - Return a pointer to the PDBfile if successful otherwise
+ *            - return NULL.
  *
  * #bind PD_mp_open fortran() scheme() python()
  */

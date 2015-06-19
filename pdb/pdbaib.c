@@ -353,6 +353,7 @@ defstr *PD_defstr_alt(PDBfile *file ARG(,,cls), const char *name,
  *           - The remaining arguments are strings each of which
  *           - specifies a member of the struct.
  *           - The list is terminated by the special token LAST.
+ *           - Unknown member types result in failure to define a new type.
  *           - Return the new defstr if successful otherwise return NULL.
  *           - The syntax of a member is:
  *           - 

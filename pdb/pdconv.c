@@ -2267,11 +2267,23 @@ static int _PD_convert(char **out, char **in, inti ni, int boffs,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_CONVERT - convert from one machine format to another NI of
- *            - type, TYPE, from IN and put them in OUT
- *            - ISTD and OSTD are the data format standards of IN and 
- *            - OUT respectively
- *            - return TRUE iff successful
+/* PD_CONVERT - Convert data IN from one machine format to another
+ *            - and place the results in OUT.
+ *            - The space OUT must be large enough to receive that converted
+ *            - data.
+ *            - The data IN has NI items of type, TYPI as defined by
+ *            - data standard STDI and structure chart CHI.
+ *            - The format of the data to be placed into OUT is
+ *            - of type TYPO as defined by data standard STDO and
+ *            - structure chart CHO.
+ *            - HSTD is the host data standard which can be different
+ *            - from either STDI or STDO.
+ *            - BOFFS is a bit offset that is usually only used in
+ *            - connection with old hardware having byte size other
+ *            - 8 bits.
+ *            - ERROR is the major operation flag used in error
+ *            - recovery.
+ *            - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_convert fortran() scheme() python()
  */

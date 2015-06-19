@@ -275,7 +275,9 @@ void _PD_rl_pdb(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_ALLOC_ENTRY - allocate memory for the variable type
+/* PD_ALLOC_ENTRY - Allocate memory for the entry NAME in PDBfile FILE.
+ *                - Return the new space if the entry exists and
+ *                - the allocation succeeds.  Return NULL otherwise.
  *
  * #bind PD_alloc_entry fortran() scheme() python()
  */
@@ -482,7 +484,8 @@ void _PD_rl_alignment(data_alignment *align)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_COPY_DIMS - make and return a copy of the given dimension list
+/* PD_COPY_DIMS - Make and return a copy of the dimension list ODIMS.
+ *              - Return NULL if unsuccessful.
  *
  * #bind PD_copy_dims fortran() scheme() python()
  */
@@ -512,7 +515,8 @@ dimdes *PD_copy_dims(const dimdes *odims)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_COPY_SYMENT - make and return a copy of the given syment
+/* PD_COPY_SYMENT - Make and return a copy of the symbol table entry OSYM.
+ *                - Return NULL if unsuccessful.
  *
  * #bind PD_copy_syment fortran() scheme() python()
  */
@@ -854,7 +858,8 @@ void _PD_free_tuple(multides *tuple)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_COPY_MEMBERS - copy a linked list of members
+/* PD_COPY_MEMBERS - Copy and return a linked list of struct members DESC.
+ *                 - Return NULL if unsuccessful.
  *
  * #bind PD_copy_members fortran() scheme() python()
  */

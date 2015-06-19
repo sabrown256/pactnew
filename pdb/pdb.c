@@ -992,7 +992,7 @@ syment *_PD_write(PDBfile *file, const char *name,
 /* PD_WRITE - Make an entry in the symbol table of PDBfile FILE
  *          - under NAME and write the data of type, TYPE, pointed to by VR
  *          - to the file.
- *          - Return TRUE iff successful.
+ *          - Return TRUE if successful and FALSE otherwise.
  *          -
  *          - NOTE: VR must be a pointer to an object with the type
  *          - given by TYPE!!!!
