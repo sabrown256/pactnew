@@ -1379,11 +1379,12 @@ static int _PD_ptr_reset_ad(PD_address *ad, void *a)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_RESET_PTR_LIST - THREADSAFE
- *                   - reset the pointer lists for the given file
+/* PD_RESET_PTR_LIST - Reset the pointer lists for the given PDBfile FILE
  *                   - so that indirect connectivity bookkeeping
- *                   - is re-initialized this will give the application
- *                   - some control over this process
+ *                   - is re-initialized.  This gives the application
+ *                   - control over the process of the connection of
+ *                   - data trees in their file representation.
+ *                   - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_reset_ptr_list fortran() scheme() python()
  */

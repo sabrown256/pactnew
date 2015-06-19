@@ -344,12 +344,12 @@ int _PD_cksum_file_write(PDBfile *file)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_VERIFY - return TRUE if there is a checksum and it matches a freshly
- *           - computed checksum
- *           - return FALSE if there is a checksum and it does not match
- *           - a freshly computed checksum
- *           - return -1 if there is no checksum in the extras table to 
- *           - verify with 
+/* PD_VERIFY - Return 1 if there is a checksum and it matches a freshly
+ *           - computed checksum of the PDBfile FILE.
+ *           - Return FALSE if there is a checksum and it does not match
+ *           - a freshly computed checksum.
+ *           - Return -1 if there is no checksum in the extras table to
+ *           - verify against.
  *
  * #bind PD_verify fortran() scheme() python()
  */

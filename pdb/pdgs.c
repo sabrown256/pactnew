@@ -149,11 +149,17 @@ static inti _PD_hyper_scatter(char *dst, int id, int nd, long *dind,
 
 /*--------------------------------------------------------------------------*/
 
-/* PD_GATHER_AS - read part of an entry from the PDB file pointed to by
- *              - the symbol table into the location pointed to by VR
- *              - IND contains one triplet of long ints per variable
+/* PD_GATHER_AS - Read an entry NAME from PDBfile FILE with one dimension
+ *              - expression into memory space VR with another dimension
+ *              - expression.
+ *              - Convert to type TYPE regardless of entry type.
+ *              - SIND contains one triplet of long ints per variable
  *              - dimension specifying start, stop, and step for the index
- *              - return the number of item successfully read
+ *              - of the entry NAME.
+ *              - The result in VR has NDST dimensions and DIND
+ *              - contains the min and max (pairwise) of each dimension's
+ *              - range.
+ *              - Return the number of item successfully read.
  *              -
  *              - NOTE: the entry MUST be an array (either a static
  *              - array or a pointer)
@@ -187,7 +193,8 @@ int64_t PD_gather_as(PDBfile *file ARG(,,cls), const char *name,
 	nr = PD_read_as_alt(file, name, type, tv, sind);
 	SC_ASSERT(nr > 0);
 
-	ng = _PD_hyper_scatter((char *) vr, 0, ndst, dind, (char *) tv, bpi, mo);
+	ng = _PD_hyper_scatter((char *) vr, 0, ndst, dind,
+			       (char *) tv, bpi, mo);
 
 	CFREE(tv);};
 
@@ -196,12 +203,16 @@ int64_t PD_gather_as(PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_GATHER - read a variable from a file with one dimension expression
- *           - into a variable in memory with another dimension expression
- *           - read part of an entry from the PDB file pointed to by
- *           - IND contains one triplet of long ints per variable
+/* PD_GATHER - Read an entry NAME from PDBfile FILE with one dimension
+ *           - expression into memory space VR with another dimension
+ *           - expression.
+ *           - SIND contains one triplet of long ints per variable
  *           - dimension specifying start, stop, and step for the index
- *           - return the number of item successfully read
+ *           - of the entry NAME.
+ *           - The result in VR has NDST dimensions and DIND
+ *           - contains the min and max (pairwise) of each dimension's
+ *           - range.
+ *           - Return the number of item successfully read.
  *           -
  *           - NOTE: VR must be a pointer to an object with the type
  *           - given by TYPE (PDBLib will allocated space if necessary)!
@@ -224,12 +235,17 @@ int64_t PD_gather(PDBfile *file ARG(,,cls), const char *name,
 
 /*--------------------------------------------------------------------------*/
 
-/* PD_SCATTER_AS - scatter an entry of type INTYPE to the PDB file, FILE
- *               - as type OUTTYPE
- *               - make an entry in the file's symbol table
- *               - the entry has name, NAME, ND dimensions, and the ranges
- *               - of the dimensions are given (min, max) pairwise in IND
- *               - return TRUE iff successful
+/* PD_SCATTER_AS - Write a variable to PDBfile FILE with one dimension
+ *               - expression from memory space VR with another dimension
+ *               - expression.
+ *               - Convert to data from memory type INTYPE to
+ *               - file type OUTTYPE.
+ *               - The space VR has type INTYPE and NSRC dimensions with SIND
+ *               - containing the min and max (pairwise) of each dimensions
+ *               - range.
+ *               - The entry NAME has NDST dimensions and DIND contains the min
+ *               - and max (pairwise) of each dimensions range.
+ *               - Return TRUE if successful and FALSE otherwise.
  *               -
  *               - NOTE: VR must be a pointer to an object with the type
  *               - given by TYPE!!!!
@@ -264,15 +280,16 @@ int PD_scatter_as(PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SCATTER - write a variable to a file with one dimension expression
- *            - using a variable in memory with another dimension expression
- *            - the entry is named by NAME has ND dimensions and IND
- *            - contains the min and max (pairwise) of each dimensions
- *            - range
- *            - return TRUE iff successful
+/* PD_SCATTER - Write a variable to PDBfile FILE with one dimension expression
+ *            - from memory space VR with another dimension expression.
+ *            - The space VR has type TYPE and NSRC dimensions with SIND
+ *            - containing the min and max (pairwise) of each dimensions range.
+ *            - The entry NAME has NDST dimensions and DIND contains the min
+ *            - and max (pairwise) of each dimensions range.
+ *            - Return TRUE if successful and FALSE otherwise.
  *            -
  *            - NOTE: VR must be a pointer to an object with the type
- *            - given by TYPE!!!!
+ *            - given by TYPE!
  *
  * #bind PD_scatter fortran() scheme() python()
  */
