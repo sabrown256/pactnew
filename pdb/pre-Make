@@ -9,6 +9,7 @@
 # include "cpyright.h"
 #
 
+Package=pdb
 LibName=pdb
 
 TGTExe = ${BinDir}/pcexec

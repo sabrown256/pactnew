@@ -1020,6 +1020,7 @@ switch ($Cmnd)
         Note $Log "PSY_AIRoot      = $PSY_AIRoot"
         Note $Log "PSY_ASRoot      = $PSY_ASRoot"
         Note $Log "PSY_Root        = $PSY_Root"
+        Note $Log "PSY_Build       = $PSY_Build"
         Note $Log "PSY_CONFIG_PATH = $PSY_CONFIG_PATH"
 
         flog $Log umask
@@ -1060,6 +1061,9 @@ switch ($Cmnd)
         endif
         if (!(-d $PSY_Root/scheme/extensions)) then
            flog $Log mkdir $PSY_Root/scheme/extensions
+        endif
+        if (!(-d $PSY_Build)) then
+           flog $Log mkdir $PSY_Build
         endif
 
         flog $Log $RM *.core *~
@@ -1449,6 +1453,9 @@ CFG_DONE:
         endif
         if (!(-d $PSY_Root/scheme/extensions)) then
            mkdir $PSY_Root/scheme/extensions
+        endif
+        if (!(-d $PSY_Build)) then
+           mkdir $PSY_Build
         endif
         if (!(-d $PSY_Root/log)) then
            mkdir $PSY_Root/log

@@ -9,6 +9,7 @@
 # include "cpyright.h"
 #
 
+Package=score
 LibName=score
 
 TGTLib = ${LibDir}/lib${LibName}.a
@@ -264,7 +265,7 @@ ${IncDir}/scfnca.h : scfnca.t
 GenInc = ${PACTTmpDir}/gc_type.h ${PACTTmpDir}/gc-score.h
 
 ${IncDir}/score_gen.h : ${GenInc}
-	@echo "build score_gen.h"
+	@echo "build ${IncDir}/score_gen.h"
 	@rm -f ${IncDir}/score_gen.h
 	@cat ${GenInc} > ${IncDir}/score_gen.h
 

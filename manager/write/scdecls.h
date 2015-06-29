@@ -11,8 +11,8 @@
 set Me = $0
 source $Me:h/pre-common
 
-Note $WLog "----- write/package -----"
-Note $WLog "Write: package"
+Note $WLog "----- write/scdecls.h -----"
+Note $WLog "Write: scdecls.h"
 Note $WLog ""
 
 #--------------------------------------------------------------------------

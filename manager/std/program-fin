@@ -23,6 +23,11 @@ Run {
    write/iso-c.h         $Log $PSY_ScrDir
 }
 
+# Create links for out of source build
+#Run {
+#   write/package-links   $Log $PSY_ScrDir
+#}
+
 Run {
    write/configured      $Log $PSY_ScrDir
    write/make-def        $Log $PSY_ScrDir

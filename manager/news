@@ -1,3 +1,31 @@
+6/22/2015
+
+PACT and PACTNEW are now sync'd as per the notice posted on
+the pactatlab mailing list on 6/8/2015.  They are the same version.
+
+
+1/05/2015
+
+ULTRA changes:
+
+1) ULTRA is now a pcsh script like PDBView.  This means that
+   users must have the full path to ULTRA in their PATH variables.
+   The best way to do this is to add the following to their
+   .cshr file:
+
+       set path = ( /usr/local/apps/pactnew/bin $path )
+
+2) An inconsistency bug was fixed affecting color usages.  Users
+   wanting a white background should change any line in their
+   .ultrarc file that looks like:
+
+      background-color-flag white
+
+   to
+
+      background-color-flag on
+
+
 6/5/2012
 
 For a long time the PACT Python bindings

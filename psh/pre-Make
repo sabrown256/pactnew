@@ -5,6 +5,8 @@
 # include "cpyright.h"
 #
 
+Package=psh
+
 TGTBin = nobin
 TGTInc = ${StdHdrs}
 

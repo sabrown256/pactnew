@@ -146,6 +146,7 @@ Tool TRACKER {
 #
 #   PSY_Base         the base directory containing sources
 #   PSY_Root         the root dev directory for this PSY_ID
+#   PSY_Build        the build directory for this PSY_ID, typically $(PSY_Root)/build
 #   PSY_AIRoot       the architecture independent root directory
 #   PSY_ASRoot       the architecture specific root directory
 #   PSY_InstRoot     the root installation directory
@@ -158,6 +159,8 @@ Tool TRACKER {
 #   PSY_MngDir       the manager directory
 #   PSY_ScrDir       the scripts directory
 #   PSY_TmpDir       the temporary build/test directory
+#   PSY_BldObj       the temporary build directory
+#   PSY_BldTst       the temporary test directory
 
 Group PSY {
    Arch        = ${PSY_Arch}
@@ -176,6 +179,7 @@ Group PSY {
 
    Base        = ${PSY_Base}
    Root        = ${PSY_Base}/dev/${PSY_ID}
+   Build       = ${PSY_Build}
    AIRoot      = ${PSY_AIRoot}
    ASRoot      = ${PSY_ASRoot}
    InstRoot    = ${PSY_InstRoot}
@@ -188,6 +192,8 @@ Group PSY {
    MngDir      = ${PSY_Base}/manager
    ScrDir      = ${PSY_Base}/scripts
    TmpDir      = ${PSY_Prefix}${PSY_ID}
+   BldObj      = ${PSY_BldObj}
+   BldTst      = ${PSY_BldTst}
 }
 
 #--------------------------------------------------------------------------

@@ -42,6 +42,9 @@ while ($#argv > 0)
            unsetenv PSY_ASRoot
            unsetenv PSY_InstRoot
            unsetenv PSY_Root
+           unsetenv PSY_Build
+           unsetenv PSY_BldObj
+           unsetenv PSY_BldTst
            unsetenv PSY_Prefix
            unsetenv PSY_AnaDir
            unsetenv PSY_CfgDir
@@ -125,6 +128,8 @@ else
    endif
 
    setenv PSY_Root     $basedir/dev/${PSY_ID}
+#   setenv PSY_Build    $basedir/dev/${PSY_ID}/build  #   out of source build
+   setenv PSY_Build    $PSY_Base
 
    if ($?PSY_AIRoot == 0) then
 
@@ -175,6 +180,24 @@ else
       setenv PSY_TmpDir  ${PSY_Prefix}${PSY_ID}
    endif
 
+   if ($PSY_Base == $PSY_Build) then
+      # classic build
+      if ($?PSY_BldObj == 0) then
+         setenv PSY_BldObj  ${PSY_Prefix}${PSY_ID}/obj
+      endif
+      if ($?PSY_BldTst == 0) then
+         setenv PSY_BldTst  ${PSY_Prefix}${PSY_ID}/test
+      endif
+   else
+      # out of source build
+      if ($?PSY_BldObj == 0) then
+         setenv PSY_BldObj  .
+      endif
+      if ($?PSY_BldTst == 0) then
+         setenv PSY_BldTst  test
+      endif
+   endif
+
 endif
 
 echo "setenv HSY_Host     $HSY_Host ; "
@@ -191,6 +214,7 @@ endif
 # root directories
 echo "setenv PSY_Base     $PSY_Base ; "
 echo "setenv PSY_Root     $PSY_Root ; "
+echo "setenv PSY_Build    $PSY_Build ; "
 echo "setenv PSY_AIRoot   $PSY_AIRoot ; "
 echo "setenv PSY_ASRoot   $PSY_ASRoot ; "
 echo "setenv PSY_InstRoot $PSY_InstRoot ; "
@@ -201,7 +225,9 @@ echo "setenv PSY_CfgDir   $PSY_CfgDir ; "
 echo "setenv PSY_FltDir   $PSY_FltDir ; "
 echo "setenv PSY_MngDir   $PSY_MngDir ; "
 echo "setenv PSY_ScrDir   $PSY_ScrDir ; "
-echo "setenv PSY_TmpDir   $PSY_TmpDir"
+echo "setenv PSY_TmpDir   $PSY_TmpDir ; "
+echo "setenv PSY_BldObj   $PSY_BldObj ; "
+echo "setenv PSY_BldTst   $PSY_BldTst"
 
 exit($err)
 

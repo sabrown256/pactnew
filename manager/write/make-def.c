@@ -41,7 +41,8 @@ int main(int c, char **v)
    {int i, rv;
     int ig, ng, it, use_acc;
     char r[BFLRG],  t[BFLRG], md[BFLRG], cc_inc[BFLRG];
-    char *psy_root, *psy_base, *psy_cfg, *psy_load, *psy_inst;
+    char *psy_bldobj, *psy_bldtst;
+    char *psy_root, *psy_base, *psy_build, *psy_cfg, *psy_load, *psy_inst;
     char *psy_publib;
     char *hsy_os_name, *hsy_os_type, *lostd;
     char *make_strategy, *make_usegnu, *dev;
@@ -111,11 +112,14 @@ int main(int c, char **v)
 
     csetenv("CROSS_COMPILE", dbget(cl, FALSE, "CROSS_COMPILE"));
 
-    psy_root = dbget(cl, TRUE, "PSY_Root");
-    psy_base = dbget(cl, TRUE, "PSY_Base");
-    psy_inst = dbget(cl, TRUE, "PSY_InstRoot");
-    psy_cfg  = dbget(cl, TRUE, "PSY_Cfg");
-    psy_load = dbget(cl, TRUE, "PSY_Load");
+    psy_root   = dbget(cl, TRUE, "PSY_Root");
+    psy_base   = dbget(cl, TRUE, "PSY_Base");
+    psy_build  = dbget(cl, TRUE, "PSY_Build");
+    psy_bldobj = dbget(cl, TRUE, "PSY_BldObj");
+    psy_bldtst = dbget(cl, TRUE, "PSY_BldTst");
+    psy_inst   = dbget(cl, TRUE, "PSY_InstRoot");
+    psy_cfg    = dbget(cl, TRUE, "PSY_Cfg");
+    psy_load   = dbget(cl, TRUE, "PSY_Load");
 
     hsy_os_name = dbget(cl, TRUE, "HSY_OS_Name");
     hsy_os_type = dbget(cl, TRUE, "HSY_OS_Type");
@@ -174,6 +178,12 @@ int main(int c, char **v)
     fprintf(fp, "PSY_Base   = %s\n", psy_base);
     fprintf(fp, "PSY_ScrDir = %s/scripts\n", psy_base);
     fprintf(fp, "PSY_Root   = %s\n", psy_root);
+    fprintf(fp, "PSY_Build  = %s\n", psy_build);
+    fprintf(fp, "PSY_BldObj = %s\n", psy_bldobj);
+    fprintf(fp, "PSY_BldTst = %s\n", psy_bldtst);
+    fprintf(fp, "PkgSource  = %s/${Package}\n", psy_base);
+    fprintf(fp, "PkgBuild   = %s/${Package}/%s\n", psy_base, psy_bldobj);
+    fprintf(fp, "PkgTest    = %s/${Package}/%s\n", psy_base, psy_bldtst);
     fprintf(fp, "ScmDir     = ${PSY_Root}/scheme\n");
     fprintf(fp, "BinDir     = ${PSY_Root}/bin\n");
     fprintf(fp, "LibDir     = ${PSY_Root}/lib\n");

@@ -7,6 +7,7 @@
 # include "cpyright.h"
 #
 
+Package=sx
 LibName=sx
 
 TGTLib = ${LibDir}/lib${LibName}.a

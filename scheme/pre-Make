@@ -7,6 +7,7 @@
 # include "cpyright.h"
 #
 
+Package=scheme
 LibName=scheme
 
 TGTLib = ${LibDir}/lib${LibName}.a

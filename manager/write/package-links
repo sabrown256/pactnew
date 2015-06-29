@@ -1,0 +1,75 @@
+#!/bin/csh -f
+#
+# PACKAGE-LINKS - Create links from $PSY_Root/build/<pkg> to $PSY_Base/<pkg>/PSY_TmpDir
+#
+# Source Version: 3.0
+# Software Release #: LLNL-CODE-422942
+#
+# include "cpyright.h"
+#
+
+set Me = $0
+source $Me:h/pre-common
+
+Note $WLog "----- write/package-links -----"
+Note $WLog "Write: package-links"
+Note $WLog ""
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+Separator $WLog
+NoteD $WLog "   Package Links"
+Note $WLog ""
+
+dbmget $WLog PSY_TmpDir^       \
+             PSY_ID^           \
+             PSY_Base^         \
+             PSY_Build^        \
+             PSY_Root
+
+    setenv EtcDir  $PSY_Root/etc
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+#
+# The old way was $PSY_base/$i/$PSY_Tmp/{obj,test}
+#  They are now links to
+#   $PSY_Build/$i  and $PSY_Build/$i/test
+#
+
+
+    foreach i (`cat $EtcDir/package`)
+        flog $WLog mkdir -p $PSY_Build/$i/test
+        flog $WLog pushd $PSY_Base/$i
+        if (!(-d $PSY_TmpDir)) then     # remove old config info
+           flog $WLog mkdir $PSY_TmpDir
+        endif
+        flog $WLog pushd $PSY_TmpDir
+
+        # remove old directory
+	if (-d obj) then
+           flog $WLog rm -rf obj
+	endif
+	if (-d test) then
+           flog $WLog rm -rf test
+	endif
+
+        if (!(-e obj)) then
+           flog $WLog ln -s $PSY_Build/$i obj
+        endif
+        if (!(-e test)) then
+           flog $WLog ln -s $PSY_Build/$i/test test
+        endif
+        flog $WLog popd
+        flog $WLog popd
+    end
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+source $Me:h/post-common
+
+exit(0)
+

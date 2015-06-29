@@ -4,6 +4,7 @@
 #
 # include "cpyright.h"
 #
+Package=scripts
 
 # these are now C programs in PSH
 TGTCScr = do-net atdbg
