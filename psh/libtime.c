@@ -68,5 +68,87 @@ char *time_string(char *ts, int nc, int fmt, double t)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* GET_DATE_S - return the date as a string */
+
+char *get_date_s(void)
+   {time_t t;
+    char *p;
+    static char s[BFLRG];
+
+    p = NULL;
+    t = time(NULL);
+    if (t > 0)
+       {nstrncpy(s, BFLRG, ctime(&t), -1);
+	LAST_CHAR(s) = '\0';
+	p = s;};
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* GET_DATE_P - return the date as an array of integers
+ *            - fill an integer array T with broken down time as follows:
+ *            -  T[0] = second
+ *            -  T[1] = minute
+ *            -  T[2] = hour
+ *            -  T[3] = day
+ *            -  T[4] = month
+ *            -  T[5] = year
+ *            -  T[6] = week day
+ *            -  T[7] = year day
+ *            -  T[8] = daylight savings time flag
+ *            - only fill in upto NT of these
+ */
+
+int get_date_p(int *t, int nt)
+   {int it, rv;
+    time_t ti;
+    struct tm *bt;
+
+    ti = time(NULL);
+    bt = localtime(&ti);
+    if (bt != NULL)
+       {rv = TRUE;
+	nt = min(nt, 9);
+	for (it = 0; it < nt; it++)
+	    {switch (it)
+	        {case 0 :
+		      t[it] = bt->tm_sec;
+		      break;
+		 case 1 :
+		      t[it] = bt->tm_min;
+		      break;
+		 case 2 :
+		      t[it] = bt->tm_hour;
+		      break;
+		 case 3 :
+		      t[it] = bt->tm_mday;
+		      break;
+		 case 4 :
+		      t[it] = bt->tm_mon + 1;
+		      break;
+		 case 5 :
+		      t[it] = bt->tm_year + 1900;
+		      break;
+		 case 6 :
+		      t[it] = bt->tm_wday + 1;
+		      break;
+		 case 7 :
+		      t[it] = bt->tm_yday + 1;
+		      break;
+		 case 8 :
+		      t[it] = bt->tm_isdst;
+		      break;};};}
+    else
+       {rv = FALSE;
+	for (it = 0; it < nt; it++)
+	    t[it] = -1;};
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 # endif
 #endif

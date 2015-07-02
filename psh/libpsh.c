@@ -1682,25 +1682,6 @@ char *grep(FILE *fp, const char *name, const char *fmt, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* GET_DATE - return the date */
-
-char *get_date(void)
-   {time_t t;
-    char *p;
-    static char s[BFLRG];
-
-    p = NULL;
-    t = time(NULL);
-    if (t > 0)
-       {nstrncpy(s, BFLRG, ctime(&t), -1);
-	LAST_CHAR(s) = '\0';
-	p = s;};
-
-    return(p);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* NSLEEP - millisecond sleep */
 
 void nsleep(int ms)

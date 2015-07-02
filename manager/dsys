@@ -1056,6 +1056,9 @@ switch ($Cmnd)
         if (!(-d $PSY_Root/man/man3)) then
            flog $Log mkdir $PSY_Root/man/man3
         endif
+        if (!(-d $PSY_Root/html)) then
+           flog $Log mkdir $PSY_Root/html
+        endif
         if (!(-d $PSY_Root/scheme)) then
            flog $Log mkdir $PSY_Root/scheme
         endif

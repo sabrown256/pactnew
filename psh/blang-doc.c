@@ -170,6 +170,7 @@ static void html_wrap(FILE *fp, fdecl *dcl, const char *sb, int ndc,
 static void man_wrap(statedes *st, fdecl *dcl,
 		     const char *sb, const char *pck, int ndc, char **cdc)
    {int ib, voidf;
+    int tm[6];
     char fname[BFLRG], upk[BFLRG];
     char upn[BFLRG], lfn[BFLRG];
     char fty[BFLRG], t[BFLRG];
@@ -202,11 +203,13 @@ static void man_wrap(statedes *st, fdecl *dcl,
     if (fp == NULL)
        return;
 
+    get_date_p(tm, 6);
+
     fprintf(fp, ".\\\"\n");
     fprintf(fp, ".\\\" See the terms of include/cpyright.h\n");
     fprintf(fp, ".\\\"\n");
-    fprintf(fp, ".TH %s 3  2011-06-21 \"%s\" \"%s Documentation\"\n",
-	    upn, upk, upk);
+    fprintf(fp, ".TH %s 3  %4d-%02d-%02d \"%s\" \"%s Documentation\"\n",
+	    upn, tm[5], tm[4], tm[3], upk, upk);
     fprintf(fp, ".SH NAME\n");
     fprintf(fp, "%s \\- \n", cfn);
     fprintf(fp, ".SH SYNOPSIS\n");

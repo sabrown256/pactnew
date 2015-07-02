@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "libpsh.c"
+#include "libtime.c"
 #include "libtyp.c"
 
 #define NO_DEFAULT_VALUE "----"

@@ -384,7 +384,8 @@ extern int
  PS_demonize(void),
  PS_file_strings_push(FILE *fp, char ***psa, int snl, unsigned int nbr),
  PS_strings_file(char **sa, const char *fname, const char *mode),
- PS_is_running(int pid);
+ PS_is_running(int pid),
+ PS_get_date_p(int *t, int nt);
 
 extern char
  *PS_nstrsave(const char *s),
@@ -413,7 +414,7 @@ extern char
  *PS_path_simplify(char *s, int dlm),
  *PS_run(int echo, const char *fmt, ...),
  *PS_grep(FILE *fp, const char *name, const char *fmt, ...),
- *PS_get_date(void),
+ *PS_get_date_s(void),
  *PS_strip_quote(const char *t),
  *PS_cnoval(void),
  *PS_cgetenv(int lit, const char *fmt, ...),

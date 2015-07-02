@@ -591,7 +591,8 @@ Note $Log ""
 
 # move all documentation to the doc package
       if (-f gh-$d.html) then
-         flog $Log mv gh-$d.html $reld/doc
+         flog $Log mv gh-$d.html $PSY_Root/html
+#         flog $Log mv gh-$d.html $reld/doc
       endif
 
       flog $Log popd

@@ -5,12 +5,19 @@
 #           - handles a certain amount of consistency
 #
 
-unalias ls
+unalias *
 
-@ Err = 0
+@ err = 0
 
-set InF = ""
-set Sfx = local
+set pact    = `which pact`
+set bindir  = $pact:h
+set rootdir = $bindir:h
+set htmldir = $rootdir/html
+
+source $rootdir/etc/env-pact.csh
+
+set inf = ""
+set sfx = local
 
 while ($#argv > 0)
    switch ($1)
@@ -24,40 +31,47 @@ while ($#argv > 0)
            echo ""
            exit(1)
       case -i:
-           set Sfx = inst
+           set sfx = inst
            breaksw
       case -s:
            shift
-           set Sfx = $1
+           set sfx = $1
            breaksw
       default:
-           set InF = ( $InF $1 )
+           set inf = ( $inf $1 )
            breaksw
    endsw
    shift
 end
 
-if ("$InF" == "") then
-   set InF = ( `ls -1 *.h` )
+if ("$inf" == "") then
+   set inf = ( `ls -1 *.h` )
 endif
 
-set Hdr = html-header.$Sfx
-set Trl = html-trailer.$Sfx
+set hdr = html-header.$sfx
+set trl = html-trailer.$sfx
 
-foreach i ($InF)
-   set Base = $i:r
-   set OutF = $Base.html
+foreach i ($inf)
+   set base = $i:r
+   set outf = $htmldir/$base.html
 
    set Title = ( `awk '$1 == "TXT:" { print }' $i | sed 's/TXT: //' | sed "s/'/\\\&rsquo;/g" | sed 's/"/\\\&quot;/g'` )
    set LastM = ( `awk '$1 == "MOD:" { print }' $i | sed 's/MOD: //'` )
 
-   echo "$i $OutF $LastM" | awk '{printf("   %-16s -> %-20s (%s)\n", $1, $2, $3);}'
+   echo "$i $outf:t $LastM" | awk '{printf("   %-16s -> %-20s (%s)\n", $1, $2, $3);}'
 
-   cat $Hdr $i $Trl                              | \
+   cat $hdr $i $trl                              | \
    awk '$1 != "TXT:" && $1 != "MOD:" { print }'  | \
    sed 's/$TXT/'"$Title"'/'                      | \
-   sed 's+$MOD+'"$LastM"'+'                      >! $OutF
+   sed 's+$MOD+'"$LastM"'+'                      >! $outf
 end
 
-exit($Err)
+# copy the any GIF that does not exist over to HTMLDIR
+foreach g (*.gif unix-README)
+   if (!(-e $htmldir/$g)) then
+      cp $g $htmldir
+   endif
+end
+
+exit($err)
 

@@ -182,7 +182,8 @@
 #define free_strings 		PS_free_strings
 #define full_path 		PS_full_path
 #define get_connect_socket 	PS_get_connect_socket
-#define get_date 		PS_get_date
+#define get_date_p 		PS_get_date_p
+#define get_date_s 		PS_get_date_s
 #define get_db 			PS_get_db
 #define get_multi_line 		PS_get_multi_line
 #define get_process_state       PS_get_process_state

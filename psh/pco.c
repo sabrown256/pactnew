@@ -1086,7 +1086,8 @@ static void check_dir(client *cl)
     char Created[BFLRG], Missing[BFLRG];
     char *sib, *dir;
     static char *dlst[] = {"bin", "lib", "include", "include/shell",
-			   "etc", "scheme", "man", "man/man1", "man/man3"};
+			   "etc", "scheme", "html",
+			   "man", "man/man1", "man/man3"};
 
     n   = sizeof(dlst)/sizeof(char *);
     sib = dbget(cl, TRUE, "PSY_InstRoot");
@@ -1388,7 +1389,7 @@ static void setup_analyze_env(client *cl)
 /* setup the analyze log file */
     snprintf(alog, BFLRG, "%s/log/analyze",  gst.dir.root);
     out = open_file("w", alog);
-    note(out, "%s\n", get_date());
+    note(out, "%s\n", get_date_s());
     fclose_safe(out);
 
     dbset(cl, "HSY_Host",       gst.host);
@@ -2432,7 +2433,7 @@ static void write_do_run_db(client *cl, state *st)
     separator(fl);
     note(fl, "Command: pco/write_do_run_db\n");
     note(fl, "Current: %s\n", s);
-    note(fl, "Date: %s\n", get_date());
+    note(fl, "Date: %s\n", get_date_s());
     note(fl, "Manager directory: %s\n", dbget(cl, FALSE, "PSY_MngDir"));
     note(fl, "\n");
 
