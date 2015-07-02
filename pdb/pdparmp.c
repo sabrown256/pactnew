@@ -1777,21 +1777,23 @@ static void _PD_comm_connect_mpi(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INIT_MPI - initialize the library for distributed parallel i/o
- *             -
- *             - if called by masterproc
- *             -    spawn master control process which will:
- *             -          initialize disk space manager
- *             -          set up symbol table manager
- *             -          go into a message loop to process requests
- *             -             from other processes
- *             - Have to initialize threads here because we need to
- *             - add 1 for the master process
+/* PD_INIT_MPI - Initialize PDBLib for distributed parallel I/O.
+ *             - If called by master task, MPR, spawn master control
+ *             - process which will:
+ *             -    1) initialize disk space manager
+ *             -    2) set up symbol table manager
+ *             -    3) go into a message loop to process requests
+ *             -       from other processes
+ *             - Threads are also initialized here because we need to
+ *             - add 1 for the master process. Consequently the
+ *             - number of threads, NTHREADS, and thread id function TID
+ *             - are required arguments.
+ *             - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_init_mpi fortran() scheme() python()
  */
 
-int PD_init_mpi(int masterproc, int nthreads, PFTid tid)
+int PD_init_mpi(int mpr, int nthreads, PFTid tid)
    {MPI_Comm world, mcomm;
     MPI_Group world_group;
 
@@ -1805,7 +1807,7 @@ int PD_init_mpi(int masterproc, int nthreads, PFTid tid)
 
 /* get my rank */
 	MPI_Comm_rank(MPI_COMM_WORLD, &_PD.mp_rank);
-	_PD.mp_master_proc = masterproc;
+	_PD.mp_master_proc = mpr;
 
 	SC_set_processor_info(_PD.mp_size, _PD.mp_rank);
 
@@ -1823,7 +1825,7 @@ int PD_init_mpi(int masterproc, int nthreads, PFTid tid)
 	nthreads = max(1L, nthreads);
 
 #ifdef USE_THREAD_SAFE_MPI
-	if (_PD.mp_rank == masterproc)
+	if (_PD.mp_rank == mpr)
 	   nthreads += 1;
 #endif
           
@@ -1840,7 +1842,7 @@ int PD_init_mpi(int masterproc, int nthreads, PFTid tid)
 	   _PD_init_pvif("_PD_pbuffer");
 
 #ifdef USE_THREAD_SAFE_MPI
-	if ((_PD.mp_rank == masterproc) && (_PD.mp_size > 1))
+	if ((_PD.mp_rank == mpr) && (_PD.mp_size > 1))
 	   {int pret;
 
 	    pret = SC_THREAD_CREATE(_PD_mp_master_thread, _PD_thread_attr,
@@ -1858,7 +1860,8 @@ int PD_init_mpi(int masterproc, int nthreads, PFTid tid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TERM_MPI - shutdown the library--terminate the master thread
+/* PD_TERM_MPI - Shutdown the distributed I/O processing for PDBLib.
+ *             - Terminate the master thread.
  *
  * #bind PD_term_mpi fortran() scheme() python()
  */

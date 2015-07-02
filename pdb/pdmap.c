@@ -13,7 +13,11 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRT_CURVE_ALT - write an ULTRA curve into a PDB file
+/* PD_WRT_CURVE_ALT - Write an ULTRA curve as specified by: a label, LABL;
+ *                  - number of points, N; x values X; and y values Y.
+ *                  - The curve is written out to the PDBfile FILE as
+ *                  - as the SIC'th curve in the file.
+ *                  - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_wrt_curve_alt fortran() python()
  */
@@ -33,7 +37,14 @@ int PD_wrt_curve_alt(PDBfile *file ARG(,,cls), const char *labl,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRT_CURVE_Y_ALT - write the y values for an ULTRA curve into a PDB file
+/* PD_WRT_CURVE_Y_ALT - Write an ULTRA curve as specified by: a label, LABL;
+ *                    - number of points, N; y values, Y; and x values
+ *                    - from curve IX in the file.
+ *                    - The curve is written out to the PDBfile FILE as
+ *                    - as the SIC'th curve in the file.
+ *                    - NOTE: no checking is done to see whether the number
+ *                    - of points for the specified x values is correct.
+ *                    - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_wrt_curve_y_alt fortran() python()
  */
@@ -90,26 +101,30 @@ static PM_set *_PD_build_set(int *ai, double *ad, const char *sname)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRT_SET - write a PM_set into a PDB file
- *            - the set information (dname, dp, dm) is structured
+/* PD_WRT_SET - Write a PM_set into a PDBfile FILE.
+ *            - The set information DNAME, ADP, ADM is structured
  *            - as follows:
  *            -
- *            - dname : the FORTRAN version of the set name left justified
+ *            - DNAME : the FORTRAN version of the set name left justified
  *            -
- *            - dp[1]              : the number of characters in dname
- *            - dp[2]              : the dimensionality of the set - nd
- *            - dp[3]              : the dimensionality of the elements - nde
- *            - dp[4]              : the number of elements in the set - ne
- *            - dp[5] ... dp[5+nd] : the sizes in each dimension
+ *            - ADP[1]               : the number of characters in dname
+ *            - ADP[2]               : the dimensionality of the set - nd
+ *            - ADP[3]               : the dimensionality of the elements - nde
+ *            - ADP[4]               : the number of elements in the set - ne
+ *            - ADP[5] ... ADP[5+nd] : the sizes in each dimension
  *            -
- *            - dm[1]      - dm[ne]          : values of first component of
- *            -                                elements
+ *            - ADM[1]      - ADM[ne]          : values of first component of
+ *            -            .                     elements
  *            -            .
  *            -            .
- *            -            .
  *            -
- *            - dm[nde*ne] - dm[nde*ne + ne] : values of nde'th component of
- *            -                                elements
+ *            - ADM[nde*ne] - ADM[nde*ne + ne] : values of nde'th component of
+ *            -                                  elements
+ *            - where nd is the number of dimensions of the set,
+ *            - ne is the number of elements, and nde is the number of
+ *            - dimensions of each element.
+ *            -
+ *            - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_wrt_set fortran() python()
  */
@@ -141,27 +156,31 @@ int PD_wrt_set(PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRT_MAP - write an PM_mapping into a PDB file
- *            - the domain information (dname, dp, dm) and range 
- *            - information (rname, rp, rm) are structured the same
+/* PD_WRT_MAP - WRITE an PM_mapping into a PDBfile FILE.
+ *            - The domain information DNAME, ADP, ADM and range 
+ *            - information RNAME, ARP, ARM are structured the same
  *            - and are as follows:
  *            -
- *            - dname : the FORTRAN version of the set name left justified
+ *            - DNAME : the FORTRAN version of the set name left justified
  *            -
- *            - dp[1]              : the number of characters in dname
- *            - dp[2]              : the dimensionality of the set - nd
- *            - dp[3]              : the dimensionality of the elements - nde
- *            - dp[4]              : the number of elements in the set - ne
- *            - dp[5] ... dp[5+nd] : the sizes in each dimension
+ *            - ADP[1]              : the number of characters in dname
+ *            - ADP[2]              : the dimensionality of the set - nd
+ *            - ADP[3]              : the dimensionality of the elements - nde
+ *            - ADP[4]              : the number of elements in the set - ne
+ *            - ADP[5] ... ADP[5+nd] : the sizes in each dimension
  *            -
- *            - dm[1]      - dm[ne]          : values of first component of
- *            -                                elements
+ *            - ADM[1]      - ADM[ne]          : values of first component of
+ *            -            .                     elements
  *            -            .
  *            -            .
- *            -            .
  *            -
- *            - dm[nde*ne] - dm[nde*ne + ne] : values of nde'th component of
- *            -                                elements
+ *            - ADM[nde*ne] - ADM[nde*ne + ne] : values of nde'th component of
+ *            -                                  elements
+ *            - where nd is the number of dimensions of the set,
+ *            - ne is the number of elements, and nde is the number of
+ *            - dimensions of each element.
+ *            -
+ *            - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_wrt_map fortran() python()
  */
@@ -203,33 +222,38 @@ int PD_wrt_map(PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRT_MAP_RAN - write a PM_mapping into a PDB file
- *                - only the range part of the mapping is given
+/* PD_WRT_MAP_RAN - Write a PM_mapping into a PDBfile FILE.
+ *                - Only the range part of the mapping is given,
  *                - but additional information is given in INFO such as
- *                - an existence map and centering are included
- *                - the domain (common to many mappings) is written separately
- *                -
- *                - the domain name is the only part of the domain specified
- *                -
- *                - the range information (rname, rp, rm) is structured
+ *                - an existence map and centering.
+ *                - The mapping is written out to the PDBfile FILE as
+ *                - as the SIM'th mapping in the file.
+ *                - The domain (common to many mappings) is written separately.
+ *                - The domain name is the only part of the domain specified.
+ *                - The range information (RNAME, ARP, ARM) is structured
  *                - as follows:
  *                -
- *                - rname : the FORTRAN version of the set name left justified
+ *                - RNAME : the FORTRAN version of the set name left justified
  *                -
- *                - rp[1]              : the number of characters in rname
- *                - rp[2]              : the dimensionality of the set - nd
- *                - rp[3]              : the dimensionality of the elements - nde
- *                - rp[4]              : the number of elements in the set - ne
- *                - rp[5] ... rp[5+nd] : the sizes in each dimension
+ *                - ARP[1]               : the number of characters in RNAME
+ *                - ARP[2]               : the dimensionality of the set - nd
+ *                - ARP[3]               : the dimensionality of the elements - nde
+ *                - ARP[4]               : the number of elements in the set - ne
+ *                - ARP[5] ... ARP[5+nd] : the sizes in each dimension
  *                -
- *                - rm[1]      - rm[ne]          : values of first component of
- *                -                                elements
+ *                - ARM[1]      - ARM[ne]          : values of first component of
+ *                -            .                     elements
  *                -            .
  *                -            .
  *                -            .
  *                -
- *                - rm[nde*ne] - rm[nde*ne + ne] : values of nde'th component of
- *                -                                elements
+ *                - ARM[nde*ne] - ARM[nde*ne + ne] : values of nde'th component of
+ *                -                                 elements
+ *                - where nd is the number of dimensions of the set,
+ *                - ne is the number of elements, and nde is the number of
+ *                - dimensions of each element.
+ *                -
+ *                - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_wrt_map_ran fortran() python()
  */

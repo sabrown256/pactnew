@@ -589,7 +589,13 @@ int64_t _PD_member_location(const char *s, hasharr *tab,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_SYMBOL - look up the entry for the named quantity
+/* PD_INQUIRE_SYMBOL - Look up the entry NAME in symbol table TAB.
+ *                   - If FLAG is TRUE convert NAME to a full path
+ *                   - to the PDBfile FILE variable prior to lookup.
+ *                   - If FULLNAME is non-NULL return the path used to
+ *                   - do the lookup.
+ *                   - Return entry from TAB if successful and return
+ *                   - NULL otherwise.
  *
  * #bind PD_inquire_symbol fortran() scheme() python()
  */
@@ -633,7 +639,11 @@ haelem *PD_inquire_symbol(const PDBfile *file ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_QUERY_ENTRY - look up the symbol table entry for the named quantity
+/* PD_QUERY_ENTRY - Look up the entry for NAME in the PDBfile FILE.
+ *                - If FULLNAME is non-NULL return the full path to
+ *                - the variable in the file.
+ *                - Return the symbol table entry if successful and
+ *                - return NULL otherwise.
  *
  * #bind PD_query_entry fortran() scheme() python()
  */
@@ -651,7 +661,14 @@ syment *PD_query_entry(const PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INQUIRE_ENTRY - look up the symbol table entry for the named quantity
+/* PD_INQUIRE_ENTRY - Look up the entry NAME in PDBfile FILE.
+ *                  - If FLAG is TRUE convert NAME to a full path
+ *                  - to the file variable prior to lookup.
+ *                  - If FULLNAME is non-NULL return the path used to
+ *                  - do the lookup.
+ *                  - Return the symbol table entry if successful and return
+ *                  - NULL otherwise.
+ *
  *
  * #bind PD_inquire_entry fortran() scheme() python()
  */
@@ -669,11 +686,19 @@ syment *PD_inquire_entry(const PDBfile *file ARG(,,cls), const char *name,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_EFFECTIVE_ENTRY - look up the effective symbol table entry
- *                    - for the named quantity which might be of the form
+/* PD_EFFECTIVE_ENTRY - Look up the effective symbol table entry
+ *                    - for NAME which might be of the form:
  *                    -     a.b.c
  *                    -     a->b
- *                    - and all other possibilities
+ *                    - and all other similar expressions for which no
+ *                    - actual symbol table entry exists.
+ *                    - If FLAG is TRUE convert NAME to a full path
+ *                    - to the PDBfile FILE variable prior to lookup.
+ *                    - If FULLNAME is non-NULL return the path used to
+ *                    - do the lookup.
+ *                    - Return the effective entry if successful and return
+ *                    - NULL otherwise.
+ *
  *
  * #bind PD_effective_entry fortran() scheme() python()
  */
@@ -765,8 +790,12 @@ static char *_PD_col_major_expr(char *bf, long nb,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INDEX_TO_EXPR - convert a linear index into
- *                  - an ASCII index expression
+/* PD_INDEX_TO_EXPR - Convert a linear index INDX into
+ *                  - an ASCII index expression BF using the
+ *                  - shape, DIM, information along with the
+ *                  - major order, MAJOR_ORDER, and default offset,
+ *                  - DEF_OFF.
+ *                  - Return a pointer of BF. 
  *
  * #bind PD_index_to_expr fortran() scheme() python()
  */

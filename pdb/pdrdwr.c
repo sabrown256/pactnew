@@ -160,11 +160,11 @@ int _PD_indirection(const char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_DEREFERENCE - THREADSAFE
- *                - starting at the end of the string work backwards to
+/* PD_DEREFERENCE - Dereference the string representation S of a type.
+ *                - Starting at the end of the string work backwards to
  *                - the first non-blank character and if it is a '*'
- *                - insert '\0' in its place
- *                - return a pointer to the beginning of the string
+ *                - insert '\0' in its place.
+ *                - Return a pointer to the beginning of the string S.
  *
  * #bind PD_dereference fortran() scheme() python()
  */
@@ -415,9 +415,13 @@ int64_t _PD_hyper_number(const PDBfile *file, char *indxpr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_HYPER_NUMBER - THREADSAFE
- *                 - return the number of elements implied by a hyper
- *                 - index expression
+/* PD_HYPER_NUMBER - Compute the number of elements implied by a hyper
+ *                 - index expression NAME of an entry in PDBfile FILE.
+ *                 - If NAME is of the form a[...], strip off the name part.
+ *                 - EP is a symbol table entry which supplies type and
+ *                 - shape information about NAME need to interpret the
+ *                 - index expression.
+ *                 - Return the number of elements specified by NAME.
  *
  * #bind PD_hyper_number fortran() scheme() python()
  */
@@ -1607,37 +1611,6 @@ int _PD_hyper_read(PDBfile *file, const char *name, const char *outtype,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_READ_BITS - read a chunk of data which is a bitstream and unpack it
- *              - arguments are:
- *              -   FILE    the PDBfile to use
- *              -   NAME    the name of the variable in the file
- *              -   TYPE    the target type of the data when unpacked
- *              -   NI      the number of items requested
- *              -   SGNED   TRUE if the data type is signed
- *              -   NBITS   the number of bits per item
- *              -   PADSZ   the number of bits of pad preceding the fields
- *              -   FPP     the number of fields per pad
- *              -   OFFS    offset from the beginning of the input data
- *              -   PAN     the number of items found 
- *              -   PDATA   the data array returned
- *
- * #bind PD_read_bits fortran() scheme() python()
- */
-
-int PD_read_bits(PDBfile *file ARG(,,cls),
-		 const char *name, const char *type, int64_t ni,
-		 int sgned, int nbits, int padsz, int fpp,
-		 int64_t offs, long *pan, char **pdata)
-   {int ret;
-
-    ret = _PD_rd_bits(file, name, type, ni, sgned, nbits,
-		      padsz, fpp, offs, pan, pdata);
-
-    return(ret);}
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 /* _PD_RD_BITS - read a chunk of data which is a bitstream and unpack it
  *             - arguments are:
  *             -   FILE    the PDBfile to use
@@ -1731,6 +1704,38 @@ int _PD_rd_bits(PDBfile *file, const char *name, const char *type, inti ni,
     _PD_rl_syment_d(ep);
 
     return(TRUE);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* PD_READ_BITS - Read a chunk of data which is a bitstream and unpack it.
+ *              - The arguments are:
+ *              -   FILE    the PDBfile to use
+ *              -   NAME    the name of the variable in the file
+ *              -   TYPE    the target type of the data when unpacked
+ *              -   NI      the number of items requested
+ *              -   SGNED   TRUE if the data type is signed
+ *              -   NBITS   the number of bits per item
+ *              -   PADSZ   the number of bits of pad preceding the fields
+ *              -   FPP     the number of fields per pad
+ *              -   OFFS    offset from the beginning of the input data
+ *              -   PAN     the number of items found 
+ *              -   PDATA   the data array returned
+ *              - Return TRUE if successful and FALSE otherwise.
+ *
+ * #bind PD_read_bits fortran() scheme() python()
+ */
+
+int PD_read_bits(PDBfile *file ARG(,,cls),
+		 const char *name, const char *type, int64_t ni,
+		 int sgned, int nbits, int padsz, int fpp,
+		 int64_t offs, long *pan, char **pdata)
+   {int ret;
+
+    ret = _PD_rd_bits(file, name, type, ni, sgned, nbits,
+		      padsz, fpp, offs, pan, pdata);
+
+    return(ret);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

@@ -483,8 +483,9 @@ int _PD_init_state(int smpflag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INIT_THREADS - initialize the library for pthreads
- *                 - must be called by only one thread.
+/* PD_INIT_THREADS - Initialize PDBLib for threaded operation.
+ *                 - This must be called by only one thread.
+ *                 - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_init_threads fortran() python()
  */
@@ -513,9 +514,13 @@ int PD_init_threads(int nthreads, PFTid tid)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_INIT_THREADS_ARG - initialize the number of threads by scanning
- *                     - for a designated key in a pattern like
+/* PD_INIT_THREADS_ARG - Find the number of threads requested by scanning
+ *                     - the C command line arguments V for a designated
+ *                     - KEY in a pattern like:
  *                     -  .... <key> <# threads> ...
+ *                     - Initialize the requested number of thread using
+ *                     - thread id function TID.
+ *                     - Return the number of threads specified.
  *
  * #bind PD_init_threads_arg fortran() python()
  */
@@ -529,7 +534,7 @@ int PD_init_threads_arg(int c, char **v, char *key, PFTid tid)
 	    {nt = SC_stoi(v[++i]);
 	     break;};};
 
-/* make Klocworks happy */
+/* limit the number of threads for definiteness */
     nt = min(nt, SC_OPT_BFSZ);
 
     PD_init_threads(nt, tid);

@@ -189,12 +189,15 @@ static int _PD_ptr_sz_itags(inti *pnb, PDBfile *file, void *vr,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_SIZEOF - return the size in bytes of the space needed to contain
- *           - a PDB representation of the given object
- *           - NOTE: this always computes with an empty pointer list
+/* PD_SIZEOF - Determine the size in bytes of the space needed to contain
+ *           - a PDB representation of NI items of TYPE in VRI.
+ *           - Use PDBfile FILE to supply any other information to do this.
+ *           - NOTE: This always computes with an empty pointer list
  *           - which means that it can overestimate the actual space
  *           - a subsequent PD_write will use by the amount of space
- *           - for pointees already written
+ *           - for pointees already written.
+ *           - Return the number of bytes if successful and return 0
+ *           - otherwise.
  *
  * #bind PD_sizeof fortran() scheme() python()
  */
@@ -413,8 +416,6 @@ long PD_sizeof(PDBfile *file ARG(,,cls),
  *             - buffer space
  *             - this is to cover the case of multiply referenced spaces
  *             - buffers which have been passed around
- *
- * #bind PN_relocate fortran() scheme() python()
  */
 
 int PN_relocate(PDBfile *file, const char *type, long n)

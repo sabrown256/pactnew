@@ -35,8 +35,8 @@ static target
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TARGET_N_PLATFORMS - return the number of pre-defined target platforms
- *                       - this is mainly support for the test suite
+/* PD_TARGET_N_PLATFORMS - Return the number of pre-defined target platforms.
+ *                       - This is mainly support for the test suite.
  *
  * #bind PD_target_n_platforms fortran() scheme() python()
  */
@@ -51,9 +51,9 @@ int PD_target_n_platforms(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TARGET_PLATFORM - target the next PDBfile created to platform TGT
- *                    - return TRUE iff platform is known
- *                    - this is mainly support for the test suite
+/* PD_TARGET_PLATFORM - Target the next PDBfile created to platform TGT.
+ *                    - Return TRUE iff platform is known.
+ *                    - This is mainly support for the test suite.
  *
  * #bind PD_target_platform fortran() scheme() python()
  */
@@ -78,9 +78,9 @@ int PD_target_platform(const char *tgt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TARGET_PLATFORM_N - target the next PDBfile created to platform NP
- *                      - return TRUE iff platform is known
- *                      - this is mainly support for the test suite
+/* PD_TARGET_PLATFORM_N - Target the next PDBfile created to platform NP.
+ *                      - Return TRUE iff platform is known.
+ *                      - This is mainly support for the test suite.
  *
  * #bind PD_target_platform_n fortran() scheme() python()
  */
@@ -102,8 +102,8 @@ int PD_target_platform_n(int np)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TARGET_PLATFORM_NAME - return the name of the Nth target platform
- *                         - this is mainly support for the test suite
+/* PD_TARGET_PLATFORM_NAME - Return the name of the Nth target platform.
+ *                         - This is mainly support for the test suite.
  *
  * #bind PD_target_platform_name fortran() scheme() python()
  */
@@ -125,15 +125,11 @@ char *PD_target_platform_name(int np)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TARGET - setup for the target machine data formats and alignments
- *           - this information is recorded in the PDBfiles to correctly
- *           - handle things when many files are open at once
- *           -
- *           - to correctly handle the situation in which there are
- *           - PD_OPEN'd files around (this may reset previously set
- *           - file->std), remember a standard specifically requested
- *           - with PD_TARGET
- *           - (note that PD_OPEN sets file->std and file->align)
+/* PD_TARGET - Set the target machine data standard, DATA, and data
+ *           - alignment, ALIGN, for the next PDBfile to be created.
+ *           - This information is recorded in the PDBfiles to correctly
+ *           - handle things when many files are open at once.
+ *           - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_target fortran() scheme() python()
  */
@@ -153,8 +149,12 @@ int PD_target(data_standard *data, data_alignment *align)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_TARGET_I - setup for the target machine data formats and alignments
- *             - using indeces for builtin data_standards and data_alignments
+/* PD_TARGET_I - Set the target machine data standard and data
+ *             - alignment for the next PDBfile to be created.
+ *             - IS is an index into the builtin list of data_standards
+ *             - and IA is an index into the builtin list of data_alignments.
+ *             - See the PDBLib Users Manual for full details.
+ *             - Return TRUE if successful and FALSE otherwise.
  *
  * #bind PD_target_i fortran() scheme() python()
  */

@@ -200,12 +200,13 @@ static void _PD_disp_data(PD_printdes *prnt, const void *x,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_EXTRAS - write the extra stuff about a PDBfile
+/* PD_WRITE_EXTRAS - Write the extras table of PDBfile FILE to regular
+ *                 - file FO.
  *
  * #bind PD_write_extras fortran() scheme() python()
  */
 
-void PD_write_extras(FILE *f0, const PDBfile *file ARG(,,cls))
+void PD_write_extras(FILE *fo, const PDBfile *file ARG(,,cls))
    {long i;
     char *date;
     defstr *dp;
@@ -216,57 +217,57 @@ void PD_write_extras(FILE *f0, const PDBfile *file ARG(,,cls))
     date = file->date;
     date = (date == NULL) ? "none" : date;
 
-    PRINT(f0, "\n");
+    PRINT(fo, "\n");
 
-    PRINT(f0, "File Name: %s\n", file->name);
+    PRINT(fo, "File Name: %s\n", file->name);
     if (file->type == NULL)
-       PRINT(f0, "File Type: PDB\n");
+       PRINT(fo, "File Type: PDB\n");
     else
-       PRINT(f0, "File Type: %s\n", file->type);
-    PRINT(f0, "File Creation Date: %s\n", date);
-    PRINT(f0, "PDB Version: %d\n", file->system_version);
-    PRINT(f0, "PDB Format Version: %d\n", file->format_version);
-    PRINT(f0, "Default Offset: %d\n", file->default_offset);
+       PRINT(fo, "File Type: %s\n", file->type);
+    PRINT(fo, "File Creation Date: %s\n", date);
+    PRINT(fo, "PDB Version: %d\n", file->system_version);
+    PRINT(fo, "PDB Format Version: %d\n", file->format_version);
+    PRINT(fo, "Default Offset: %d\n", file->default_offset);
     if (file->major_order == ROW_MAJOR_ORDER)
-       PRINT(f0, "Array Order: ROW MAJOR (C)\n");
+       PRINT(fo, "Array Order: ROW MAJOR (C)\n");
     else
-       PRINT(f0, "Array Order: COLUMN MAJOR (FORTRAN)\n");
+       PRINT(fo, "Array Order: COLUMN MAJOR (FORTRAN)\n");
 
 /* checksum info */
     if (file->cksum.use != PD_MD5_OFF)
-       {PRINT(f0, "Checksums: ");
+       {PRINT(fo, "Checksums: ");
 	if (file->cksum.use & PD_MD5_FILE)
-	   PRINT(f0, "file ");
+	   PRINT(fo, "file ");
 	if (file->cksum.use & PD_MD5_RW)
-	   PRINT(f0, "variable ");
-	PRINT(f0, "\n");};
+	   PRINT(fo, "variable ");
+	PRINT(fo, "\n");};
 
 /* type info */
-    PRINT(f0, "Types Needing Conversion:");
+    PRINT(fo, "Types Needing Conversion:");
     for (i = 0; SC_hasharr_next(file->chart, &i, NULL, NULL, (void **) &dp); i++)
         {if (dp->convert > 0)
-	    PRINT(f0, " %s", dp->type);};
-    PRINT(f0, "\n");
+	    PRINT(fo, " %s", dp->type);};
+    PRINT(fo, "\n");
 
     if (file->attrtab != NULL)
-       PRINT(f0, "Attribute Table: Yes\n");
+       PRINT(fo, "Attribute Table: Yes\n");
 
     if (file->maximum_size != _PD.maxfsize)
-       PRINT(f0, "Maximum family member size: %ld\n", file->maximum_size);
+       PRINT(fo, "Maximum family member size: %ld\n", file->maximum_size);
 
     if (file->previous_file != NULL)
-       PRINT(f0, "Previous file in family: %s\n", file->previous_file);
+       PRINT(fo, "Previous file in family: %s\n", file->previous_file);
 
 /* symtab and chart info */
     if (file->virtual_internal)
-       {PRINT(f0, "Symbol Table Address: 0x%lx\n", file->symtab);
-	PRINT(f0, "Structure Chart Address: 0x%lx\n", file->chart);}
+       {PRINT(fo, "Symbol Table Address: 0x%lx\n", file->symtab);
+	PRINT(fo, "Structure Chart Address: 0x%lx\n", file->chart);}
     else
-       {PRINT(f0, "Header Address: %s\n",
+       {PRINT(fo, "Header Address: %s\n",
 	      SC_itos(NULL, 0, file->headaddr, NULL));
-	PRINT(f0, "Symbol Table Address: %s\n",
+	PRINT(fo, "Symbol Table Address: %s\n",
 	      SC_itos(NULL, 0, file->symtaddr, NULL));
-	PRINT(f0, "Structure Chart Address: %s\n",
+	PRINT(fo, "Structure Chart Address: %s\n",
 	      SC_itos(NULL, 0, file->chrtaddr, NULL));};
 
     return;}
@@ -274,7 +275,7 @@ void PD_write_extras(FILE *f0, const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PRINT_EXTRAS - print the extra stuff about a PDBfile
+/* PD_PRINT_EXTRAS - Print the extras table of PDBfile FILE to stdout.
  *
  * #bind PD_print_extras fortran() scheme() python()
  */
@@ -289,37 +290,39 @@ void PD_print_extras(const PDBfile *file ARG(,,cls))
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_SYMENT - write a symbol table entry in human readable form
+/* PD_WRITE_SYMENT - Write a symbol table entry EP in human readable form
+ *                 - out to regular file FO.
  *
  * #bind PD_write_syment fortran() scheme() python()
  */
 
-void PD_write_syment(FILE *f0, syment *ep)
+void PD_write_syment(FILE *fo, syment *ep)
    {char t[2][MAXLINE];
     dimdes *dim;
 
-    PRINT(f0, "Type: %s\n", PD_entry_type(ep));
+    PRINT(fo, "Type: %s\n", PD_entry_type(ep));
     if (PD_entry_dimensions(ep) != NULL)
-       {PRINT(f0, "Dimensions: (");
+       {PRINT(fo, "Dimensions: (");
 
         for (dim = PD_entry_dimensions(ep); dim != NULL; dim = dim->next)
             {SC_itos(t[0], MAXLINE, dim->index_min, NULL);
 	     SC_itos(t[1], MAXLINE, dim->index_max, NULL);
-	     PRINT(f0, "%s:%s", t[0], t[1]);
+	     PRINT(fo, "%s:%s", t[0], t[1]);
 	     if (dim->next != NULL)
-	        PRINT(f0, ", ");};
+	        PRINT(fo, ", ");};
 
-	PRINT(f0, ")\n");};
+	PRINT(fo, ")\n");};
 
-    PRINT(f0, "Length: %s\n", SC_itos(NULL, 0, PD_entry_number(ep), NULL));
-    PRINT(f0, "Address: %s\n", SC_itos(NULL, 0, PD_entry_address(ep), NULL));
+    PRINT(fo, "Length: %s\n", SC_itos(NULL, 0, PD_entry_number(ep), NULL));
+    PRINT(fo, "Address: %s\n", SC_itos(NULL, 0, PD_entry_address(ep), NULL));
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PRINT_SYMENT - print a symbol table entry in human readable form
+/* PD_PRINT_SYMENT - Print symbol table entry EP in human readable form
+ *                 - to stdout.
  *
  * #bind PD_print_syment fortran() scheme() python()
  */
@@ -334,44 +337,45 @@ void PD_print_syment(syment *ep)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_DEFSTR - write a defstr in human readable form
+/* PD_WRITE_DEFSTR - Write defstr DP in human readable form to regular
+ *                 - file FO.
  *
  * #bind PD_write_defstr fortran() scheme() python()
  */
 
-void PD_write_defstr(FILE *f0, defstr *dp)
+void PD_write_defstr(FILE *fo, defstr *dp)
    {memdes *lst, *nxt;
     char bg[80];
 
     SC_strncpy(bg, 80, "Members: {", -1);
 
-    PRINT(f0, "Type: %s\n", dp->type);
-    PRINT(f0, "Alignment: %d\n", dp->alignment);
+    PRINT(fo, "Type: %s\n", dp->type);
+    PRINT(fo, "Alignment: %d\n", dp->alignment);
     if (dp->members != NULL)
        {for (lst = dp->members; lst != NULL; lst = nxt)
             {nxt = lst->next;
              if (lst->cast_offs < 0L)
                 {if (nxt == NULL)
-                    PRINT(f0, "%s%s;}\n", bg, lst->member);
+                    PRINT(fo, "%s%s;}\n", bg, lst->member);
                  else
-                    PRINT(f0, "%s%s;\n", bg, lst->member);}
+                    PRINT(fo, "%s%s;\n", bg, lst->member);}
              else
                 {if (nxt == NULL)
-                    PRINT(f0, "%s%s;}  (cast by %s)\n",
+                    PRINT(fo, "%s%s;}  (cast by %s)\n",
                           bg, lst->member, lst->cast_memb);
                  else
-                    PRINT(f0, "%s%s;  (cast by %s)\n",
+                    PRINT(fo, "%s%s;  (cast by %s)\n",
                           bg, lst->member, lst->cast_memb);};
              SC_strncpy(bg, 80, "          ", -1);};};
 
-    PRINT(f0, "Size in bytes: %ld\n", dp->size);
+    PRINT(fo, "Size in bytes: %ld\n", dp->size);
 
     return;}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PRINT_DEFSTR - print a defstr in human readable form
+/* PD_PRINT_DEFSTR - Print defstr DP in human readable form to stdout.
  *
  * #bind PD_print_defstr fortran() scheme() python()
  */
@@ -418,27 +422,27 @@ static void _PD_print_char_kind(PD_printdes *prnt, const char *vr, inti ni,
     char bf[MAXLINE];
     char *cp, *prefix, *before, *after;
     const char *nodename;
-    FILE *f0;
+    FILE *fo;
 
     offset   = prnt->offset;
     prefix   = prnt->prefix;
     before   = prnt->before;
     after    = prnt->after;
     nodename = prnt->nodename;
-    f0       = prnt->fp;
+    fo       = prnt->fp;
 
     cp = (char *) vr;
 
     if (idx == G_STRING_I)
        {if ((ni == 1L) && (offset == 0L))
 	   {if (PD_gs.print_ctrl[5] == 0)
-	       {PRINT(f0, "%s%s%s = %c\n",
+	       {PRINT(fo, "%s%s%s = %c\n",
 		      prefix, before, nodename, *cp);}
 	    else if (PD_gs.print_ctrl[5] == 1)
-	       {PRINT(f0, "%s%s = %c\n",
+	       {PRINT(fo, "%s%s = %c\n",
 		      before, nodename, *cp);}
 	    else
-	       {PRINT(f0, "        %c", *cp);};}
+	       {PRINT(fo, "        %c", *cp);};}
 
         else
 	   {max1 = MAXLINE - 7 - strlen(prefix) -
@@ -454,13 +458,13 @@ static void _PD_print_char_kind(PD_printdes *prnt, const char *vr, inti ni,
 /* with quotes */
 	    if (quo == TRUE)
 	       {if (PD_gs.print_ctrl[5] == 0)
-		   {PRINT(f0, "%s%s%s = \"%s\"\n",
+		   {PRINT(fo, "%s%s%s = \"%s\"\n",
 			  prefix, before, nodename, bf);}
 	        else if (PD_gs.print_ctrl[5] == 1)
-		   {PRINT(f0, "%s%s = \"%s\"\n",
+		   {PRINT(fo, "%s%s = \"%s\"\n",
 			  before, nodename, bf);}
 		else
-		   {PRINT(f0, "        \"%s\"\n", bf);};
+		   {PRINT(fo, "        \"%s\"\n", bf);};
 
 		while (ni > 0L)
 		   {i = min(ni, max2);
@@ -468,19 +472,19 @@ static void _PD_print_char_kind(PD_printdes *prnt, const char *vr, inti ni,
 		    SC_strncpy(bf, MAXLINE, cp, i);
 
 		    cp += i;
-		    PRINT(f0, "%s%s%s = \"%s\"\n", prefix, after,
+		    PRINT(fo, "%s%s%s = \"%s\"\n", prefix, after,
 			  nodename, bf);};}
 
 /* without quotes */
 	    else
 	       {if (PD_gs.print_ctrl[5] == 0)
-		   {PRINT(f0, "%s%s%s = %s\n",
+		   {PRINT(fo, "%s%s%s = %s\n",
 			  prefix, before, nodename, bf);}
 	        else if (PD_gs.print_ctrl[5] == 1)
-		   {PRINT(f0, "%s%s = %s\n",
+		   {PRINT(fo, "%s%s = %s\n",
 			  before, nodename, bf);}
 		else
-		   {PRINT(f0, "        %s\n", bf);};
+		   {PRINT(fo, "        %s\n", bf);};
 
 		while (ni > 0L)
 		   {i = min(ni, max2);
@@ -488,7 +492,7 @@ static void _PD_print_char_kind(PD_printdes *prnt, const char *vr, inti ni,
 		    SC_strncpy(bf, MAXLINE, cp, i);
 
 		    cp += i;
-		    PRINT(f0, "%s%s%s = %s\n", prefix, after,
+		    PRINT(fo, "%s%s%s = %s\n", prefix, after,
 			  nodename, bf);};};};}
 
     else
@@ -507,22 +511,22 @@ static void _PD_print_char_kind(PD_printdes *prnt, const char *vr, inti ni,
 static int _PD_io_print(PD_printdes *prnt, const PDBfile *file,
 			const char *vr,
 			inti ni, const char *type, int n, long *ind)
-   {int k, m, idx, nn, isz, status, quo;
+   {int k, m, idx, nn, isz, st, quo;
     int id, ifx, ifp, icx;
     inti i, j, offset;
     char bf[MAXLINE], s[MAXLINE];
     char *t;
     defstr *pd;
-    FILE *f0;
+    FILE *fo;
     char *prefix, *before;
     const char *nodename;
 
     prefix   = prnt->prefix;
     before   = prnt->before;
     nodename = prnt->nodename;
-    f0       = prnt->fp;
+    fo       = prnt->fp;
 
-    status = 0;
+    st     = 0;
     offset = 1L;
 
     nn = 0;
@@ -543,7 +547,7 @@ static int _PD_io_print(PD_printdes *prnt, const PDBfile *file,
 
     pd = PD_inquire_host_type(file, type);
     if (pd == NULL)
-       return(status);
+       return(st);
 
     isz = pd->size;
     id  = SC_type_id(type, FALSE);
@@ -585,36 +589,43 @@ static int _PD_io_print(PD_printdes *prnt, const PDBfile *file,
 
 	else if (strcmp(type, "function") == 0)
 	   {if (PD_gs.print_ctrl[5] == 0)
-	       {PRINT(f0, "%s%s%s = <function>\n", prefix, before, nodename);}
+	       {PRINT(fo, "%s%s%s = <function>\n", prefix, before, nodename);}
 	    else if (PD_gs.print_ctrl[5] == 1)
-	       {PRINT(f0, "%s%s = <function>\n", before, nodename);}
+	       {PRINT(fo, "%s%s = <function>\n", before, nodename);}
 	    else
-	       {PRINT(f0, "        <function>\n");};}
+	       {PRINT(fo, "        <function>\n");};}
 
         else if (SC_type_match_size(KIND_INT, isz) != G_UNKNOWN_I)
 	   _PD_disp_data(prnt, vr, ni, G_BIT_I, n, ind);
 
 	else
-	   {PRINT(f0, "%s%s%s = ", prefix, before, nodename);
-	    PRINT(f0, "<type %s unprintable>\n", type);};}
+	   {PRINT(fo, "%s%s%s = ", prefix, before, nodename);
+	    PRINT(fo, "<type %s unprintable>\n", type);};}
     else
-       {PRINT(f0, "%s%s%s = ", prefix, before, nodename);
-        PRINT(f0, "<type %s unprintable>\n", type);};
+       {PRINT(fo, "%s%s%s = ", prefix, before, nodename);
+        PRINT(fo, "<type %s unprintable>\n", type);};
 
-    return(status);}
+    return(st);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_WRITE_ENTRY - write a data item from a PDB file in a formated way
+/* PD_WRITE_ENTRY - Write all or part of VR according to an entry from
+ *                - PDBfile FILE in a formated way to regular file FO.
+ *                - If EP is non-NULL use it, otherwise lookup the entry
+ *                - for NAME and use it to supply information to interpret
+ *                - the type and shape of VR.
+ *                - N is the number of items to write and the N linear
+ *                - indeces into VR are in IND.
+ *                - If N is 0 and/or IND is NULL write all of VR
  *
  * #bind PD_write_entry fortran() scheme() python()
  */
 
-int PD_write_entry(FILE *f0, const PDBfile *file ARG(,,cls),
+int PD_write_entry(FILE *fo, const PDBfile *file ARG(,,cls),
 		   const char *name, const void *vr,
 		   syment *ep, int n, long *ind)
-   {int status;
+   {int st;
     char prefix[80], pathname[MAXLINE];
     char before[2], after[2];
     PD_smp_state *pa;
@@ -630,7 +641,7 @@ int PD_write_entry(FILE *f0, const PDBfile *file ARG(,,cls),
 	     memset(PD_gs.err, 0, MAXLINE);
 	     break;};
 
-     status = 0;
+     st = 0;
 
     if (ep == NULL)
        ep = PD_inquire_entry(file, name, FALSE, NULL);
@@ -644,19 +655,23 @@ int PD_write_entry(FILE *f0, const PDBfile *file ARG(,,cls),
     *before = '\0';
     *after  = '\0';
 
-    status = _PD_print_data(f0,
-			    prefix, before, after, pathname, file, vr,
-			    PD_entry_number(ep), PD_entry_type(ep),
-			    PD_entry_dimensions(ep),
-			    file->major_order, file->default_offset, 0,
-			    n, ind);
+    st = _PD_print_data(fo,
+			prefix, before, after, pathname, file, vr,
+			PD_entry_number(ep), PD_entry_type(ep),
+			PD_entry_dimensions(ep),
+			file->major_order, file->default_offset, 0,
+			n, ind);
 
-    return(status);}
+    return(st);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PD_PRINT_ENTRY - print a data item from a PDB file in a formated way
+/* PD_PRINT_ENTRY - Print VR according to an entry from
+ *                - PDBfile FILE in a formated way to stdout.
+ *                - If EP is non-NULL use it, otherwise lookup the entry
+ *                - for NAME and use it to supply information to interpret
+ *                - the type and shape of VR.
  *
  * #bind PD_print_entry fortran() scheme() python()
  */
@@ -677,14 +692,14 @@ int PD_print_entry(const PDBfile *file ARG(,,cls),
 static int _PD_print_indirection(PD_printdes *prnt, const PDBfile *file,
 				 char **vr, inti ni, char *type,
                                  int irecursion, int n, long *ind)
-   {int min_index, status, def_off;
+   {int min_index, st, def_off;
     inti i, ditems, nc, nr;
     char field[80], bf[MAXLINE];
     char *dtype, *s;
     char *prefix, *before, *after;
     const char *nodename;
     dimdes *dims;
-    FILE *f0;
+    FILE *fo;
 
     prefix   = prnt->prefix;
     before   = prnt->before;
@@ -692,9 +707,9 @@ static int _PD_print_indirection(PD_printdes *prnt, const PDBfile *file,
     nodename = prnt->nodename;
     def_off  = prnt->def_off;
     dims     = prnt->dims;
-    f0       = prnt->fp;
+    fo       = prnt->fp;
 
-    status = 0;
+    st = 0;
 
     dtype = PD_dereference(CSTRSAVE(type));
 
@@ -719,7 +734,7 @@ static int _PD_print_indirection(PD_printdes *prnt, const PDBfile *file,
             {snprintf(bf, MAXLINE,
                       "UNKNOWN TYPE %s - _PD_PRINT_INDIRECTION",
                      dtype);
-             status = -1;
+             st = -1;
              PD_error(bf, PD_PRINT);};
 
 /* if the type is an indirection, follow the pointer */
@@ -727,20 +742,20 @@ static int _PD_print_indirection(PD_printdes *prnt, const PDBfile *file,
 	    {prnt->nodename = field;
 	     prnt->before   = before;
 	     if (_PD_indirection(dtype))
-	        status &= _PD_print_indirection(prnt, file,
-						(char **) DEREF(vr),
-						ditems, dtype, 
-						irecursion, n, ind);
+	        st &= _PD_print_indirection(prnt, file,
+					    (char **) DEREF(vr),
+					    ditems, dtype, 
+					    irecursion, n, ind);
              else
-                status &= _PD_print_leaf(prnt, file, DEREF(vr),
-					 ditems, dtype, irecursion, n, ind);}
+                st &= _PD_print_leaf(prnt, file, DEREF(vr),
+				     ditems, dtype, irecursion, n, ind);}
          else
 	    {if (PD_gs.print_ctrl[5] == 0)
-	        {PRINT(f0, "%s%s%s = (nil)\n", prefix, before, field);}
+	        PRINT(fo, "%s%s%s = (nil)\n", prefix, before, field);
 	     else if (PD_gs.print_ctrl[5] == 1)
-	        {PRINT(f0, "%s%s = (nil)\n", before, field);}
+	        PRINT(fo, "%s%s = (nil)\n", before, field);
 	     else
-	        {PRINT(f0, "        (nil)\n");};};
+	        PRINT(fo, "        (nil)\n");};
 
          before = after;};
 
@@ -748,19 +763,19 @@ static int _PD_print_indirection(PD_printdes *prnt, const PDBfile *file,
 
     prnt->nodename = NULL;
 
-    return(status);}
+    return(st);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PRINT_DATA - print out variables in a nicely formatted way  */
 
-static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after, 
+static int _PD_print_data(FILE *fo, char *prefix, char *before, char *after, 
                           char *nodename, const PDBfile *file,
 			  const void *vr, inti ni,
                           char *type, dimdes *dims, int mjr, int def_off, 
                           int irecursion, int n, long *ind)
-   {int status;
+   {int st;
     PD_printdes prnt;
 
     prnt.mjr      = mjr;
@@ -770,35 +785,35 @@ static int _PD_print_data(FILE *f0, char *prefix, char *before, char *after,
     prnt.after    = after;
     prnt.nodename = nodename;
     prnt.dims     = dims;
-    prnt.fp       = f0;
+    prnt.fp       = fo;
     prnt.nn       = 0;
     prnt.offset   = 0;
 
-    status = 0;
+    st = 0;
 
 /* if the type is an indirection, follow the pointer */
     if (_PD_indirection(type))
-       status = _PD_print_indirection(&prnt, file, (char **) vr, ni, type, 
-				      irecursion, n, ind);
+       st = _PD_print_indirection(&prnt, file, (char **) vr, ni, type, 
+				  irecursion, n, ind);
     else
-       status = _PD_print_leaf(&prnt, file, vr, ni, type,
-			       irecursion, n, ind);
+       st = _PD_print_leaf(&prnt, file, vr, ni, type,
+			   irecursion, n, ind);
 
-    return(status);}
+    return(st);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
 /* _PD_PRINT_MEMBER - print the specified member of a struct */
 
-static int _PD_print_member(FILE *f0, char *prefix,
+static int _PD_print_member(FILE *fo, char *prefix,
 			    char *mbefore, char *mafter,
 			    const PDBfile *file,
 			    const char *svr, const char *type,
 			    memdes *desc, char *mfield, long nb,
 			    int mjr, int def_off, 
 			    int *pirec, int n, long *ind)
-   {int irecursion, status;
+   {int irecursion, st;
     long mitems, nc, nr;
     char *mtype, *s1;
     const char *mvr;
@@ -823,36 +838,36 @@ static int _PD_print_member(FILE *f0, char *prefix,
        mtype = ldp->type;
 
     if (PD_gs.print_ctrl[2] == 0)
-       status = _PD_print_data(f0, prefix, mbefore, mafter, mfield,
-			       file, mvr, mitems,
-			       mtype, mdims, mjr, def_off, 0,
-			       n, ind);
+       st = _PD_print_data(fo, prefix, mbefore, mafter, mfield,
+			   file, mvr, mitems,
+			   mtype, mdims, mjr, def_off, 0,
+			   n, ind);
     else
        {if (_PD_test_recursion(type, mtype))
 	   {nc = strlen(mfield);
 	    s1 = mfield + nc;
 	    nr = nb - nc;
 	    snprintf(s1, nr, "<%d>", irecursion);
-	    status = _PD_print_data(f0, prefix, mbefore, blank, mfield,
-				    file, mvr, mitems,
-				    mtype, mdims,
-				    mjr, def_off, ++irecursion,
-				    n, ind);}
+	    st = _PD_print_data(fo, prefix, mbefore, blank, mfield,
+				file, mvr, mitems,
+				mtype, mdims,
+				mjr, def_off, ++irecursion,
+				n, ind);}
         else
-	   status = _PD_print_data(f0, prefix, mbefore, mafter, mfield,
-				   file, mvr, mitems,
-				   mtype, mdims,
-				   mjr, def_off, 0,
-				   n, ind);};
+	   st = _PD_print_data(fo, prefix, mbefore, mafter, mfield,
+			       file, mvr, mitems,
+			       mtype, mdims,
+			       mjr, def_off, 0,
+			       n, ind);};
 
     *pirec = irecursion;
 
-    return(status);}
+    return(st);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _PD_PRINT_LEAF - if 'type' is a primitive type, display the data,
+/* _PD_PRINT_LEAF - if TYPE is a primitive type, display the data VR,
  *                - otherwise, lookup the type, and display each member.
  */
 
@@ -860,7 +875,7 @@ int _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
 		   const char *vr, inti ni,
 		   const char *type, int irecursion, int n, long *ind)
    {int mjr, def_off;
-    int size, min_index, nchars, status;
+    int size, min_index, nchars, st;
     inti ii;
     char field[80], mfield[80];
     char *prefix, *before, *after;
@@ -869,7 +884,7 @@ int _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
     defstr *defp;
     dimdes *dims;
     memdes *desc, *mem_lst, *next;
-    FILE *f0;
+    FILE *fo;
     static char before_2[5] = "|__ ";
     static char after_2[5]  = "|   ";
     static char spaces[5]   = "    ";
@@ -881,9 +896,9 @@ int _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
     mjr      = prnt->mjr;
     def_off  = prnt->def_off;
     dims     = prnt->dims;
-    f0       = prnt->fp;
+    fo       = prnt->fp;
 
-    status  = 0;
+    st      = 0;
     mem_lst = NULL;
  
 /* print out the type */
@@ -896,7 +911,7 @@ int _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
        mem_lst = defp->members;
 
     if (mem_lst == NULL)
-       status &= _PD_io_print(prnt, file, vr, ni, type, n, ind);
+       st &= _PD_io_print(prnt, file, vr, ni, type, n, ind);
     else
        {s2     = CSTRSAVE(prefix);
         nchars = strlen(prefix) + strlen(before) + 1;
@@ -936,17 +951,17 @@ int _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
                  case 1 :
 		      mbefore = spaces;
 		      mafter  = spaces;
-		      PRINT(f0, "%s%s\n", prefix, field);
+		      PRINT(fo, "%s%s\n", prefix, field);
 		      break;
                  case 2 :
 		      mbefore = before_2;
 		      mafter  = after_2;
 		      if (ii > 0L)
-			 PRINT(f0, "%s%s\n", prefix, mafter);
-		      PRINT(f0, "%s%s\n", prefix, field);
+			 PRINT(fo, "%s%s\n", prefix, mafter);
+		      PRINT(fo, "%s%s\n", prefix, field);
 		      if (irecursion > 0)
-			 {PRINT(f0, "%s ___|\n", s2);
-			  PRINT(f0, "%s%s\n", s2, mafter);};
+			 {PRINT(fo, "%s ___|\n", s2);
+			  PRINT(fo, "%s%s\n", s2, mafter);};
 		      break;};
 
              strcpy(s, after);
@@ -961,11 +976,11 @@ int _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
 
 		  if ((sm == NULL) ||
 		      ((sm != NULL) && (SC_regx_match(mfield, sm) == FALSE)))
-		     status &= _PD_print_member(f0, prefix, mbefore, mafter,
-						file, svr, type, desc,
-						mfield, 80,
-						mjr, def_off,
-						&irecursion, n, ind);
+		     st &= _PD_print_member(fo, prefix, mbefore, mafter,
+					    file, svr, type, desc,
+					    mfield, 80,
+					    mjr, def_off,
+					    &irecursion, n, ind);
 
                   next = desc->next;
                   if (next != NULL)
@@ -977,7 +992,7 @@ int _PD_print_leaf(PD_printdes *prnt, const PDBfile *file,
         CFREE(s2);
         *s = '\0';};
 
-    return(status);}
+    return(st);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
