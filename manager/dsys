@@ -210,7 +210,7 @@ switch ($Cmnd)
    case build:
         echo ""
 
-        set Shared = ( `dsys configured | awk '$1 == "Shared" { print $3 }'` )
+        set Shared = ( `./dsys configured | awk '$1 == "Shared" { print $3 }'` )
         if ("$Shared" == "yes") then
            set MTgt = shared
            set Msg  = "shared and static"
@@ -581,7 +581,7 @@ switch ($Cmnd)
 #--------------------------------------------------------------------------
 
    case commit:
-        pact-commit $argv
+        ./pact-commit $argv
         set RStatus = $status
         breaksw
 
@@ -972,8 +972,11 @@ switch ($Cmnd)
         setenv DSYS_TARGET pact_config
 
 # set the configuration for this system
-        setenv PSY_ID    `$PSY_CfgMan use`
-        setenv PSY_Root  $DevDir/$PSY_ID
+        setenv PSY_ID     `$PSY_CfgMan use`
+        setenv PSY_Root   $DevDir/$PSY_ID
+        setenv PSY_TmpDir ${PSY_Prefix}${PSY_ID}
+        setenv PSY_BldObj $PSY_TmpDir/obj
+        setenv PSY_BldTst $PSY_TmpDir/test
 
 # now that we have the system, reset the variables that depend on it
         set LogDir  = $PSY_Root/log
@@ -1015,6 +1018,7 @@ switch ($Cmnd)
         if ($?SESSION_CONFIG == 1) then
            Note $Log "SESSION_CONFIG  = $SESSION_CONFIG"
         endif
+        Note $Log "PSY_Base        = $PSY_Base"
         Note $Log "PSY_ID          = $PSY_ID"
         Note $Log "PSY_SITE        = $PSY_SITE"
         Note $Log "PSY_AIRoot      = $PSY_AIRoot"
@@ -1047,6 +1051,9 @@ switch ($Cmnd)
         if (!(-d $PSY_Root/etc)) then
            flog $Log mkdir $PSY_Root/etc
         endif
+        if (!(-d $PSY_Root/html)) then
+           flog $Log mkdir $PSY_Root/html
+        endif
         if (!(-d $PSY_Root/man)) then
            flog $Log mkdir $PSY_Root/man
         endif
@@ -1055,9 +1062,6 @@ switch ($Cmnd)
         endif
         if (!(-d $PSY_Root/man/man3)) then
            flog $Log mkdir $PSY_Root/man/man3
-        endif
-        if (!(-d $PSY_Root/html)) then
-           flog $Log mkdir $PSY_Root/html
         endif
         if (!(-d $PSY_Root/scheme)) then
            flog $Log mkdir $PSY_Root/scheme

@@ -69,13 +69,13 @@ void manage_tmp_dir(statedes *st, int start)
 	else
 	   dir_was_there = TRUE;
 
-        if (!dir_was_there)
+        if (dir_was_there == FALSE)
 	   {snprintf(cmd, BFLRG, "mkdir -p %s/", st->tmpdir);
 	    ss = system(cmd);};}
 
 /* do this at the end */
     else
-       {if (!dir_was_there)
+       {if (dir_was_there == FALSE)
 	   {snprintf(cmd, BFLRG, "rm -rf %s/", st->tmpdir);
 	    ss = system(cmd);};};
 

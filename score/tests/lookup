@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 flog $Log pushd $SrcDir
 flog $Log $MAKE ha
@@ -34,7 +34,7 @@ else
    NoteD $Log "                    $msg"
    Note $Log ""
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a lookup_hash -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 
@@ -55,7 +55,7 @@ else
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a lookup_tree -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
 

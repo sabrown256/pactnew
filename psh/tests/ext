@@ -3,7 +3,7 @@
 # EXT - test gexec
 #
 
-source ../../tests/common
+source $PSY_Base/psh/tests/common
 
 set msg = "GEXEC Test ....................."
 

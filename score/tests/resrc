@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Resource Test ..........."
 set exe = $BinDir/tscrs
@@ -26,7 +26,7 @@ if (-x $exe) then
    set xstatus = $status
    flog $Log popd
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a resrc -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 

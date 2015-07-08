@@ -110,8 +110,8 @@ setenv ZeroSpace  "-z 2"
    setenv BinDir    $PSY_Root/bin
 
    if ($?TestDir == 0) then
-      # Cmake sets testdir itself
-      setenv TestDir   $SrcDir/$PSY_TmpDir/test
+# may be set by CMake
+      setenv TestDir   $PSY_Build/$Package/$PSY_TmpDir/test
    endif
    setenv FilesDir  $SrcDir/tests
    setenv RefDir    $FilesDir/ref
@@ -246,6 +246,7 @@ Note $Log "Test environment"
 Note $Log ""
 Note $Log "Directories:"
 Note $Log "PSY_Base   = |$PSY_Base|"
+Note $Log "PSY_Build  = |$PSY_Build|"
 Note $Log "PSY_ID     = |$PSY_ID|"
 Note $Log "PSY_Root   = |$PSY_Root|"
 Note $Log "SrcDir     = |$SrcDir|"

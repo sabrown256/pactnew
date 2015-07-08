@@ -8,7 +8,7 @@
 
 set Package = score
 
-source ../../scripts/test-env
+source $PSY_Base/score/tests/common
 
 set Tests   = ""
 set KillSrv = ""
@@ -64,7 +64,7 @@ rm -f $Log *.core core* >& /dev/null
 touch $Log
 flog $Log date
 
-source ../../tests/common-make
+source $PSY_Base/score/tests/common-make
 
 if ($?CROSS_FE == 0) then
    flog $Log setenv CROSS_FE
@@ -87,7 +87,7 @@ foreach tst ($Tests)
    set opt = $KillSrv
    set io  = ftee
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a mk_$tst -e $xstatus -l -rpf "$rpf" ""
 

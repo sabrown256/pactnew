@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Make Info Test .........."
 
@@ -47,7 +47,7 @@ if ($ok == TRUE) then
          set exe = $m
          set io  = flog
          set opt = ( -info $v )
-         source ../../scripts/test-run
+	 source $PSY_Base/scripts/test-run
 
          if ($xstatus >= 254) then
             NoteD $Log -n "o"

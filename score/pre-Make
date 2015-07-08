@@ -408,7 +408,7 @@ mpitty : ${BinDir}/sctty ${BinDir}/mpi-io-wrap
 
 ${BinDir}/mpi-io-wrap : ${TGTLib} scwrap.c
 	@(echo "${CCAnnounce} scwrap.c -o ${BinDir}/mpi-io-wrap" ; \
-	  make-wrap ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs})
+	  ./make-wrap ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs})
 
 ${BinDir}/sctty : ${TGTLib} sctty.c
 	@(echo "${CCAnnounce} sctty.c -o ${BinDir}/sctty" ; \

@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE MM Performance Test ....."
 set exe = $BinDir/tscmpf
@@ -27,10 +27,9 @@ if ($xstatus != 0) then
    NoteD $Log "                         ERROR Building MM Performance Program"
    NoteD $Log "                    ${msg}FAILED"
 else
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 endif
 
 $TEST_CHECK part -a mprf -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 
 exit($status)
-

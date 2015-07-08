@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Buffered I/O Test ......."
 set exe = $BinDir/tscbf
@@ -24,7 +24,7 @@ set xstatus = $status
 flog $Log popd
 
 if ($xstatus == 0) then
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 endif
 
 $TEST_CHECK part -a buf -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"

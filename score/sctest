@@ -11,7 +11,7 @@
 setenv Package score
 setenv Test    ""
 set vgdirs = ( . )
-source ../scripts/test-env
+source $PSY_Base/scripts/test-env
 
 set Tests = ""
 

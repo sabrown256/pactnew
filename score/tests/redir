@@ -7,11 +7,7 @@
 #
 
 set Package = score
-if (-d ../../scripts) then
-   source ../../scripts/functions-pact.csh
-else if (-d ../../../scripts) then
-   source ../../../scripts/functions-pact.csh
-endif
+source $PSY_Base/scripts/functions-pact.csh
 
 set KillSrv = FALSE
 

@@ -180,11 +180,11 @@ hdrf = ${IncDir}/sxpdbd.h
 
 IncAction = @pact generate
 
-LibAction = @(echo "build-ext" ; build-ext ; pact devgen)
+LibAction = @(echo "build-ext" ; ./build-ext ; pact devgen)
 
 build : ${IncDir}/sx_gen.h ${hdrf}
 	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
-	@build-ext
+	@./build-ext
 
 #
 # make the executable

@@ -5,7 +5,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Type Management Test ...."
 set exe = $BinDir/tsctyp
@@ -36,7 +36,7 @@ else
    set opt = ""
    set io  = flog
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    @ lerr = $status
 

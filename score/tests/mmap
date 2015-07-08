@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Mapped File Test ........"
 set exe = $BinDir/tscmf
@@ -27,7 +27,7 @@ if ($CROSS_COMPILE == FALSE) then
    flog $Log popd
 
    if ($xstatus == 0) then
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
    endif
 
    touch mft.foo

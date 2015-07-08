@@ -9,7 +9,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Unit Tests .............."
 
@@ -48,7 +48,7 @@ else
    set opt = ""
    set io  = flog
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a sharp_scctl -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -65,7 +65,7 @@ else
    set opt = ""
    set io  = flog
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a sharp_memc -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -82,7 +82,7 @@ else
    set opt = ""
    set io  = flog
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a sharp_str -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -99,7 +99,7 @@ else
    set opt = ""
    set io  = flog
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a sharp_vsnprintf -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 

@@ -85,6 +85,8 @@ set opt = ""
 
 InitLog Log $logd/bproto
 
+flog $Log set path = ( $PSY_ScrDir $path )
+
 Note $Log ""
 Note $Log "Generating C bindings for Fortran, SX, and Python"
 Note $Log ""
@@ -94,14 +96,7 @@ Note $Log ""
 
 # GENERATE - generate interfaces for each package
 
-   @ CCount = `echo $d | wc -c`
-   @ NDots  = 20 - $CCount
-   set Fill = "$d "
-   while ($NDots > 0)
-      set Fill = "$Fill."
-      @ NDots = $NDots - 1
-   end
-
+   set Fill = ( `fill-string -n 20 $d` )
    NoteD $Log -n "      $Fill "
    Note $Log ""
 

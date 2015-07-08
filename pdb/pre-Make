@@ -103,8 +103,8 @@ Srcs = pdb.c pdbaib.c pdcast.c pdfmt.c pdfmta.c pdfmtb.c pdfmtc.c pdsymt.c  \
        pdcomm.c pdbmp.c pdser.c pdlow.c pdrdwr.c pdptr.c                    \
        pdmemb.c pdgs.c pdcsum.c pdflt.c pdblk.c pdbmm.c pdconv.c            \
        pdpath.c pdbfc.c pdbnet.c pdprnt.c pdshar.c pdtgt.c pdbx.c           \
-       pdmap.c pdbdir.c pdszof.c pdpar.c pdparmp.c pdspoke.c pdold.c        \
-       ${SrcsN} ${gcs}
+       pdmap.c pdbdir.c pdszof.c pdpar.c pdparmp.c pdold.c                  \
+       ${spokef} ${SrcsN} ${gcs}
 
 gco = gc-pdb.o
 
@@ -120,8 +120,8 @@ Objs = pdb.o pdbaib.o pdbmp.o pdser.o pdlow.o pdsymt.o pdblk.o      \
        pdcast.o pdrdwr.o pdptr.o pdprnt.o pdmemb.o pdflt.o          \
        pdbmm.o pdconv.o pdpath.o pdbfc.o pdbnet.o pdshar.o          \
        pdcsum.o pdbx.o pdmap.o pdszof.o pdbdir.o pdpar.o pdcomm.o   \
-       pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdspoke.o pdold.o \
-       ${gco}
+       pdtgt.o pdtyp.o pdtypa.o pdtypb.o pdtypc.o pdold.o           \
+       ${spokeo} ${gco}
 
 gca = ${TGTLib}(gc-pdb.o)
 
@@ -147,7 +147,7 @@ ArObjs = ${TGTLib}(pdb.o) ${TGTLib}(pdbaib.o) ${TGTLib}(pdcast.o)    \
          ${TGTLib}(pdspoke.o) ${TGTLib}(pdold.o)                     \
          ${ArObjsN} ${gca}
 
-${LibDep} : ${hdrf} ${Hdrs} pdspoke.c pdb_formats.h scope_dp.h
+${LibDep} : ${hdrf} ${Hdrs} ${spokef} pdb_formats.h scope_dp.h
 
 #
 # Generated code rules
@@ -168,18 +168,19 @@ hdrf = ${IncDir}/pdform.h ${IncDir}/pdb_gen.h
 
 # spokes
 
-pdspoke.c : config-spokes pdshar.c
-	config-spokes
+${spokef} : config-spokes pdshar.c
+	config-spokes -dst $@
 
-spokef = pdspoke.c
+spokef = ${PSY_BldObj}/pdspoke.c
+spokeo = ${PSY_BldObj}/pdspoke.o
 
-IncAction = @pact generate
+IncAction = @(echo "config-spokes" ; ./config-spokes -dst ${spokef} ; pact generate)
 
-LibAction = @(echo "build-spokes" ; build-spokes spoke ; pact devgen)
+LibAction = @(echo "build-spokes" ; ./build-spokes spoke ; pact devgen)
 
-build : ${hdrf} pdspoke.c
+build : ${hdrf} ${spokef}
 	@acc ${ACFlags} -c ${Srcs} -a ${TGTLib}
-	build-spokes build
+	./build-spokes build
 
 #
 # standard tests

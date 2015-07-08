@@ -615,7 +615,7 @@ DIRVAR:
 #       OSF1 csh won't work with an environment variable!!!!!
    set WrkDirTmp = $WrkDir
 
-   setenv PSY_Base   $WrkDirTmp:t
+   setenv PSY_Base  $WrkDir
    setenv Root      $WrkDirTmp:h
    setenv SetupLog  $Root/$hsy_uhost.$Stamp.setup
    setenv ArgFile   $SHARED/.do-local-args.$hsy_uhost.$Stamp.$$
@@ -639,6 +639,7 @@ INITLOG:
    if ("$Phase" == "-setup") then
       $RM $LogHost
       touch $LogHost
+      Note $LogHost "do-local -setup"
    else
 
 # make LogHost a full path name

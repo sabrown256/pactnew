@@ -3,7 +3,7 @@
 # INFO - test pact-info
 #
 
-source ../../tests/common
+source $PSY_Base/psh/tests/common
 
 set msg = "INFO Test ......................"
 

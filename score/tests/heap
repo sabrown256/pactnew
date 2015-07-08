@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Heap Check Test ........."
 set exe = $BinDir/tscmtr
@@ -33,7 +33,7 @@ if (($RF_STATIC_LINKING == FALSE) && ("$HaveDevZero" == "HAVE_DEV_ZERO")) then
          setenv CROSS_FE   "$CROSS_FE -v"
       endif
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
    endif
 endif
 

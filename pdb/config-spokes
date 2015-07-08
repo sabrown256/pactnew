@@ -8,10 +8,27 @@
 # include "cpyright.h"
 #
 
+set src = `dirname $0`
+set dst = pdspoke.c
+
+while ($#argv > 0)
+   switch ($1)
+      case -dst:
+           shift
+           set dst  = $1
+           breaksw
+      default:
+           echo "Unexpected command line arg: $1"
+	   exit(1)
+           breaksw
+   endsw
+   shift
+end
+
 unalias ls
 
 # find the available spokes
-pushd spokes >& /dev/null
+pushd $src/spokes >& /dev/null
 
 set spokes = ""
 foreach i (`ls -1r`)
@@ -28,10 +45,10 @@ end
 
 popd >& /dev/null
 
-rm -f pdspoke.c
-touch pdspoke.c
+rm -f $dst
+touch $dst
 
-cat >&! pdspoke.c << EOF
+cat >&! $dst << EOF
 /*
  * PDSPOKE.C - automatically generated routine to register C coded spokes
  *
@@ -59,21 +76,21 @@ int _PD_register_spokes(void)
 EOF
 
 foreach i ($spokes)
-    echo "    extern int PD_register_${i}(void);" >>& pdspoke.c
+    echo "    extern int PD_register_${i}(void);" >>& $dst
 end
-echo "" >>& pdspoke.c
+echo "" >>& $dst
 
-echo "    if (ns == 0)" >>& pdspoke.c
-echo "       {G_register_pdb_types();" >>& pdspoke.c
-echo "        ns += (PD_register_pdb() >= 0);" >>& pdspoke.c
+echo "    if (ns == 0)" >>& $dst
+echo "       {G_register_pdb_types();" >>& $dst
+echo "        ns += (PD_register_pdb() >= 0);" >>& $dst
 
 foreach i ($spokes)
-    echo "        ns += (PD_register_${i}() >= 0);" >>& pdspoke.c
+    echo "        ns += (PD_register_${i}() >= 0);" >>& $dst
 end
 
-echo "        };" >>& pdspoke.c
+echo "        };" >>& $dst
 
-cat >>& pdspoke.c << EOF
+cat >>& $dst << EOF
 
     n = SC_array_get_n(_PD_file_types);
 

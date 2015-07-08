@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE I/O Test ................"
 set exe = $BinDir/tscio
@@ -24,7 +24,7 @@ set xstatus = $status
 flog $Log popd
 
 if ($xstatus == 0) then
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 endif
 
 set rpf = ( $rpf tscio.txt )

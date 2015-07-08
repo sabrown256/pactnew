@@ -36,7 +36,7 @@ while ($#argv > 0)
 end
 
 if ($tgt == run) then
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
 # print the fiducial answer for this test
 else

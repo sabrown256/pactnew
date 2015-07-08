@@ -7,11 +7,7 @@
 #
 
 set Package = score
-if (-d ../../scripts) then
-   source ../../scripts/functions-pact.csh
-else if (-d ../../../scripts) then
-   source ../../../scripts/functions-pact.csh
-endif
+source $PSY_Base/scripts/functions-pact.csh
 
 if (-x ../../manager/cfgman) then
    set TMFiles = ( `ls tmake.b.*` darg )
@@ -25,7 +21,7 @@ rm -f $Log *.core core*
 touch $Log
 flog $Log date
 
-source ../../tests/common-make
+source $PSY_Base/score/tests/common-make
 
 setenv SC_EXEC_CPU_FACTOR   1024
 setenv SC_EXEC_TIME_LIMIT     64

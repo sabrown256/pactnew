@@ -32,7 +32,7 @@ TGTScr = do-local do-stats do-automake distribute \
 TGTEtc = csh-subroutines \
          functions-pact.csh functions-pact.sh functions-pact.pl
 
-IncAction = sinstall cross-info ${BinDir}
+#IncAction = sinstall cross-info ${BinDir}
 
 targets :
 	@echo "Targets for SCRIPTS"
@@ -53,6 +53,7 @@ hdrf =
 bindf = 
 
 generate : ${bindf} ${hdrf}
+	pact scrinstall
 
 IncAction = sinstall ${TGTEtc} ${EtcDir}
 

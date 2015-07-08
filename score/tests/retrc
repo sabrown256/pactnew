@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Retrace Test ............"
 set exe = $BinDir/tscrtr
@@ -33,7 +33,7 @@ if (($CROSS_COMPILE == FALSE) && ($HSY_OS_Name != Darwin ) && ("$Valgrind" == ""
       setenv CROSS_FE   "$CROSS_FE -v"
    endif
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a retrc -e $xstatus -dt $dt -x $exe -rpf "$rpf" none
 

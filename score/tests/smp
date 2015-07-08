@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Parallel Test ..........."
 set io  = flog
@@ -86,7 +86,7 @@ set io  = flog
 
             foreach n ($NThrds)
                set opt = ( $arg -n $n $mode -d 1 -s )
-               source ../../../scripts/test-run
+               source $PSY_Base/scripts/test-run
 
                if ($xstatus >= 254) then
                   NoteD $Log -n "o"
@@ -127,7 +127,7 @@ set io  = flog
 
          foreach n ($NThrds)
             set opt = ( -nd $mode -nt $n )
-            source ../../../scripts/test-run
+            source $PSY_Base/scripts/test-run
 
             if ($xstatus >= 254) then
                NoteD $Log -n "o"

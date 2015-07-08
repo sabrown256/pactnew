@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/score/tests/common
 
 set msg = "SCORE Archive Scan Test ......."
 set exe = $BinDir/fcscan
@@ -53,7 +53,7 @@ if ($xstatus == 0) then
    flog $Log $AR $AROpt libar.a f*.o
    flog $Log $AR -t libar.a
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    set rpf = ( $rpf f*.o libar.a )
    flog $Log cat libar.a
@@ -74,7 +74,7 @@ if ($xstatus == 0) then
    set opt = ( -a $LibDir/libscore.a )
    set io  = flog
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    @ NL = `$CROSS_FE $exe $opt | sort | wc -l`
    @ NL = $NL

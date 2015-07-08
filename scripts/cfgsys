@@ -127,9 +127,32 @@ else
       setenv PSY_Base    $basedir
    endif
 
+# force PSY_Base to be a full path
+   if ($PSY_Base !~ /*) then
+      setenv PSY_Base    $basedir/$PSY_Base
+   endif
+
    setenv PSY_Root     $basedir/dev/${PSY_ID}
-#   setenv PSY_Build    $basedir/dev/${PSY_ID}/build  #   out of source build
-   setenv PSY_Build    $PSY_Base
+
+# NOTE: if PSY_Build is already defined to a bad value
+# we cannot recover so always define PSY_Build based
+# on the directory structure we know
+#   if ($?PSY_Build == 0) then
+
+# CMake out of source build
+      if (-d $PSY_Root/build) then
+         setenv PSY_Build    $PSY_Root/build
+# classic build
+      else
+         setenv PSY_Build    $PSY_Base
+      endif
+#   endif
+
+# force PSY_Build to be a full path
+# NOTE: see PSY_Build = pact on do-net builds
+   if ($PSY_Build !~ /*) then
+      setenv PSY_Build    $HOME/$PSY_Build
+   endif
 
    if ($?PSY_AIRoot == 0) then
 
