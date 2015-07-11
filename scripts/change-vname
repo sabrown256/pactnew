@@ -1,0 +1,60 @@
+#!/bin/csh -f
+#
+# CHANGE-VNAME - map variable names in the code
+#
+# include cpyright.h
+#
+
+unalias *
+
+@ err = 0
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: change-vname [-h] [<old> <new>]*"
+           echo "   h   this help message"
+           echo ""
+           echo ""
+           exit(1)
+      default:
+           break
+           breaksw
+   endsw
+   shift
+end
+
+set exe    = `which pact`
+set bindir = $exe:h
+set etcdir = $bindir:h/etc
+
+#source $etcdir/env-pact.csh
+#source $etcdir/functions-pact.csh
+
+#InitLog log $cwd/log.$0:t
+
+set lst = ( $argv )
+@ ni = $#lst
+
+foreach p (score pml pdb pgs panacea scheme sx python fortran)
+   echo "   $p"
+   @ i  = 0
+   while ($i < $ni)
+      @ i = $i + 1
+      set on = $lst[$i]
+      @ i = $i + 1
+      set nn = $lst[$i]
+      echo "      $on -> $nn"
+
+      pushd ../$p >>& /dev/null
+      foreach f (*.[ch])
+         sed "s|$on|$nn|g" $f >&! $f.new
+         mv $f.new $f
+      end
+      popd >>& /dev/null
+   end
+end
+
+exit($err)
+

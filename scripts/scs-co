@@ -164,7 +164,8 @@ else if ($knd == git) then
       awk '$1 == "commit" { tag = $2 }                                   \
            $1 == "Date:"  { "date -d \""$3" "$4" "$6" "$5"\" \"+%Y %m %d\""|getline dt } \
            $1 == "--" { printf("%s %s\n", dt, tag); }'                 | \
-      awk '$2 > "'$m'" { lm = $2 ; ld = $3 ; lt = $4}                    \
+      awk '$2 < "'$m'" && NR <= 1 { lm = $2 ; ld = $3 ; lt = $4}         \
+           $2 > "'$m'" { lm = $2 ; ld = $3 ; lt = $4}                    \
            $2 == "'$m'" && $3 > "'$d'" { lm = $2 ; ld = $3 ; lt = $4 }   \
            $2 == "'$m'" && $3 == "'$d'" { lm = $2 ; ld = $3 ; lt = $4 }  \
            END { printf("%s/%s/%s %s\n", '$y', lm, ld, lt); }'         | \
