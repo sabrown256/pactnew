@@ -859,8 +859,8 @@ char *SS_object_type_name(object *o, char *atype, long nb)
     if (itype == G_INT_I)
        SC_strncpy(atype, nb, G_INT_S, -1);
 
-    else if (itype == G_FLOAT_I)
-       SC_strncpy(atype, nb, G_FLOAT_S, -1);
+    else if (itype == G_DOUBLE_I)
+       SC_strncpy(atype, nb, G_DOUBLE_S, -1);
 
     else if (itype == G_STRING_I)
        SC_strncpy(atype, nb, "string", -1);

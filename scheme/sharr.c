@@ -199,7 +199,7 @@ static object *_SSI_make_hasharr(SS_psides *si, object *arg)
     typ = SC_arrtype(arg, -1);
     if (typ == G_INT_I)
        sz = (int) SS_INTEGER_VALUE(arg);
-    else if (typ == G_FLOAT_I)
+    else if (typ == G_DOUBLE_I)
        sz = (int) SS_FLOAT_VALUE(arg);
     else
        SS_error(si, "BAD ARGUMENT - MAKE-HASH-TABLE", arg);

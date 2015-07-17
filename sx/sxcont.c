@@ -53,6 +53,16 @@ void _SX_args(SS_psides *si, object *obj, void *v, SC_type *td)
 
 		*pv = (void *) SS_GET(SX_pdbdata, obj);}
 
+	    else if (td->g == KIND_POINTER)
+	       {if (SX_PDBDATAP(obj))
+		   {C_array *ca;
+		    ca  = PDBDATA_DATA(obj);
+		    *pv = ca->data;
+                    SC_mark(*pv, 1);}
+		else if (SX_C_ARRAYP(obj))
+ 		   {*pv = C_ARRAY_DATA(obj);
+                    SC_mark(*pv, 1);};}
+
 	    else if (obj->val != NULL)
 	       *pv = obj->val;
 

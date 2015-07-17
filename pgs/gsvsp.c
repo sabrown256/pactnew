@@ -849,7 +849,7 @@ void PG_trans_points(const PG_device *dev, int n, int nd,
 
 void PG_trans_point(const PG_device *dev ARG(,,cls),
 		    int nd, PG_coord_sys ics, double *xi,
-		    PG_coord_sys ocs, double *xo)
+		    PG_coord_sys ocs, double *xo ARG(*,out))
    {int id;
     double *o[PG_SPACEDM], *n[PG_SPACEDM];
 
@@ -1442,7 +1442,7 @@ void _PG_fix_wtos(PG_device *dev, int wh)
  */
 
 void PG_fget_axis_log_scale(const PG_device *dev ARG(,,cls),
-			    int nd, int *iflg)
+			    int nd, int *iflg ARG(*,out))
    {int id;
     const PG_dev_geometry *g;
 
@@ -1616,8 +1616,8 @@ static INLINE void _PG_set_space_WC(PG_device *dev, int nd, double *wc)
  * #bind PG_get_viewspace fortran() scheme() python()
  */
 
-void PG_get_viewspace(const PG_device *dev ARG(,,cls),
-		      PG_coord_sys cs, double *box)
+void PG_get_viewspace(const PG_device *dev ARG(,,cls), PG_coord_sys cs,
+		      double *box ARG([0.0,0.0,0.0,0.0,0.0,0.0],out))
    {const PG_dev_geometry *g;
 
     g = &dev->g;

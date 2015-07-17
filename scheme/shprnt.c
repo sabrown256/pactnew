@@ -1166,7 +1166,7 @@ void SS_wr_atm(SS_psides *si, object *obj, object *strm)
 	if (ityp == G_INT_I)
 	   SC_itos(t, MAXLINE, SS_INTEGER_VALUE(obj), NULL);
 
-	else if (ityp == G_FLOAT_I)
+	else if (ityp == G_DOUBLE_I)
 	   SC_ftos(t, MAXLINE, FALSE, SS_gs.fmts[1], SS_FLOAT_VALUE(obj));
 
 	else if (ityp == G_DOUBLE_COMPLEX_I)

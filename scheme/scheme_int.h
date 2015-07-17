@@ -267,6 +267,10 @@ extern SS_procedure
  *_SS_mk_scheme_proc(const char *pname, const char *pdoc,
 		     SS_form ptype, SS_C_procedure *cp);
 
+extern SC_type
+ *_SS_list_type(SS_psides *si, object *lst),
+ *_SS_vector_type(SS_psides *si, object *vct);
+
 extern int
  _SS_object_map(SS_psides *si, FILE *fp, int flag),
  _SS_get_object_length(SS_psides *si, object *obj),
@@ -280,7 +284,9 @@ extern int
 extern void
  _SS_rl_C_proc(SS_C_procedure *cp),
  _SS_install(SS_psides *si, const char *pname, const char *pdoc,
-	     PFPHand phand, int n, PFVoid *pr, SS_form ptype);
+	     PFPHand phand, int n, PFVoid *pr, SS_form ptype),
+ *_SS_list_to_array(SS_psides *si, object *o),
+ *_SS_vector_to_array(SS_psides *si, object *vct);
 
 extern object
  *_SS_numtype_to_object(SS_psides *si, const char *type, void *p, long n),

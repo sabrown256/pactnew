@@ -77,7 +77,7 @@ memdes *_SX_hash_hook(const PDBfile *file, const char *vr, defstr *dp)
         if (c == G_INT_I)
 	   SC_strncpy(new_mem, MAXLINE, "long_long *val", -1);
 
-	else if (c == G_FLOAT_I)
+	else if (c == G_DOUBLE_I)
 	   SC_strncpy(new_mem, MAXLINE, "double *val", -1);
 
 	else if (c == G_STRING_I)

@@ -765,7 +765,7 @@ object *SS_mk_float(SS_psides *si, double d)
     dp  = CMAKE(double);
     *dp = d;
 
-    op = SS_mk_object(si, dp, G_FLOAT_I, SELF_EV, NULL,
+    op = SS_mk_object(si, dp, G_DOUBLE_I, SELF_EV, NULL,
 		      SS_wr_atm, _SS_rl_float);
 
     return(op);}
@@ -1063,7 +1063,7 @@ int _SS_get_object_length(SS_psides *si, object *obj)
        ni = SS_STRING_LENGTH(obj) + 1;
 
     else if ((ityp == G_INT_I) ||
-	     (ityp == G_FLOAT_I))
+	     (ityp == G_DOUBLE_I))
        ni = 1;
 
     else
@@ -1204,7 +1204,7 @@ int _SS_object_to_numtype_id(int vid, void *p, long n, object *val)
        d = SS_BOOLEAN_VALUE(val);
     else if (oid == G_INT_I)
        d = SS_INTEGER_VALUE(val);
-    else if (oid == G_FLOAT_I)
+    else if (oid == G_DOUBLE_I)
        d = SS_FLOAT_VALUE(val);
     else
        d = 0.0;
@@ -1291,8 +1291,10 @@ int _SS_object_to_numtype(const char *type, void *p, long n, object *val)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_LIST_TO_NUMTYPE_ID - convert multiple objects to an array P which
- *                        - has type TYPE to the value of object VAL
+/* _SS_LIST_TO_NUMTYPE_ID - convert a list of objects, O, to an array P which
+ *                        - has type index VID and length N
+ *                        - it is an error if the length of the list is
+ *                        - greater than N
  *                        - return TRUE iff successful
  */
 
@@ -1358,8 +1360,8 @@ int _SS_list_to_numtype_id(SS_psides *si, int vid, void *p, long n, object *o)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* _SS_LIST_TO_NUMTYPE - convert multiple objects to an array P which
- *                     - has type TYPE to the value of object VAL
+/* _SS_LIST_TO_NUMTYPE - convert a list of objects, O, to an array P which
+ *                     - has type TYPE and length N
  *                     - return TRUE iff successful
  */
 
@@ -1371,6 +1373,126 @@ int _SS_list_to_numtype(SS_psides *si, const char *type,
     rv  = _SS_list_to_numtype_id(si, vid, p, n, o);
 
     return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_LIST_TYPE - scan list LST and each element has the same type
+ *               - handy special case often used in numerical work
+ *               - return an SC_type describing it
+ *               - otherwise return NULL
+ */
+
+SC_type *_SS_list_type(SS_psides *si, object *lst)
+   {int id, ok;
+    object *o, *l;
+    SC_type *td;
+
+    td = NULL;
+
+    if (SS_consp(lst) == TRUE)
+       {o  = SS_CAR_MACRO(lst);
+	id = SC_arrtype(o, -1);
+	ok = TRUE;
+
+	for (l = SS_CDR_MACRO(lst);
+	     (ok == TRUE) && !SS_nullobjp(l);
+	     l = SS_CDR_MACRO(l))
+	    {o  = SS_CAR_MACRO(l);
+	     ok = (id == SC_arrtype(o, -1));};
+
+	if (ok == TRUE)
+	   td = _SC_get_type_id(id);};
+
+    return(td);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_LIST_TO_ARRAY - convert a list of objects, O, to an array P which
+ *                   - has type TYPE and length N
+ *                   - return TRUE iff successful
+ */
+
+void *_SS_list_to_array(SS_psides *si, object *o)
+   {int vid, rv;
+    long n, bpi;
+    void *p;
+    SC_type *td;
+
+    p  = NULL;
+    n  = SS_length(si, o);
+    td = _SS_list_type(si, o);
+    if (td != NULL)
+       {bpi = td->bpi;
+	vid = td->id;
+	p   = CMAKE_N(char, bpi*n);
+	rv  = _SS_list_to_numtype_id(si, vid, p, n, o);
+        if (rv == FALSE)
+	   CFREE(p);};
+
+    return(p);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_VECTOR_TYPE - scan vector VCT and each element has the same type
+ *                 - handy special case often used in numerical work
+ *                 - return an SC_type describing it
+ *                 - otherwise return NULL
+ */
+
+SC_type *_SS_vector_type(SS_psides *si, object *vct)
+   {int i, n, id, ok;
+    object **va;
+    SC_type *td;
+
+    td = NULL;
+
+    if (SS_vectorp(vct) == TRUE)
+       {va = SS_VECTOR_ARRAY(vct);
+	n  = SS_VECTOR_LENGTH(vct);
+
+	id = SC_arrtype(va[0], -1);
+	ok = TRUE;
+
+	for (i = 0; (ok == TRUE) && (i < n); i++)
+	    ok = (id == SC_arrtype(va[i], -1));
+
+	if (ok == TRUE)
+	   td = _SC_get_type_id(id);};
+
+    return(td);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/* _SS_VECTOR_TO_ARRAY - convert a vector of objects, O, to an array P which
+ *                     - has type TYPE and length N
+ *                     - return TRUE iff successful
+ */
+
+void *_SS_vector_to_array(SS_psides *si, object *vct)
+   {int vid;
+    long i, n, bpi;
+    object **va;
+    void *p;
+    SC_type *td;
+
+    p  = NULL;
+    td = _SS_vector_type(si, vct);
+    if (td != NULL)
+       {bpi = td->bpi;
+	vid = td->id;
+
+	va  = SS_VECTOR_ARRAY(vct);
+	n   = SS_VECTOR_LENGTH(vct);
+
+        p   = CMAKE_N(char, bpi*n);
+	for (i = 0; i < n; i++)
+	    _SS_object_to_numtype_id(vid, p, i, va[i]);};
+
+    return(p);}
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/

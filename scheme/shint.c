@@ -376,6 +376,8 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 		 break;
 	    case KIND_QUATERNION :
 	         _SS_quaternion_arg(si, obj, v);
+		 break;
+
 	    default :
 	         if (type == G_STRING_I)
 		    {s = _SS_get_print_name(si, obj);
@@ -393,6 +395,14 @@ static void _SS_args(SS_psides *si, object *obj, void *v, int type)
 
 		 else if (type == G_SS_OUTPUT_PORT_I)
 		    *pv = (void *) SS_OUTSTREAM(obj);
+
+	         else if (td->g == KIND_POINTER)
+		    {if (SS_vectorp(obj))
+		        *pv = _SS_vector_to_array(si, obj);
+		     else if (SS_consp(obj))
+		        *pv = _SS_list_to_array(si, obj);
+		     else
+		        ok = FALSE;}
 
 		 else
 		    ok = FALSE;

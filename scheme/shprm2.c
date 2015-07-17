@@ -19,12 +19,12 @@ typedef object *(*PFBINOBJ)(SS_psides *si, object *argl);
      _num  = SS_car(si, _arg);                                               \
      _arg  = SS_cdr(si, _arg);                                               \
      _ityp = SC_arrtype(_num, -1);                                           \
-     _typ  = G_INT_I;                                                       \
-     if (_ityp == G_INT_I)                                                  \
-        _oper = SS_INTEGER_VALUE(_num);                                      \
-     else if (_ityp == G_FLOAT_I)                                           \
+     if (_ityp == G_INT_I)                                                   \
+        {_oper = SS_INTEGER_VALUE(_num);                                     \
+         _typ  = G_INT_I;}                                                   \
+     else if (_ityp == G_DOUBLE_I)                                           \
         {_oper = SS_FLOAT_VALUE(_num);                                       \
-         _typ  = G_FLOAT_I;}                                                \
+         _typ  = G_DOUBLE_I;}                                                \
      else                                                                    \
         SS_error(_si, "ARGUMENT MUST BE A NUMBER - SS_GET_OPERAND", _num);}
 
@@ -89,7 +89,7 @@ object *SS_unary_flt(SS_psides *si, SS_C_procedure *cp, object *argl)
 	y  = f(SS_INTEGER_VALUE(x));
 	rv = SS_mk_float(si, y);}
 
-    else if (id == G_FLOAT_I)
+    else if (id == G_DOUBLE_I)
        {double y;
 	PFDoubled f;
 	f  = (PFDoubled) cp->proc[0];
@@ -229,7 +229,7 @@ static object *_SS_bin_fix(SS_psides *si, long ni,
     double accv, *v;
     object *acc;
 
-    idf = ((op == PM_fdivide) || (op == HYPOT)) ? G_FLOAT_I : G_INT_I;
+    idf = ((op == PM_fdivide) || (op == HYPOT)) ? G_DOUBLE_I : G_INT_I;
 
     v = CMAKE_N(double, ni);
     _SS_list_to_numtype_id(si, G_DOUBLE_I, v, ni, argl);
