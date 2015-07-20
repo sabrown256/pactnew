@@ -357,7 +357,8 @@ object *SX_mode_text(SS_psides *si)
  */
 
 void SX_setup_viewspace(PG_device *dev, double mh)
-   {double labsp, nvh, nvoy;
+   {int i, imn, imx;
+    double labsp, nvh, nvoy;
     static double obx[PG_BOXSZ] = { -HUGE, -HUGE, -HUGE, -HUGE, -HUGE, -HUGE};
     static int traditional = TRUE;
 
@@ -380,17 +381,21 @@ void SX_setup_viewspace(PG_device *dev, double mh)
        {nvh  = SX_gs.view_dx[1]/(1.0 + labsp);
 	nvoy = (obx[2] + labsp)/(1.0 + labsp);
 
+/* ULTRA viewport X placement controls do not work without this */
+	SX_gs.view_x[1] = SX_gs.view_x[0] + SX_gs.view_dx[0];
+
+/* ULTRA viewport Y placement controls do not work without this */
 	SX_gs.view_x[2] = nvoy;
 	SX_gs.view_x[3] = nvoy + nvh;
 
-	dev->view_x[2] = nvoy;
-	dev->view_x[3] = nvoy + nvh;
+	imn = 1;
+	imx = 4;
 
 /* set the old school state */
 /*        SX_gs.view_dx[1]    = nvh; */
 	SX_gs.window_dx[1] *= mh;}
 
-/* this way make better use of space as the window is
+/* this way makes better use of space as the window is
  * made larger or smaller
  * it does this by modifying SX_gs.view_x
  */
@@ -401,12 +406,15 @@ void SX_setup_viewspace(PG_device *dev, double mh)
 	SX_gs.view_x[2] = nvoy;
 	SX_gs.view_x[3] = nvoy + nvh;
 
-	dev->view_x[2] = nvoy;
-	dev->view_x[3] = nvoy + nvh;
+	imn = 2;
+	imx = 4;
 
 /* set the old school state */
 	SX_gs.view_dx[1]    = nvh;
 	SX_gs.window_dx[1] *= mh;};
+
+    for (i = imn; i < imx; i++)
+        dev->view_x[i]  = SX_gs.view_x[i];
 
     return;}
 
