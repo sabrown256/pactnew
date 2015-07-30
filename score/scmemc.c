@@ -128,7 +128,14 @@ void SC_mem_statb(u_int64_t *al, u_int64_t *fr, u_int64_t *df, u_int64_t *mx)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_STATS - return memory usage statistics
+/* SC_MEM_STATS - Return SCORE memory manager memory usage statistics.
+ *              - All information is in bytes. Individual statistics are
+ *              - returned only if the pointer associated with it is non-NULL.
+ *              - The statistics are:
+ *              -   AL - total memory allocated
+ *              -   FR - total memory freed
+ *              -   DF - current difference between allocated and freed
+ *              -   MX - maximum difference between allocated and freed
  *
  * #bind SC_mem_stats fortran() scheme(memory-usage) python()
  */
@@ -180,16 +187,17 @@ void _SC_mem_exhausted(int cnd)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_CONFIGURE_MM - configure the memory manager bin structure
- *                 - bin sizes increase linearly up to MXL and
- *                 - exponentially up to the maximum managed size MXM
- *                 - for efficiency memory will be requested from the
+/* SC_CONFIGURE_MM - Configure the SCORE memory manager bin structure.
+ *                 - Bin sizes increase linearly up to MXL and
+ *                 - exponentially up to the maximum managed size MXM.
+ *                 - For efficiency, memory will be requested from the
  *                 - system in units of BSZ for bins with size <= BSZ
  *                 - and broken up into appropriately sized units to
- *                 - be added to the free lists
- *                 - for bins with size > BSZ single units will be
+ *                 - be added to the free lists.
+ *                 - For bins with size > BSZ single units will be
  *                 - requested from the system in order to keep applications
- *                 - from grabbing too much memory that may not be used
+ *                 - from grabbing too much memory that may not be used.
+ *                 - Parameters defining the bins are:
  *                 -   MXL - maximum block size for linear region
  *                 -   MXM - maximum managed block size
  *                 -   BSZ - maximum block size requested from the system
@@ -737,18 +745,18 @@ int SC_free_n(void *p, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_ZERO_SPACE_N - set zero space flag on heap for thread TID
- *                 - thread action
- *                 -   -2 : all heaps
- *                 -   -1 : current heap
- *                 -  0-N : specified heap
- *                 - flag action
- *                 -   0 : don't zero
- *                 -   1 : zero on alloc and free
- *                 -   2 : zero on alloc only
- *                 -   3 : zero on free only
- *                 -   5 : use calloc to get zeroed memory in _SC_prim_alloc
- *                 - return the original value
+/* SC_ZERO_SPACE_N - Set the zero space flag on heap for thread TID to FLAG.
+ *                 - Action based on TID:
+ *                 -   -2   all heaps
+ *                 -   -1   current heap
+ *                 -  0-N   specified heap
+ *                 - Action based on FLAG:
+ *                 -   0   don't zero
+ *                 -   1   zero on alloc and free
+ *                 -   2   zero on alloc only
+ *                 -   3   zero on free only
+ *                 -   5   use calloc to get zeroed memory in _SC_prim_alloc
+ *                 - Return the original value.
  *
  * #bind SC_zero_space_n fortran() scheme(set-zero-space-n!) python()
  */

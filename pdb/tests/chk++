@@ -9,7 +9,7 @@ unalias *
 
 @ err = 0
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 if ($TEST_SKIP !~ *pdb:pdb_chk++*) then
 

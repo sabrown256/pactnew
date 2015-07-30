@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "SX PDB Archive Test .........."
 set exe = $BinDir/sx
@@ -28,7 +28,7 @@ if (($THREADING == no) && ($HAVE_MPI == no)) then
    flog $Log ar -rsc pdbvar.a demo.d?
    flog $Log ( cat demo.d? >&! pdbvar.blob )
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if ($xstatus == 0) then
       set Ref = $FilesDir/ref/pdbvar

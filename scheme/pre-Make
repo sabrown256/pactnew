@@ -22,7 +22,7 @@ TGTScm = applications/runt.scm applications/lang.scm \
 OD = DefaultO
 
 # Compiler/Loader Options
-CcFlags = -I. -I../.. -I${IncDir} ${MDInc}
+CcFlags = -I. -I${PACTSrcDir} -I${IncDir} ${MDInc}
 LdFlags = -L${LibDir} ${LDFLAGS}
 
 ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}

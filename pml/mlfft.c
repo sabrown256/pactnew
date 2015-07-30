@@ -131,7 +131,7 @@ complex *PM_uniform_complex_y(int no, double *xo,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_NEXT_EXP_TWO - return the largest M such that 2^M <= N
+/* PM_NEXT_EXP_TWO - Return the largest M such that 2^M <= N.
  *
  * #bind PM_next_exp_two fortran() scheme() python()
  */
@@ -373,16 +373,25 @@ complex *PM_fft_sc_real(double *x, int n, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_FFT_SC_REAL_DATA - do FFT on set of real data which is not necessarily
- *                     - evenly spaced
- *                     - returned via the argument list are the frequency
- *                     - values from most negative to most positive
- *                     - and the complex transform values can be in the same
- *                     - order as the frequency array (this is counter to the
- *                     - standard FFT practice but is the way one thinks of
- *                     - the transform data (this is controlled by ORDR)
- *                     - return the number of points in the transform arrays
- *                     - if successful and 0 otherwise
+/* PM_FFT_SC_REAL_DATA - Do FFT on set of NI real data points (XI, YI) which
+ *                     - are not necessarily evenly spaced.
+ *                     - An evenly spaced array of domain values from XMN to
+ *                     - XMX is computed and the (XI, YI) are interpolated
+ *                     - onto it for purposes of doing the transform.
+ *                     - The length of this array is one greater than the
+ *                     - smallest power of 2 greater than NI.
+ *                     - This domain array is returned via PXO if it is
+ *                     - non-NULL and freed otherwise.
+ *                     - The complex transform values, PYO, which can
+ *                     - be in the same order as the domain array.  This is
+ *                     - counter to the standard FFT practice but is the
+ *                     - way one intuitively thinks of the transform data.
+ *                     - If ORDR is TRUE then PYO is ordered, intuitively,
+ *                     - the same as PXO.  If ORDR is FALSE PYO is ordered
+ *                     - such that the non-negative frequency values are first
+ *                     - followed by the negative frequency values.
+ *                     - Return the number of points in the transform arrays
+ *                     - if successful and return 0 otherwise.
  *
  * #bind PM_fft_sc_real_data fortran() scheme() python()
  */
@@ -420,18 +429,27 @@ int PM_fft_sc_real_data(complex **pyo, double **pxo,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_FFT_SC_COMPLEX_DATA - do FFT on set of complex data which is not
- *                        - necessarily evenly spaced
- *                        - FLAG is 1 for FFT and -1 for inv(FFT)
- *                        - returned via the argument list are the frequency
- *                        - values from most negative to most positive
- *                        - and the complex transform values can be in the
- *                        - same order as the frequency array (this is
- *                        - counter to the standard FFT practice but is
- *                        - the way one thinks of the transform data
- *                        - (this is controlled by ORDR)
- *                        - return the number of points in the transform
- *                        - arrays if successful and 0 otherwise
+/* PM_FFT_SC_COMPLEX_DATA - Do FFT on set of NI points (XI, YI) where
+ *                        - XI is real and YI is complex and are not
+ *                        - necessarily evenly spaced.
+ *                        - FLAG is 1 for FFT and -1 for inv(FFT).
+ *                        - An evenly spaced array of domain values from XMN to
+ *                        - XMX is computed and the (XI, YI) are interpolated
+ *                        - onto it for purposes of doing the transform.
+ *                        - The length of this array is one greater than the
+ *                        - smallest power of 2 greater than NI.
+ *                        - This domain array is returned via PXO if it is
+ *                        - non-NULL and freed otherwise.
+ *                        - The complex transform values, PYO, which can
+ *                        - be in the same order as the domain array.  This is
+ *                        - counter to the standard FFT practice but is the
+ *                        - way one intuitively thinks of the transform data.
+ *                        - If ORDR is TRUE then PYO is ordered, intuitively,
+ *                        - the same as PXO.  If ORDR is FALSE PYO is ordered
+ *                        - such that the non-negative frequency values are first
+ *                        - followed by the negative frequency values.
+ *                        - Return the number of points in the transform arrays
+ *                        - if successful and return 0 otherwise.
  *
  * #bind PM_fft_sc_complex_data fortran() scheme() python()
  */

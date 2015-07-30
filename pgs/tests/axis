@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pgs/tests/common
 
 set msg = "PGS Axis Test .........."
 set exe = $BinDir/tgslax
@@ -71,7 +71,7 @@ end
             set opt = ( $lnlg -s $FilesDir/$i )
             set io  = $ob.res
 
-            source ../../../scripts/test-run
+            source $PSY_Base/scripts/test-run
 
             flog $Log ( cat $ob.res |& sed 's|e-00|e+00|g' >&! $ob.res.x )
             flog $Log ( mv $ob.res.x $ob.res )

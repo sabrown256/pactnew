@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pml/tests/common
 
 set msg = "PML Function Test ......"
 set exe = $BinDir/tmlfn
@@ -27,7 +27,7 @@ set io  = flog
       NoteD $Log ""
       NoteD $Log "                         Can't build PML Function Test Program"
    else
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
    endif
 
 $TEST_CHECK part -a func -e $xstatus -dt $dt -x $exe none

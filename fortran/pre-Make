@@ -131,7 +131,7 @@ modules : ${LibDep}
 	@rm -rf ${PSY_TmpDir}
 
 ${PACTTmpDir}/gm-${LibName}.f : ${PACTSrcDir}/flibc.f
-	@../scripts/bproto
+	@${BinDir}/bproto
 
 genmod : ${PACTTmpDir}/gm-${LibName}.f
 
@@ -140,7 +140,7 @@ IncAction = @pact genmod
 #LibAction = @pact devgen
 
 SDir = ${PACTSrcDir}
-LibAction = @(cd ${PACTTmpDir} ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ../../pre-Make Hdrs=../../fpact.h modules)
+LibAction = @(cd ${PACTTmpDir} ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ${PACTSrcDir}/pre-Make Hdrs=${PACTSrcDir}/fpact.h modules)
 
 SLibs = ${DPLib} ${FLib} ${MDLib}
 Libs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}

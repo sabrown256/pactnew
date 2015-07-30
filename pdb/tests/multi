@@ -5,7 +5,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 # NOTE: the exec tests in SCORE are a much more thorough test that this
 # so save the time and do not do this

@@ -104,6 +104,7 @@ struct s_anadep
     char arch[MAXLINE];
     char root[PATH_MAX];
     char exe[PATH_MAX];
+    char srcdir[PATH_MAX];
     int (*pred)(anadep *state, char *fa, char *fb, int force);};
 
 #ifdef NON_INTEGER_ENUM

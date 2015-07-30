@@ -10,7 +10,7 @@
 
 setenv Package  panacea
 setenv Test     $0:t
-source ../../../scripts/test-env
+source $PSY_Base/scripts/test-env
 
 if ("$CROSS_FE" == "") then
    set cross_fe = ""

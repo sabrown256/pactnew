@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDB SMP Parallel Test .............."
 set exe = $BinDir/tpdsmp
@@ -30,7 +30,7 @@ if ("$Parallel" != "") then
       NoteD $Log "                         ERROR Building SMP Parallel Tests"
       NoteD $Log "                    ${msg}FAILED"
    else
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
       set rpf = ( $rpf ptest.pdb wrn.pdb )
    endif
 

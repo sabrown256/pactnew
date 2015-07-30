@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "PDBDiff Test ................."
 set rpf = ""
@@ -38,7 +38,7 @@ if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
    set opt = ( $ulopt -l $FilesDir/pdbdtu.scm )
    set io  = flog
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a diff_make -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
    flog $Log @ nerr = $nerr + $status
@@ -68,7 +68,7 @@ if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       set opt = ( $dfopt -v -w pdbda.dat pdbdb.dat )
       set io  = pdbd.res
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a diff_all -e $xstatus -dt $dt -x $exe -l -r -rpf "$rpf" none
       flog $Log set xstatus = $status
@@ -100,7 +100,7 @@ if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       set opt = ( $dfopt -v -w pdbda.dat pdbdb.dat -M 2 4 )
       set io  = pdbd.res
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a diff_select -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       if ($status != 0) then

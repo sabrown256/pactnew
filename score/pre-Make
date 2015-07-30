@@ -221,7 +221,7 @@ ArObjs = ${ArDObjs} ${ArEObjs} ${ArMObjs} ${ArPObjs} \
 
 ${IncDir}/bfd.api : bfd.def
 	@echo "import-api bfd.def -o ${IncDir}/bfd.api"
-	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
+	@${BinDir}/import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
 
 scf77lr.o : scf77lr.l sclexan.h
 
@@ -620,7 +620,7 @@ ExcludeType  = -excl omp_lockdes
 LExcludeType = ${ExcludeType}
 
 dmake :
-	${PSY_ScrDir}/bproto ${LExcludeType}
+	${BinDir}/bproto ${LExcludeType}
 	@smake build
 	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 

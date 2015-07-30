@@ -612,6 +612,687 @@ switch ($Cmnd)
 #--------------------------------------------------------------------------
 #--------------------------------------------------------------------------
 
+   case cmake-config:
+        if (!(-x /bin/true) && !(-x /usr/bin/true)) then
+           echo "ERROR: /bin/true not executable - exiting"
+           exit(1)
+        endif
+
+        if ($?USER == 0) then
+           if ($?LOGNAME == 0) then
+              set USER = "anonymous"
+           else
+              set USER = $LOGNAME
+           endif
+        endif
+
+#--        set ldof = partial
+#--
+#--        set DoingConfig = TRUE
+#--
+#--# do not let the current environment dictate compiler choices
+#--        unsetenv Bits
+#--        unsetenv HSY_CPU
+#--        unsetenv HAVE_ANSI_C9X_COMPLEX
+#--        unsetenv HAVE_READLINE
+#--        unsetenv PACT_CC_FAMILY
+#--        unsetenv PACT_CC_EXE
+#--        unsetenv PACT_CC_VERSION
+#--        unsetenv PACT_CC_PATH
+#--        unsetenv PACT_FC_FAMILY
+#--        unsetenv PACT_FC_EXE
+#--        unsetenv PACT_FC_VERSION
+#--        unsetenv PACT_FC_PATH
+#--        unsetenv SMP_Pthread
+#--
+#--        unsetenv Z_Inc
+#--        unsetenv X11_Inc
+#--        unsetenv PNG_Inc
+#--        unsetenv JPEG_Inc
+#--        unsetenv MDG_Inc
+#--
+#--# do not bother with core files for the many analyzers
+#--        limit coredumpsize 0 >& /dev/null
+#--
+#           setenv PSY_Build $basedir/dev/${PSY_ID}/build
+           setenv PSY_Build $PSY_Root/build
+#--        setenv PSY_CONFIG_PATH ""
+#--        if ($?PSY_SITE == 1) then
+#--           set lsite = `echo $PSY_SITE | tr "[A-Z]" "[a-z]"`
+#--           setenv PSY_CONFIG_PATH  "$PSY_CONFIG_PATH local/$lsite"
+#--           unset lsite
+#--        endif
+#--        setenv PSY_CONFIG_PATH  "$PSY_CONFIG_PATH local std"
+#--
+#--        setenv USE_LDLibPath ""
+#--
+#--        setenv CCompiler  gnu
+#--
+#--        setenv PSY_Arch  `$PSY_ScrDir/system-id`
+#--        setenv Bits      `$PSY_ScrDir/nbit -d`
+#--
+#--        set Configuration = ""
+#--        set method        = 2
+#--        set cross_ref     = none
+#--        set reconfig      = FALSE
+#--        set mpi           = FALSE
+#--        set python        = FALSE
+#--        set shared        = FALSE
+#--        set openmp        = FALSE
+#--        set platform      = FALSE
+#--        set pthread       = FALSE
+#--        set pydir         = ""
+#--        set pyexe         = "python"
+#--        set flst          = ""
+#--        set dbcfg         = ""
+#--        set ucfg          = ""
+#--
+#--        set HelpCode      = ./$0
+#--        set WhoIAm        = $USER
+#--
+#--        set SCSRepository = ""
+#--        set SRCDate       = ""
+#-- 
+#--        set Opt   = "$HelpCode:t  $argv"
+#--        set PArgs = "-l"
+#--
+# save a copy of the args for the log
+        set nargs = ( $argv )
+
+#--        while ($#argv > 0)
+#--           switch ($1)
+#--              case -a:
+#--                   shift
+#--                   setenv SESSION_CONFIG $1
+#--#                   $PSY_CfgMan add $1 >& /dev/null
+#--                   breaksw
+#--              case -as:
+#--                   set PArgs = ( $PArgs "-as" )
+#--                   breaksw
+#--              case -b:
+#--                   shift
+#--                   setenv Bits $1
+#--                   breaksw
+#--              case -cc:
+#--                   shift
+#--                   setenv CCompiler  $1
+#--                   $PSY_MngDir/verify-cc $CCompiler
+#--                   if ($status != 0) then
+#--                      exit(1)
+#--                   endif
+#--                   breaksw
+#--              case -c:
+#--                   set PArgs = ( $PArgs "-c" )
+#--                   breaksw
+#--              case -db:
+#--                   shift
+#--                   if ("$1" =~ /*) then
+#--                      set dbcfg = $1
+#--                   else
+#--                      set dbcfg = $cwd/$1
+#--                   endif
+#--                   if (-f $dbcfg) then
+#--                      pushd $dbcfg:h >& /dev/null
+#--                      set dbcfg = $cwd/$dbcfg:t
+#--                      popd >& /dev/null
+#--                   endif
+#--                   breaksw
+#--              case -epy:
+#--                   shift
+#--                   set pyexe  = $1
+#--                   set python = TRUE
+#--                   set flst   = ( $flst -epy $pyexe )
+#--                   breaksw
+#--              case -f:
+#--                   shift
+#--                   setenv PSY_CONFIG_PATH   "$1 $PSY_CONFIG_PATH"
+#--                   breaksw
+#--              case -F:
+#--                   set PArgs = ( $PArgs "-F" )
+#--                   breaksw
+#--              case -feature:
+#--              case -features:
+#--                   shift
+#--                   set flst = ( $flst `echo "$1" | sed s'|,| |g'` )
+#--                   breaksw
+#--              case -g:
+#--                   set ldof  = debug
+#--                   set PArgs = ( $PArgs "-g" )
+#--                   breaksw
+#--              case -gsys:
+#--                   shift
+#--                   switch ("$1")
+#--                      case gl:
+#--                           setenv GRAPHICS_UseOGL TRUE
+#--                           breaksw
+#--                      case qd:
+#--                           setenv GRAPHICS_UseQD  TRUE
+#--                           breaksw
+#--                      case x11:
+#--                           setenv GRAPHICS_UseX  TRUE
+#--                           breaksw
+#--                   endsw
+#--                   breaksw
+#--              case -h:
+#--                   echo ""
+#--                   echo "Usage: dsys config [-a <sid>] [-as] [-b 32 | 64] [-c] [-db <db>]"
+#--                   echo "                   [-f <directory>] [-F] [-feature <feature>] [-g]"
+#--                   echo "                   [-gsys <opt>] [-h] [-i <directory>] [-llp <path>] [+/-logdb] [-o] [-O]"
+#--                   echo "                   [-p] [-cc <C compiler>] [-py] [-s] [-sl] [-t] [-tg <var> <value>] [-v] [<config>]"
+#--                   echo ""
+#--                   echo "        -a         set the system id for this config"
+#--                   echo "        -as        do parts of config asynchronously"
+#--                   echo "        -c         create missing directories for -i option"
+#--                   echo "        -db        configure from specified database"
+#--                   echo "        -f         a directory containing your configuration file"
+#--                   echo "        -F         do fast builds using /tmp"
+#--                   echo "        -g         build an absolutely debuggable version"
+#--                   echo "        -gsys      use specified graphics system"
+#--                   echo "                   options are: gl (OpenGL), qd (Apple Quickdraw), and x11 (default)"
+#--                   echo "        -h         this help message"
+#--                   echo "        -i         base installation directory (default /usr/local)"
+#--                   echo "                   to omit installation use "-i none""
+#--                   echo "        -llp       use <path> for LD_LIBRARY_PATH when analyzing compilers"
+#--                   echo "                   special value '.' for path computed from compiler location (old default)"
+#--                   echo "        +/-logdb   + log perdb transactions, - do not log perdb transactions (default)"
+#--                   echo "        -o         build an absolutely optimizied version"
+#--                   echo "        -O         build an mixed debuggable/optimizied version"
+#--                   echo "        -p         build a profiling version"
+#--                   echo "        -strict    fail if exactly specified features are not found"
+#--                   echo "        -v         display the Version of the Source Control System"
+#--                   echo "        -V         configuration/build makefiles verbose"
+#--                   echo ""
+#--                   echo "   The following options apply only if no config file is specified:"
+#--                   echo "        -b         size of pointers in bits for platforms with option"
+#--                   echo "                   the default is determined by the platform defaults"
+#--                   echo "        -cc        specify the compiler set to be used (default gnu)"
+#--                   echo "                   use only when compilers from multiple vendors are"
+#--                   echo "                   available on your system."
+#--                   echo "                   For a multi-platform config a colon delimited list"
+#--                   echo "                   compilers may be specified with the order matching"
+#--                   echo "                   the individual configurations (usually frontend first"
+#--                   echo "                   then backend)."
+#--                   echo "                   Use your PATH variable to select among multiple"
+#--                   echo "                   installed versions of a single vendors compilers"
+#--                   echo "                   a partial list of available compilers/platforms:"
+#--                   echo "                      clang       CLANG compilers"
+#--                   echo "                      intel       Intel compilers"
+#--                   echo "                      gnu         GNU compilers"
+#--                   echo "                      open64      Open64 compilers"
+#--                   echo "                      path        PathScale compilers"
+#--                   echo "                      pgi         PGI compilers"
+#--                   echo "                      sun         SUN compilers"
+#--                   echo "                   The following are multi-platform configurations for"
+#--                   echo "                   cross build situations and are safe:"
+#--                   echo "                      mp-gnu-bgl    GNU for IBM BG/L frontend and backend"
+#--                   echo "                      mp-gnu-bgp    GNU for IBM BG/P frontend and backend"
+#--                   echo "                      mp-gnu-bgq    GNU for IBM BG/Q frontend and backend"
+#--                   echo "                      mp-gnu-cxe    GNU for CRAY XE frontend and backend"
+#--                   echo "                      mp-gnu-win-64 GNU frontend and MinGW Win64 backend"
+#--                   echo "                      mp-pgi-cxe    PGI for CRAY XE frontend and backend"
+#--                   echo "                      mp-xlc-bgl    XLC for IBM BG/L frontend and backend"
+#--                   echo "                      mp-xlc-bgp    XLC for IBM BG/P frontend and backend"
+#--                   echo "                      mp-xlc-bgq    XLC for IBM BG/Q frontend and backend"
+#--                   echo "                   The following are risky since they may refer to a frontend"
+#--                   echo "                   build you do not have or control:"
+#--                   echo "                      gnu-bgl     GNU for IBM BG/L backend only"
+#--                   echo "                      gnu-bgp     GNU for IBM BG/P backend only"
+#--                   echo "                      gnu-bgq     GNU for IBM BG/Q backend only"
+#--                   echo "                      gnu-cxe     GNU for CRAY XE backend only"
+#--                   echo "                      pgi-cxe     PGI for CRAY XE backend only"
+#--                   echo "                      win-64      MinGW for Win64 backend"
+#--                   echo "                      xlc-bgl     XLC for IBM BG/L backend only"
+#--                   echo "                      xlc-bgp     XLC for IBM BG/P backend only"
+#--                   echo "                      xlc-bgq     XLC for IBM BG/Q backend only"
+#--                   echo "        -epy       full path python executable, implies -py"
+#--                   echo "                   may be comma delimited list of executables"
+#--                   echo "        -feature   <feature>[,<feature>]*"
+#--                   echo "                   look in pact/manager/features for available features"
+#--                   echo "        -mpi       build MPI version (equivalent to -feature mpi)"
+#--                   echo "        -py        build python bindings (equivalent to -feature python)"
+#--                   echo "        -s         build OpenMP version (equivalent to -feature openmp)"
+#--                   echo "        -sl        build shared libraries (equivalent to -feature shared)"
+#--                   echo "        -t         build threaded version (equivalent to -feature pthread)"
+#--                   echo "        -tg        specify tool/group variable - used to select tool versions"
+#--                   echo ""
+#--                   echo "   Config files are optional and should be used to exercise"
+#--                   echo "   more control than is available from the command line options"
+#--                   echo "        <config>   the configuration for the installation"
+#--                   echo "                   sample configs (see manager/std) are:"
+#--                   echo "                        -    auto-aix     IBM RS6000 systems"
+#--                   echo "                        -    auto-darwin  Mac OS X systmes"
+#--                   echo "                        -    auto-hp      HP RISC 700 systems"
+#--                   echo "                        -    auto-irix64  64 bit SGI systems running IRIX64 6.x"
+#--                   echo "                        -    auto-linux   LINUX systems"
+#--                   echo "                        -    auto-osf     OSF systems"
+#--                   echo "                        -    auto-sol     Sun Solaris systems"
+#--                   echo "                   (check manager/local for any local configs)"
+#--                   echo ""
+#--                   exit(1)
+#--                   breaksw
+#--              case -i:
+#--                   shift
+#--                   if (("$1" == none) || ("$1" =~ /*)) then
+#--                      set PArgs = ( $PArgs "-i" $1 )
+#--                   else
+#--                      set PArgs = ( $PArgs "-i" $cwd/$1 )
+#--                   endif
+#--                   breaksw
+#--# NOTE: use -epy instead (kept for backward compatibility)
+#--              case -ipy:
+#--                   shift
+#--                   set pydir  = $1
+#--                   set python = TRUE
+#--                   set flst   = ( $flst -ipy $pydir )
+#--                   breaksw
+#--              case -llp:
+#--                   shift
+#--                   setenv USE_LDLibPath "-l $1"
+#--                   breaksw
+#--              case +logdb:
+#--                   setenv PERDB_LOG "-l"
+#--                   breaksw
+#--              case -logdb:
+#--                   setenv PERDB_LOG ""
+#--                   breaksw
+#--              case -md:
+#--                   shift
+#--                   set method = $1
+#--                   breaksw
+#--              case -mpi:
+#--                   set mpi  = TRUE
+#--                   set flst = ( $flst -mpi )
+#--                   breaksw
+#--              case -O:
+#--                   set ldof = mixed
+#--                   breaksw
+#--              case -o:
+#--                   set ldof  = optimize
+#--                   set PArgs = ( $PArgs "-o" )
+#--                   breaksw
+#--              case -p:
+#--                   set PArgs = ( $PArgs "-p" )
+#--                   breaksw
+#--              case -plt:
+#--                   shift
+#--                   set cross_ref = $1
+#--                   set platform  = TRUE
+#--                   breaksw
+#--              case -py:
+#--                   set python = TRUE
+#--                   set flst   = ( $flst -py )
+#--                   breaksw
+#--              case -r:
+#--                   set reconfig = TRUE
+#--                   breaksw
+#--              case -s:
+#--                   set openmp = TRUE
+#--                   set flst   = ( $flst -s )
+#--                   breaksw
+#--              case -sl:
+#--                   set shared = TRUE
+#--                   set flst   = ( $flst -sl )
+#--                   breaksw
+#--              case -strict:
+#--                   shift
+#--                   set PArgs = ( $PArgs "-strict" $1 )
+#--                   breaksw
+#--              case -t:
+#--                   set pthread = TRUE
+#--                   set flst    = ( $flst -t )
+#--                   breaksw
+#--              case -tg:
+#--                   shift
+#--                   set var = $1
+#--                   shift
+#--                   set val = $1
+#--                   setenv $var $val
+#--                   set PArgs = ( $PArgs "-tg" ${var}=${val} )
+#--                   unset var
+#--                   unset val
+#--                   breaksw
+#--              case -v*:
+#--                   source pact-scs
+#--                   echo "  Source Version:   " $SCSVersion
+#--                   echo "  Software Release: " $SCSRelease
+#--                   echo ""
+#--                   exit(1)
+#--              case -V:
+#--                   set PArgs = ( $PArgs "-v" )
+#--                   breaksw
+#--              default:
+#--                   set Configuration = $1
+#--           endsw
+#--           shift
+#--        end
+#--
+#--        unsetenv LD_LIBRARY_PATH
+#--
+        set BeginTime = `$TIMER -r`
+#--
+#--# provide context for child processes
+#--        setenv DSYS_TARGET pact_config
+#--
+#--# set the configuration for this system
+#--        setenv PSY_ID    `$PSY_CfgMan use`
+#--        setenv PSY_Root  $DevDir/$PSY_ID
+#--
+#--# now that we have the system, reset the variables that depend on it
+        set LogDir  = $PSY_Root/log
+#--        set IncDir  = $PSY_Root/include
+#--        set EtcDir  = $PSY_Root/etc
+#--        set BinDir  = $PSY_Root/bin
+#--        set LibDir  = $PSY_Root/lib
+#--        set PACT    = $BinDir/pact
+#--
+#--        setenv PERDB  $BinDir/perdb
+#--        setenv GEXEC  $BinDir/gexec
+#--
+#--        set EnvCsh = $EtcDir/env-pact.csh
+#--        set EnvSh  = $EtcDir/env-pact.sh
+#--
+#--        set temp   = $SHELL
+#--        set CurrSh = $temp:t
+#--        setenv CURR_SH $CurrSh
+#--
+#--# source control system variables
+#--        source pact-scs
+#--
+#--# set up some items in the working environment
+#--        set path = ( . $BinDir $PSY_ScrDir $path )
+#--
+#--        setenv HSY_OS_Name  `uname -s`
+#--
+# make sure the log directory is there - do not wait for later
+        if (!(-d $LogDir)) then
+           mkdir -p $LogDir
+        endif
+        if (!(-d $PSY_Root/log)) then
+           flog $Log mkdir $PSY_Root/log
+        endif
+
+        InitLog Log $LogDir/cmake-config
+
+        Note $Log "Args            = $nargs"
+#--        if ($?SESSION_CONFIG == 1) then
+#--           Note $Log "SESSION_CONFIG  = $SESSION_CONFIG"
+#--        endif
+#--        Note $Log "PSY_ID          = $PSY_ID"
+#--        Note $Log "PSY_SITE        = $PSY_SITE"
+#--        Note $Log "PSY_AIRoot      = $PSY_AIRoot"
+#--        Note $Log "PSY_ASRoot      = $PSY_ASRoot"
+        Note $Log "PSY_Root        = $PSY_Root"
+        Note $Log "PSY_Build       = $PSY_Build"
+#--        Note $Log "PSY_CONFIG_PATH = $PSY_CONFIG_PATH"
+
+        flog $Log umask
+
+# make sure that the installation directories exist
+        if (!(-d $DevDir)) then
+           flog $Log mkdir $DevDir
+        endif
+        if (!(-d $PSY_Root)) then
+           flog $Log mkdir $PSY_Root
+        endif
+#--        if (!(-d $PSY_Root/bin)) then
+#--           flog $Log mkdir $PSY_Root/bin
+#--        endif
+#--        if (!(-d $PSY_Root/lib)) then
+#--           flog $Log mkdir $PSY_Root/lib
+#--        endif
+#--        if (!(-d $PSY_Root/include)) then
+#--           flog $Log mkdir $PSY_Root/include
+#--        endif
+#--        if (!(-d $PSY_Root/include/shell)) then
+#--           flog $Log mkdir $PSY_Root/include/shell
+#--        endif
+#--        if (!(-d $PSY_Root/etc)) then
+#--           flog $Log mkdir $PSY_Root/etc
+#--        endif
+#--        if (!(-d $PSY_Root/man)) then
+#--           flog $Log mkdir $PSY_Root/man
+#--        endif
+#--        if (!(-d $PSY_Root/man/man1)) then
+#--           flog $Log mkdir $PSY_Root/man/man1
+#--        endif
+#--        if (!(-d $PSY_Root/man/man3)) then
+#--           flog $Log mkdir $PSY_Root/man/man3
+#--        endif
+#--        if (!(-d $PSY_Root/scheme)) then
+#--           flog $Log mkdir $PSY_Root/scheme
+#--        endif
+#--        if (!(-d $PSY_Root/scheme/extensions)) then
+#--           flog $Log mkdir $PSY_Root/scheme/extensions
+#--        endif
+        if (!(-d $PSY_Build)) then
+           flog $Log mkdir $PSY_Build
+        endif
+
+        set CMAKE_OPTS = " -DCMAKE_BUILD_TYPE=Debug"
+        set CMAKE_OPTS = ($CMAKE_OPTS -DPSY_Root=$PSY_Root)
+#        set CMAKE_OPTS = ($CMAKE_OPTS -DCMAKE_INSTALL_PREFIX=../install-debug)
+#       set CMAKE_OPTS = "$CMAKE_OPTS -C $HOST_CONFIG"
+
+	flog $Log pushd $PSY_Build
+
+        # clean up any old config  XXX - helps with testing
+	flog $Log rm -rf *
+
+	flog $Log cmake $PSY_Base $CMAKE_OPTS
+        set RStatus = $status
+	# XXX want status from cmake
+
+        if ($RStatus != 0) then
+           Note $Log "Error from CMake see $LogDir/cmake-config"
+        endif
+
+
+# cmake --graphviz=test.dot .
+# dot -Tpdf test.dot -o test.pdf
+
+        flog $Log popd
+
+#--
+#--        flog $Log $RM *.core *~
+#--        flog $Log $RM $LogDir/analyze* $LogDir/write*
+#--
+#--# figure out from where configuration info is coming
+#--        set gdir = gen/$PSY_Arch
+#--        if (!(-d $gdir)) then
+#--           flog $Log mkdir -p $gdir
+#--        endif
+#--        if ($reconfig == FALSE) then
+#--           flog $Log rm -f $gdir/$Configuration
+#--        endif
+#--
+#--# if using a database do the location/generation steps
+#--        if ("$dbcfg" != "") then
+#--           NoteD $Log "Using database $dbcfg to configure this PACT installation."
+#--
+#--           if (-f $dbcfg) then
+#--#              set ndbcfg = $cwd/$gdir/$PSY_ID.cfg
+#--              flog $Log set ndbcfg = $EtcDir/$PSY_ID.cfg
+#--              if ($dbcfg != $ndbcfg) then
+#--                 flog $Log cp $dbcfg $ndbcfg
+#--              endif
+#--              flog $Log set dbcfg = $ndbcfg
+#--              unset ndbcfg
+#--           else
+#--              NoteD $Log "No such database '$dbcfg' - exiting"
+#--              exit(1)
+#--           endif
+#--
+#--# if using a file or generated config
+#--        else
+#--           Note $Log "Original feature list: $flst"
+#--           Note $Log "Original config file: $Configuration"
+#--
+#--# if no configuration is specified - generate from scratch
+#--           if ("$Configuration" == "") then
+#--              call GEN_CONFIG()
+#--              flog $Log set cmod = "command line options"
+#--              flog $Log set ucfg = $gdir/$Configuration
+#--              flog $Log set dir  = $gdir
+#--
+#--# if file exists as is use it
+#--           else if (-f $Configuration) then
+#--              flog $Log set cmod = "full path file"
+#--              flog $Log set ucfg = $gdir/$Configuration
+#--              flog $Log set dir  = $gdir
+#--
+#--# otherwise look in the configs directories for the root and build it
+#--           else
+#--
+#--# NEW: now we may need to look in gdir for generated platform configs
+#--# this follows from the -cc <comp1>:<comp2>:... capability
+#--# and the fact that the generated platform configs are written
+#--# into gdir which seems a good temporary place for these
+#--              flog $Log setenv PSY_CONFIG_PATH  "$PSY_CONFIG_PATH $gdir"
+#--              flog $Log set Configuration = $Configuration:t
+#--
+#--              set inf   = ( `gen-cfg-root -r $Configuration` )
+#--              set croot = $inf[1]
+#--              if ($#inf > 1) then
+#--                 set flst  = ( $flst $inf[2-] )
+#--              endif
+#--              if ($croot == none) then
+#--                 flog $Log set cmod = "existing file"
+#--                 flog $Log set ucfg = $gdir/$Configuration
+#--                 flog $Log set dir  = $gdir
+#--              endif
+#--              unset inf
+#--              unset croot
+#--           endif
+#--
+#--# remove duplicate features and take care of Bits
+#--           Note $Log "First pass feature list: $flst"
+#--           set nflst = ""
+#--           foreach f ($flst)
+#--              if (("$f" == 64) || ("$f" == 32)) then
+#--                 flog $Log setenv Bits $f
+#--              else
+#--                 set ok = TRUE
+#--                 foreach l ($nflst)
+#--                    if ("$f" == "$l") then
+#--                       set ok = FALSE
+#--                       break
+#--                    endif
+#--                 end
+#--                 if ($ok == TRUE) then
+#--                    set nflst = ( $nflst $f )
+#--                 endif
+#--              endif
+#--           end
+#--           set flst = ( $nflst )
+#--           unset ok
+#--
+#--           Note $Log "Final feature list: $flst"
+#--
+#--# if there still is no config file - generate from what we know
+#--           if ("$ucfg" == "") then
+#--              flog $Log set cmod = "generated file"
+#--              flog $Log set ucfg = `gen-cfg $Configuration`
+#--              flog $Log set dir  = $gdir
+#--           endif
+#--           NoteD $Log ""
+#--           NoteD $Log "Configuring from $ucfg ($cmod)"
+#--           unset gdir
+#--        endif
+#--
+#--        set RStatus = 0
+#--
+#--        flog $Log cp types.db $EtcDir
+#--
+#--        flog $Log pushd ../psh
+#--        flog $Log unsetenv LD_LIBRARY_PATH
+#--        flog $Log ./ccw -g pco.c -o $BinDir/pco
+#--        if ($status == 0) then
+#--           flog $Log ./ccw -g -DPSY_Prefix=\"${PSY_Prefix}\" do-run.c -o $BinDir/do-run
+#--           flog $Log ./ccw -g perdb.c -o $BinDir/perdb
+#--           flog $Log ./ccw -g gexec.c -o $BinDir/gexec
+#--           flog $Log ./ccw -g elide.c -o $BinDir/elide
+#--           flog $Log ./ccw -g blang.c -o $BinDir/blang
+#--           flog $Log ./ccw -g rpath.c -o $BinDir/rpath
+#--           flog $Log ./ccw -g template.c -o $BinDir/template
+#--           flog $Log setenv DB_TYPES $EtcDir/types.db
+#--        else
+#--           NoteD $Log ""
+#--           NoteD $Log "Failed to build pco utility - exiting"
+#--           NoteD $Log ""
+#--           exit(1)
+#--        endif
+#--
+#--        flog $Log popd
+#--
+#--# remove standard Tool and Group variables from the environment
+#--        foreach v ( `env |& sed 's|^[ \t].*||' | sed 's|=.*$||'` )
+#--           switch ($v)
+#--              case CC_*:
+#--              case FC_*:
+#--              case LD_*:
+#--              case Std_*:
+#--              case Cfg_*:
+#--              case Cfe_*:
+#--                   unsetenv $v
+#--           endsw
+#--        end
+#--
+#--# setup PERDB and the config database
+#--        call DB_CONFIG()
+#--
+#--# run PCO
+#--        call PCO_CONFIG()
+#--
+#--        if ($RStatus != 0) then
+#--           goto CFG_DONE
+#--        endif
+#--
+#--# now that PCO made us one, source it        
+#--        source $EnvCsh
+#--
+#--# cleanup path so as not to tax wimpy OSs such as Solaris
+#--# and remove any extra pact version from the path
+#--        eval `$PSY_ScrDir/simplify-path -p pact`
+#--
+#--        flog $Log chmod a+x code-date
+#--        flog $Log pwd
+#--
+#--        flog $Log csh -f $DSYS linstall
+#--        set RStatus = $status
+#--        Note $Log "Status = $RStatus"
+#--        if ($RStatus != 0) then
+#--           NoteD $Log "   linstall failed during 'dsys config'"
+#--           goto CFG_DONE
+#--        endif
+#--
+#--        Separator $Log
+#--
+#--# check for multi-platform config
+#--        dbget PSY_Platforms
+#--        if ("$PSY_Platforms" != "") then
+#--           call MP_CONFIG()
+#--
+#--# single platform config
+#--        else
+#--           call SP_CONFIG()
+#--        endif
+#--
+#--# wrap it up
+#--        call FIN_CONFIG()
+#--
+#--CFG_DONE:
+#--        unset dbopt
+#--
+#--        if ($?SESSION_CONFIG == 1) then
+#--           Note $Log "Leaving with:"
+#--           Note $Log "   SESSION_CONFIG  = $SESSION_CONFIG"
+#--        endif
+
+        breaksw
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
    case config:
         if (!(-x /bin/true) && !(-x /usr/bin/true)) then
            echo "ERROR: /bin/true not executable - exiting"

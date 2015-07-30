@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pml/tests/common
 
 set msg = "PML NAN Test ..........."
 set exe = $BinDir/tmlnan
@@ -27,7 +27,7 @@ set io  = flog
          NoteD $Log ""
          NoteD $Log "                         Can't build PML NAN Test Program"
       else
-         source ../../../scripts/test-run
+         source $PSY_Base/scripts/test-run
       endif
 
 $TEST_CHECK part -a nan -e $xstatus -dt $dt -x $exe none

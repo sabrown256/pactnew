@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "PDBView Shell Test ..........."
 set exe = $BinDir/sx

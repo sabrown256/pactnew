@@ -38,24 +38,28 @@ enable_testing()
 set_property(GLOBAL PROPERTY generate_target )
 
 add_subdirectory(psh)
-#add_subdirectory(score)
-#add_subdirectory(pml)
-#add_subdirectory(pdb)
-#add_subdirectory(pgs)
-#add_subdirectory(scheme)
-#add_subdirectory(panacea)
-##add_subdirectory(sx)
+add_subdirectory(scripts)
+
+add_subdirectory(score)
+add_subdirectory(pml)
+
+# NOTE: pdb requires file pgs_gen.h from pgs
+add_subdirectory(pdb)
+add_subdirectory(pgs)
+
+add_subdirectory(scheme)
+add_subdirectory(panacea)
+#add_subdirectory(sx)
 
 #add_subdirectory(doc)
-#add_subdirectory(fortran)
+add_subdirectory(fortran)
 #add_subdirectory(python)
-add_subdirectory(scripts)
 
 
 get_property(generate_target_list GLOBAL PROPERTY generate_target) 
 #message(STATUS "generate_target_list = ${generate_target_list}")
 add_custom_target(generate
-    DEPENDS ${generate_target_list}
+    DEPENDS pact-build-tools ${generate_target_list}
     )
 
 get_property(incinstall_target_list GLOBAL PROPERTY incinstall_target) 

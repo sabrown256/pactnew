@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "PDBCP Test ..................."
 set exe = $BinDir/pdbcp
@@ -69,7 +69,7 @@ if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
       NoteD $Log -n "                       $lbl ........................"
       Note $Log ""
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       Note $Log "cp-$it.pdb status = $xstatus"
 

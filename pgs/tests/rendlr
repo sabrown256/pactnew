@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pgs/tests/common
 
 set msg = "PGS Basic Test ........."
 set exe = $BinDir/tgsa
@@ -29,7 +29,7 @@ set io  = ftee
       NoteD $Log "                    ${msg}FAILED"
    else
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       if (($xstatus == 0) && ("$Valgrind" == "")) then
          flog $Log ls -l gspsts.ps $RefDir/gspsts.ps

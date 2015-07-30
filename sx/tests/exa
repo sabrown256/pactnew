@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "PDBView Example Test ........."
 set exe = $BinDir/sx
@@ -30,7 +30,7 @@ set io  = pdbvbatch.res
 
    flog $Log rm -f $files
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if ($xstatus == 0) then
       flog $Log @ xstatus = 0

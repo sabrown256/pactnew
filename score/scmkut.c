@@ -123,6 +123,9 @@ static int setup_env(char *src, anadep *state)
     if (p != NULL)
        SC_strncpy(state->root, PATH_MAX, p, PATH_MAX);
 
+/* the directory in which the dmake session is run IS the source directory */
+    getcwd(state->srcdir, PATH_MAX);
+
 /* setup the architecture string */
     p = getenv("SESSION_CONFIG");
     if (p != NULL)

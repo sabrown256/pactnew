@@ -12,8 +12,8 @@ set exe = $BinDir/tsctyp
 
 @ lerr = 1
 
-flog $Log pushd $SrcDir
-flog $Log $MAKE type
+flog $Log pushd $TestBldDir
+flog $Log $MAKE ${TestPrefix}type
 set xstatus = $status
 flog $Log popd
 

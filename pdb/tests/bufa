@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg  = "PDB Buffer Test A .................."
 set exe  = $BinDir/tpdbf
@@ -61,7 +61,7 @@ if ($OS != AIX) then
 
 # run without strace
          if ("$STRACE" == "") then
-            source ../../../scripts/test-run
+            source $PSY_Base/scripts/test-run
 
             $TEST_CHECK part -a bufa_${s} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" ""
             @ nerr = $nerr + $status
@@ -125,7 +125,7 @@ if ($OS != AIX) then
 
 # run without strace
                if ("$STRACE" == "") then
-                  source ../../../scripts/test-run
+                  source $PSY_Base/scripts/test-run
 
                   $TEST_CHECK part -a bufa_${n} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" ""
                   @ nerr = $nerr + $status

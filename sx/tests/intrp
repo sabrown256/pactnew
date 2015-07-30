@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "PDBView Interpolation Test ..."
 set exe = $BinDir/sx
@@ -21,7 +21,7 @@ set io  = pdbvinterp.tmp
 
    flog $Log $RM 3x1.ps
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if ($xstatus == 0) then
       grep -i "error" pdbvinterp.tmp > pdbvinterp.err

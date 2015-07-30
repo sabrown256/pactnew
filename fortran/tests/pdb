@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/fortran/tests/common
 
 set msg = "PDB API Test ....................... "
 
@@ -66,7 +66,7 @@ if ($xstatus == 0) then
       set opt = ( -p )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a pdb_manual -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -84,7 +84,7 @@ if ($xstatus == 0) then
       set opt = ( -p )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a pdb_auto -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -102,7 +102,7 @@ if ($xstatus == 0) then
       set opt = ""
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a pdb_hyper -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -129,7 +129,7 @@ if ($xstatus == 0) then
          set opt = ( -p 4 $exe )
          set io  = flog
 
-         source ../../../scripts/test-run
+         source $PSY_Base/scripts/test-run
 
          $TEST_CHECK part -a pdb_dp -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 

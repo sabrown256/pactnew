@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/fortran/tests/common
 
 set msg = "PGS API Test ....................... "
 
@@ -54,7 +54,7 @@ if ($xstatus == 0) then
       set opt = ( -s )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a pgs_manual -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -72,7 +72,7 @@ if ($xstatus == 0) then
       set opt = ( -s )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a pgs_auto -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 
@@ -90,7 +90,7 @@ if ($xstatus == 0) then
       set opt = ( -s )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a pgs_contour -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 

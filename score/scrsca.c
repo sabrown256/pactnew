@@ -850,7 +850,16 @@ int SC_resource_usage(SC_rusedes *ru, int pid)
 
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_STATR - return memory usage statistics including system resources
+/* SC_MEM_STATR - Return SCORE memory manager memory usage statistics.
+ *              - All information is in bytes. Individual statistics are
+ *              - returned only if the pointer associated with it is non-NULL.
+ *              - The statistics are:
+ *              -   AL - total memory allocated
+ *              -   FR - total memory freed
+ *              -   DF - current difference between allocated and freed
+ *              -   MX - maximum difference between allocated and freed
+ *              -   RS - total memory used according to the system
+ *              -   OV - total bytes of memory overhead
  *
  * #bind SC_mem_statr fortran() scheme(memory-rusage) python()
  */

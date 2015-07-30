@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDB Buffer Test B .................."
 set exe = $BinDir/tpdb
@@ -34,7 +34,7 @@ if ("$Valgrind" == "") then
 
       set lopt = ( $opt -b $n )
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a bufb_${n} -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ lerr = $lerr + $status

@@ -63,8 +63,8 @@ static int test_1_hash(void)
     sb = CSTRSAVE("string-b");
 
     tab = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
-    hpa = SC_hasharr_install(tab, "a", sa, SC_STRING_S, 3, -1);
-    hpb = SC_hasharr_install(tab, "b", sb, SC_STRING_S, 3, -1);
+    hpa = SC_hasharr_install(tab, "a", sa, G_STRING_S, 3, -1);
+    hpb = SC_hasharr_install(tab, "b", sb, G_STRING_S, 3, -1);
 
     err += (hpa == NULL);
     err += (hpb == NULL);
@@ -103,8 +103,8 @@ static int test_1_ha(void)
     sb = CSTRSAVE("string-b");
 
     ha = SC_make_hasharr(HSZSMALL, NODOC, SC_HA_NAME_KEY, 0);
-    hpa = SC_hasharr_install(ha, "a", sa, SC_STRING_S, 3, -1);
-    hpb = SC_hasharr_install(ha, "b", sb, SC_STRING_S, 3, -1);
+    hpa = SC_hasharr_install(ha, "a", sa, G_STRING_S, 3, -1);
+    hpb = SC_hasharr_install(ha, "b", sb, G_STRING_S, 3, -1);
 
     err += (hpa == NULL);
     err += (hpb == NULL);
@@ -141,8 +141,8 @@ static int test_1_al(void)
     sa = CSTRSAVE("string-a");
     sb = CSTRSAVE("string-b");
 
-    lsa = SC_add_alist(NULL, "a", SC_STRING_S, sa);
-    lsb = SC_add_alist(lsa,  "b", SC_STRING_S, sb);
+    lsa = SC_add_alist(NULL, "a", G_STRING_S, sa);
+    lsb = SC_add_alist(lsa,  "b", G_STRING_S, sb);
     err += (lsa == NULL);
     err += (lsb == NULL);
 
@@ -213,13 +213,13 @@ static int test_3(void)
     sb = CSTRSAVE("string-b");
 
     lsa = NULL;
-    lsa = SC_add_alist(lsa, "a1", SC_STRING_S, sa);
-    lsa = SC_add_alist(lsa, "a2", SC_STRING_S, sb);
+    lsa = SC_add_alist(lsa, "a1", G_STRING_S, sa);
+    lsa = SC_add_alist(lsa, "a2", G_STRING_S, sb);
     err += (lsa == NULL);
 
     lsb = NULL;
-    lsb = SC_add_alist(lsb, "b1", SC_STRING_S, sa);
-    lsb = SC_add_alist(lsb, "b2", SC_STRING_S, sb);
+    lsb = SC_add_alist(lsb, "b1", G_STRING_S, sa);
+    lsb = SC_add_alist(lsb, "b2", G_STRING_S, sb);
     err += (lsb == NULL);
 
     lsc = SC_append_alist(NULL, lsa);

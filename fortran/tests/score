@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/fortran/tests/common
 
 set msg = "SCORE API Test ....................."
 
@@ -58,7 +58,7 @@ if ($xstatus == 0) then
    set opt = ( $FilesDir/tscls.src )
    set io  = tscls.res
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if (("$Valgrind" == "") && ($xstatus == 0)) then
       diff tscls.res $RefDir/tscls > tscls.res.diff
@@ -86,7 +86,7 @@ if ($xstatus == 0) then
    set opt = ""
    set io  = flog
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a score_hash -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
 

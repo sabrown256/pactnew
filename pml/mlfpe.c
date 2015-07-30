@@ -304,7 +304,12 @@ void PM_enable_fpe_t(int flg, PFSignal_handler hnd, void *a, int nb)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_ENABLE_FPE - enable software trapping of floating point exceptions
+/* PM_ENABLE_FPE - Change handling of floating point exceptions.
+ *               - If FLG is TRUE and HND is non-NULL associate HND with
+ *               - SIGFPE.  If FLG is TRUE enable hardware trapping of
+ *               - floating point exceptions.  If FLG is FALSE associate
+ *               - SIG_DFL with SIGFPE and disable hardware trapping of
+ *               - floating point exceptions.
  *
  * #bind PM_enable_fpe fortran() python()
  */
@@ -439,8 +444,17 @@ void PM_restore_fpu(void *a)
 
 /*--------------------------------------------------------------------------*/
 
-/* PM_FIX_NAND - replace all NaNs in D with the value V
- *             - return the number of NaNs found
+/* PM_FIX_NAND - Replace all NaNs and Infs of type indicated by MASK
+ *             - in the array of N double values D with V.
+ *             - MASK is a bit array:
+ *             -    bit   condition
+ *             -      1  IEEE plus Infinity
+ *             -      2  IEEE minus Infinity
+ *             -      4  IEEE positive signalling NaN
+ *             -      8  IEEE negative signalling NaN
+ *             -     16  IEEE positive quiet NaN
+ *             -     32  IEEE negative quiet NaN
+ *             - Return the number of NaNs and Infs found.
  *
  * #bind PM_fix_nand fortran() scheme() python()
  */
@@ -463,7 +477,17 @@ long PM_fix_nand(long n, double *d, int mask, double v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_COUNT_NAND - return the number of NaNs found in D
+/* PM_COUNT_NAND - Count the NaNs and Infs in the N element double array D
+ *               - which match specifications in MASK.
+ *               - MASK is a bit array:
+ *               -    bit   condition
+ *               -      1  IEEE plus Infinity
+ *               -      2  IEEE minus Infinity
+ *               -      4  IEEE positive signalling NaN
+ *               -      8  IEEE negative signalling NaN
+ *               -     16  IEEE positive quiet NaN
+ *               -     32  IEEE negative quiet NaN
+ *               - Return the number of NaNs and Infs found.
  *
  * #bind PM_count_nand fortran() scheme() python()
  */
@@ -484,8 +508,17 @@ long PM_count_nand(long n, double *d, int mask)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_FIX_NANF - replace all NaNs in F with the value V
- *            - return the number of NaNs found
+/* PM_FIX_NANF - Replace all NaNs and Infs of type indicated by MASK
+ *             - in the array of N float values F with V.
+ *             - MASK is a bit array:
+ *             -    bit   condition
+ *             -      1  IEEE plus Infinity
+ *             -      2  IEEE minus Infinity
+ *             -      4  IEEE positive signalling NaN
+ *             -      8  IEEE negative signalling NaN
+ *             -     16  IEEE positive quiet NaN
+ *             -     32  IEEE negative quiet NaN
+ *             - Return the number of NaNs and Infs found.
  *
  * #bind PM_fix_nanf fortran() scheme() python()
  */
@@ -507,7 +540,17 @@ long PM_fix_nanf(long n, float *f, int mask, float v)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_COUNT_NANF - return the number of NaNs found in F
+/* PM_COUNT_NANF - Count the NaNs and Infs in the N element float array F
+ *               - which match specifications in MASK.
+ *               - MASK is a bit array:
+ *               -    bit   condition
+ *               -      1  IEEE plus Infinity
+ *               -      2  IEEE minus Infinity
+ *               -      4  IEEE positive signalling NaN
+ *               -      8  IEEE negative signalling NaN
+ *               -     16  IEEE positive quiet NaN
+ *               -     32  IEEE negative quiet NaN
+ *               - Return the number of NaNs and Infs found.
  *
  * #bind PM_count_nanf fortran() scheme() python()
  */
@@ -529,15 +572,15 @@ long PM_count_nanf(long n, float *f, int mask)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_FP_TYPED - return one of the following depending on what
- *             - kind of floating point value D is
- *             -   0  D is a legal IEEE double
- *             -   1  D is IEEE plus Infinity
- *             -   2  D is IEEE minus Infinity
- *             -   4  D is an IEEE positive signalling NaN
- *             -   8  D is an IEEE negative signalling NaN
- *             -   16 D is an IEEE positive quiet NaN
- *             -   32 D is an IEEE negative quiet NaN
+/* PM_FP_TYPED - Return one of the following depending on what
+ *             - kind of double value D is:
+ *             -    0  a legal IEEE double
+ *             -    1  IEEE plus Infinity
+ *             -    2  IEEE minus Infinity
+ *             -    4  IEEE positive signalling NaN
+ *             -    8  IEEE negative signalling NaN
+ *             -   16  IEEE positive quiet NaN
+ *             -   32  IEEE negative quiet NaN
  *
  * #bind PM_fp_typed fortran() scheme() python()
  */
@@ -595,15 +638,15 @@ int PM_fp_typed(double d)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_FP_TYPEF - return one of the following depending on what
- *             - kind of floating point value F is
- *             -   0  F is a legal IEEE float
- *             -   1  F is IEEE plus Infinity
- *             -   2  F is IEEE minus Infinity
- *             -   4  F is an IEEE positive signalling NaN
- *             -   8  F is an IEEE negative signalling NaN
- *             -   16 F is an IEEE positive quiet NaN
- *             -   32 F is an IEEE negative quiet NaN
+/* PM_FP_TYPEF - Return one of the following depending on what
+ *             - kind of float value F is:
+ *             -    0  a legal IEEE double
+ *             -    1  IEEE plus Infinity
+ *             -    2  IEEE minus Infinity
+ *             -    4  IEEE positive signalling NaN
+ *             -    8  IEEE negative signalling NaN
+ *             -   16  IEEE positive quiet NaN
+ *             -   32  IEEE negative quiet NaN
  *
  * #bind PM_fp_typef fortran() scheme() python()
  */

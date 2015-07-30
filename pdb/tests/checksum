@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDB Checksum Test .................."
 set exe = $BinDir/tpdcs
@@ -43,13 +43,13 @@ if ($scan == TRUE) then
       
       NoteD $Log "         Parameters: $prm"
       set opt = ( $bopt $prm )
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
       @ lerr = $lerr + $xstatus
    end
    set xstatus = $lerr
 
 else
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 endif
 
 $TEST_CHECK part -a checksum -e $xstatus -dt $dt -x $exe "$msg"

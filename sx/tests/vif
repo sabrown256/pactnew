@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "SX PDB VIF Test .............."
 set exe = $BinDir/sx
@@ -23,7 +23,7 @@ set io  = sxpdbi.res
 
    if (("$sys[1]" != "CRAY") && ("$MPI" == "")) then
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       if ("$Valgrind" == "") then
          if ($xstatus == 0) then

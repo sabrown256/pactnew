@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "ULTRA Annotation Test ........"
 set exe = $BinDir/ultra
@@ -19,7 +19,7 @@ set io  = ulmmt.log
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
 $TEST_CHECK part -a annot -e $xstatus -dt $dt -rpf "$rpf" none
 

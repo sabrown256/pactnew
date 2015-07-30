@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/scheme/tests/common
 
 set msg = "SCHEME String Test ..........."
 set exe = $BinDir/scheme
@@ -21,7 +21,7 @@ set io  = flog
 
    flog $Log pwd
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
 $TEST_CHECK part -a string -e $xstatus -dt $dt -rpf "$rpf" none
 

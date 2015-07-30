@@ -364,13 +364,12 @@ SC_smp_state *_SC_get_state(int id)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_INIT_THREADS - initialize SCORE threads
- *                 - return the number of threads initialized in this call or
- *                 - the number of threads originally initialized
- *                 - if it has already been done
- *                 - NOTE: policy is that SC_init_threads really works
- *                 -       once, that is you can call it all you want but
- *                 -       only the first one will allocate any threads!
+/* SC_INIT_THREADS - Initialize NT SCORE threads with thread ID function TID.
+ *                 - Initialization is done only once.  Any subsequent calls
+ *                 - do nothing but return the number of threads originally
+ *                 - initialized.  The first call allocates the specified
+ *                 - number of threads.
+ *                 - Return the number of threads initialized.
  *
  * #bind SC_init_threads fortran() python()
  */

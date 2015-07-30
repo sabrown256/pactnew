@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pgs/tests/common
 
 set msg = "PGS MPEG Test .........."
 
@@ -33,7 +33,7 @@ set msg = "PGS MPEG Test .........."
       set opt = ""
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a mpeg1 -e $xstatus -dt $dt -l -x $exe -rpf "$rpf" none
 
@@ -45,7 +45,7 @@ set msg = "PGS MPEG Test .........."
       set opt = ""
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a mpeg2 -e $xstatus -dt $dt -l -x $exe -rpf "$rpf" none
 

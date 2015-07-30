@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "ULTRA Env Test ..............."
 set exe = $BinDir/ultra
@@ -25,7 +25,7 @@ set io  = ulenv.log
    unsetenv ULTRA  
    setenv DO_RUN_SUBMIT_ENV
 
-#   source ../../../scripts/test-run
+#   source $PSY_Base/scripts/test-run
    set t0 = `$TIMER -r`
    if ("$Valgrind" == "") then
       flog $Log ($CROSS_FE $exe $opt \(end\) >&! ulenv.log)

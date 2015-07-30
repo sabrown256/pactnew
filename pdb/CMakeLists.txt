@@ -8,9 +8,9 @@
 #
 # include "cpyright.h"
 #
-
+set(Package pdb)
 set(LibName pdb)
-set(TGTLib TRUE)
+set(TGTLib  pdb)
 
 #--TGTExe = ${BinDir}/pcexec
 #--TGTLib = ${LibDir}/lib${LibName}.a
@@ -57,6 +57,7 @@ set(TGTLib TRUE)
 # Required Libraries
 #
 #--Libs = ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+set(Libs pdb pml score ${MDLib})
 
 #--DepLib = ${LibDir}/libpml.a \
 #--	 ${LibDir}/libscore.a
@@ -83,6 +84,42 @@ set(TGTLib TRUE)
 #--	@echo "   time      : make timing test"
 #--	@echo "   trans     : make text translation utility"
 
+
+#
+# Spokes
+# XXX - simulate build-spokes
+#
+# hdf5.def
+set(hdf5_src
+#    spokes/hdf5/trhdf5.c
+) #  trhdf5.h
+
+set(llf_src
+    spokes/llf/trlfw.c
+    spokes/llf/trllf.c
+) #  trllf.h
+
+set(nacf_src
+    spokes/nacf/trnaca.c
+) #   trnacf.h
+
+# mysql.def sqlite3.def
+set(sql_src
+#    spokes/sql/trsql.c
+#    spokes/sql/trsqlg.c
+#    spokes/sql/trmysql.c
+#    spokes/sql/trsqlite.c
+) # trsql.h
+
+set(xml_src 
+    spokes/xml/trxml.c
+    spokes/xml/trxmldtd.c
+    spokes/xml/trxmlp.c
+    spokes/xml/trxmlxsd.c
+)  # trxml.h
+
+
+
 #
 # Headers Files
 #
@@ -94,11 +131,22 @@ set(TGTInc ${Hdrs})   # XXX ppc.h
 #
 #--gcs = ${PACTTmpDir}/gc-pdb.c
 
+set(SPARC pnparc.c pnmpi.c)
+set(SNOIPC pnnil.c)
+
+##################################################
+# make-def
+
+set(MPDevicesS  ${SPARC})
+set(MPDevicesO  ${ArPARC})
+set(IPCDevicesS ${SPOSIX})
+set(IPCDevicesO ${ArPOSIX})
+##################################################
+
+
 set(SrcsA pnet.c pnbin.c pnpio.c)
 set(SrcsN ${MPDevicesS} ${IPCDevicesS} ${SrcsA})
 
-set(SPARC pnparc.c pnmpi.c)
-set(SNOIPC pnnil.c)
 
 set(Srcs
     pdb.c pdbaib.c pdcast.c pdfmt.c pdfmta.c pdfmtb.c pdfmtc.c pdsymt.c
@@ -108,7 +156,8 @@ set(Srcs
     pdmap.c pdbdir.c pdszof.c pdpar.c pdparmp.c pdold.c
     ${SrcsN}
 # ${gcs}
-    )
+    ${hdf5_src} ${llf_src} ${nacf_src} ${sql_src} ${xml_src}
+)
 # XXX remove pdspoke.c, in GSrcs
 
 #--gco = gc-pdb.o
@@ -164,12 +213,16 @@ set(Srcs
 add_custom_command(
     OUTPUT ${IncDir}/pdform.h
     DEPENDS template
-    COMMAND ${BinDir}/template -t ${EtcDir}/types.db -desc 1 -o ${IncDir}/pdform.h
+    COMMAND ${BinDir}/template
+        -t ${DB_TYPES}
+        -desc 1
+        -o ${IncDir}/pdform.h
     COMMENT "template -desc 1 -o pdform.h"
     )
 LIST(APPEND hdrf ${IncDir}/pdform.h)
 
 #--GenInc = ${PACTTmpDir}/gc-pdb.h
+LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc-pdb.h)
 
 #--${IncDir}/pdb_gen.h : ${IncDir}/pdform.h ${GenInc}
 #--	@echo "build pdb_gen.h"
@@ -186,13 +239,20 @@ add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/pdspoke.c
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/config-spokes
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/config-spokes
-            -root ${CMAKE_CURRENT_BINARY_DIR}
-            -src  ${CMAKE_CURRENT_SOURCE_DIR}
+            -dst ${CMAKE_CURRENT_BINARY_DIR}/pdspoke.c
     COMMENT "config-spokes"
     )
 LIST(APPEND GSrcs ${CMAKE_CURRENT_BINARY_DIR}/pdspoke.c)
 
 #--spokef = pdspoke.c
+
+#Command: mv gf-pdb.c ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gm-pdb.f ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gs-pdb.c ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gs-pdb.h ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gp-pdb.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-pdb.h ../../../python/z-lnx-2.12-o/obj
+#Command: mv gh-pdb.html ../../../doc
 
 #--IncAction = @pact generate
 set(do-bproto TRUE)
@@ -200,10 +260,10 @@ set(do-bproto TRUE)
 include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 
 #--LibAction = @(echo "build-spokes" ; build-spokes spoke ; pact devgen)
-add_custom_target(build-spokes
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build-spokes
-    COMMENT "build-spokes"
-)
+#add_custom_target(build-spokes
+#    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/build-spokes
+#    COMMENT "build-spokes"
+#)
 
 
 #--build : ${hdrf} pdspoke.c
@@ -233,58 +293,88 @@ add_custom_target(build-spokes
 #--${BinDir}/tpdb : tpdb.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdb.c -o ${BinDir}/tpdb" ; \
 #--	  ${CLD} ${LdFlags} tpdb.c -o ${BinDir}/tpdb ${Libs})
+add_executable(tpdb tpdb.c)
+target_link_libraries(tpdb ${Libs})
+
 
 #--${BinDir}/tpdc : tpdc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdc.c -o ${BinDir}/tpdc" ; \
 #--	  ${CLD} ${LdFlags} tpdc.c -o ${BinDir}/tpdc ${Libs})
+add_executable(tpdc tpdc.c)
+target_link_libraries(tpdc ${Libs})
 
 #--${BinDir}/tpdf : tpdf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdf.c -o ${BinDir}/tpdf" ; \
 #--	  ${CLD} ${LdFlags} tpdf.c -o ${BinDir}/tpdf ${Libs})
+add_executable(tpdf tpdf.c)
+target_link_libraries(tpdf ${Libs})
 
 #--${BinDir}/tpdp : tpdp.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdp.c -o ${BinDir}/tpdp" ; \
 #--	  ${CLD} ${LdFlags} tpdp.c -o ${BinDir}/tpdp ${Libs})
+add_executable(tpdp tpdp.c)
+target_link_libraries(tpdp ${Libs})
 
 #--${BinDir}/tpda : tpda.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpda.c -o ${BinDir}/tpda" ; \
 #--	  ${CLD} ${LdFlags} tpda.c -o ${BinDir}/tpda ${Libs})
+add_executable(tpda tpda.c)
+target_link_libraries(tpda ${Libs})
 
 #--${BinDir}/tpdas : tpdas.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdas.c -o ${BinDir}/tpdas" ; \
 #--	  ${CLD} ${LdFlags} tpdas.c -o ${BinDir}/tpdas ${Libs})
+add_executable(tpdas tpdas.c)
+target_link_libraries(tpdas ${Libs})
 
 #--${BinDir}/tpdop : tpdop.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdop.c -o ${BinDir}/tpdop" ; \
 #--	  ${CLD} ${LdFlags} tpdop.c -o ${BinDir}/tpdop ${Libs})
+add_executable(tpdop tpdop.c)
+target_link_libraries(tpdop ${Libs})
 
 #--${BinDir}/tpdap : tpdap.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdap.c -o ${BinDir}/tpdap" ; \
 #--	  ${CLD} ${LdFlags} tpdap.c -o ${BinDir}/tpdap ${Libs})
+add_executable(tpdap tpdap.c)
+target_link_libraries(tpdap ${Libs})
 
 #--${BinDir}/tpdgs : tpdgs.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdgs.c -o ${BinDir}/tpdgs" ; \
 #--	  ${CLD} ${LdFlags} tpdgs.c -o ${BinDir}/tpdgs ${Libs})
+add_executable(tpdgs tpdgs.c)
+target_link_libraries(tpdgs ${Libs})
 
 #--${BinDir}/tpdls : tpdls.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdls.c -o ${BinDir}/tpdls" ; \
 #--	  ${CLD} ${LdFlags} tpdls.c -o ${BinDir}/tpdls ${Libs})
+add_executable(tpdls tpdls.c)
+target_link_libraries(tpdls ${Libs})
 
 #--${BinDir}/tpdnrm : tpdnrm.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdnrm.c -o ${BinDir}/tpdnrm" ; \
 #--	  ${CLD} ${LdFlags} tpdnrm.c -o ${BinDir}/tpdnrm ${Libs})
+add_executable(tpdnrm tpdnrm.c)
+target_link_libraries(tpdnrm ${Libs})
 
 #--${BinDir}/tpdcs : tpdcs.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdcs.c -o ${BinDir}/tpdcs" ; \
 #--	  ${CLD} ${LdFlags} tpdcs.c -o ${BinDir}/tpdcs ${Libs})
-#--        
+add_executable(tpdcs tpdcs.c)
+target_link_libraries(tpdcs ${Libs})
+
 #--${BinDir}/tpdfr : tpdfr.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdfr.c -o ${BinDir}/tpdfr" ; \
 #--	  ${CLD} ${LdFlags} tpdfr.c -o ${BinDir}/tpdfr ${Libs})
-#--        
+add_executable(tpdfr tpdfr.c)
+target_link_libraries(tpdfr ${Libs})
+        
 #--${BinDir}/tpdbf : tpdbf.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdbf.c -o ${BinDir}/tpdbf" ; \
 #--	  ${CLD} ${LdFlags} tpdbf.c -o ${BinDir}/tpdbf ${Libs})
+add_executable(tpdbf tpdbf.c)
+target_link_libraries(tpdbf ${Libs})
+
 #--        
 #--${BinDir}/tpdfc : tpdfc.c ${InstallDep} ${Hdrs} ${DepLib} pdbtfr.h
 #--	@(echo "${CCAnnounce} tpdfc.c -o ${BinDir}/tpdfc" ; \
@@ -306,6 +396,8 @@ add_custom_target(build-spokes
 #--${BinDir}/tpnb : ${TGTLib} tpnb.c
 #--	@(echo "${CCAnnounce} tpnb.c -o ${BinDir}/tpnb" ; \
 #--	  ${CLD} ${LdFlags} tpnb.c -o ${BinDir}/tpnb ${Libs})
+add_executable(tpnb tpnb.c)
+target_link_libraries(tpnb ${Libs})
 
 #--${BinDir}/tpnc : ${TGTLib} tpnc.c
 #--	@(echo "${CCAnnounce} tpnc.c -o ${BinDir}/tpnc" ; \
@@ -323,7 +415,10 @@ add_custom_target(build-spokes
 #--${BinDir}/tpnm : ${TGTLib} tpnm.c
 #--	@(echo "${CCAnnounce} tpnm.c -o ${BinDir}/tpnm" ; \
 #--	  ${CLD} ${LdFlags} tpnm.c -o ${BinDir}/tpnm ${Libs})
-#
+add_executable(tpnm tpnm.c)
+target_link_libraries(tpnm ${Libs})
+
+
 # parallel process tests
 #
 #--${BinDir}/tpnp : ${TGTLib} tpnp.c
@@ -345,6 +440,8 @@ add_custom_target(build-spokes
 #--${TGTExe} : ${BinDep}
 #--	@(echo "${CCAnnounce} pcexec.c -o ${TGTExe}" ; \
 #--	  ${CLD} ${LdFlags} pcexec.c -o ${TGTExe} ${Libs})
+add_executable(pcexec pcexec.c)
+target_link_libraries(pcexec ${Libs})
 
 #
 # async - run the shell script pn-async in the resulting xterm 
@@ -379,6 +476,8 @@ add_custom_target(build-spokes
 #--${BinDir}/tpdn : tpdn.c ${InstallDep} ${Hdrs} ${DepLib}
 #--	@(echo "${CCAnnounce} tpdn.c -o ${BinDir}/tpdn" ; \
 #--	  ${CLD} ${LdFlags} tpdn.c -o ${BinDir}/tpdn ${Libs})
+add_executable(tpdn tpdn.c)
+target_link_libraries(tpdn ${Libs})
 
 #
 # pdb to hdf converter
@@ -397,6 +496,8 @@ add_custom_target(build-spokes
 #--${BinDir}/tpdsmp : tpdsmp.c ${InstallDep} ${Hdrs} ${DepLib}
 #--	@(echo "${CCAnnounce} tpdsmp.c -o ${BinDir}/tpdsmp" ; \
 #--	  ${CLD} ${LdFlags} tpdsmp.c -o ${BinDir}/tpdsmp ${Libs})
+add_executable(tpdsmp tpdsmp.c)
+target_link_libraries(tpdsmp ${Libs})
 
 #
 # distributed mp i/o test
@@ -406,6 +507,9 @@ add_custom_target(build-spokes
 #--${BinDir}/tpddp : tpddp.c ${InstallDep} ${Hdrs} ${DepLib}
 #--	@(echo "${CCAnnounce} tpddp.c -o ${BinDir}/tpddp ${Libs}" ; \
 #--	  ${CC} ${LdFlags} tpddp.c -o ${BinDir}/tpddp ${Libs} ${DPLib})
+# XXX MPI libraries
+#add_executable(tpddp tpddp.c)
+#target_link_libraries(tpddp ${Libs} ${DPLib})
 
 #
 # test attribute handling
@@ -428,10 +532,14 @@ add_custom_target(build-spokes
 #--${BinDir}/tpdrc : tpdrc.c ${InstallDep} ${Hdrs} ${DepLib}
 #--	@(echo "${CCAnnounce} tpdrc.c -o ${BinDir}/tpdrc" ; \
 #--	  ${CLD} ${LdFlags} tpdrc.c -o ${BinDir}/tpdrc ${Libs})
+add_executable(tpdrc tpdrc.c)
+target_link_libraries(tpdrc ${Libs})
 
 #--${BinDir}/tpdtd : tpdtd.c ${InstallDep} ${Hdrs} ${DepLib}
 #--	@(echo "${CCAnnounce} tpdtd.c -o ${BinDir}/tpdtd" ; \
 #--	  ${CLD} ${LdFlags} tpdtd.c -o ${BinDir}/tpdtd ${Libs})
+add_executable(tpdtd tpdtd.c)
+target_link_libraries(tpdtd ${Libs})
 
 #
 # test file descriptor usage
@@ -441,6 +549,8 @@ add_custom_target(build-spokes
 #--${BinDir}/tpdfd : tpdfd.c ${InstallDep} ${Hdrs} ${DepLib}
 #--	@(echo "${CCAnnounce} tpdfd.c -o ${BinDir}/tpdfd" ; \
 #--	  ${CLD} ${LdFlags} tpdfd.c -o ${BinDir}/tpdfd ${Libs})
+add_executable(tpdfd tpdfd.c)
+target_link_libraries(tpdfd ${Libs})
 
 #
 # timing test
@@ -464,6 +574,8 @@ add_custom_target(build-spokes
 #--trans : ${InstallDep} ${Hdrs} ${DepLib}
 #--	@(echo "${CCAnnounce} pdctrns.c -o ${BinDir}/pdctrns" ; \
 #--	  ${CLD} ${LdFlags} pdctrns.c -o ${BinDir}/pdctrns ${Libs})
+add_executable(pdctrns pdctrns.c)
+target_link_libraries(pdctrns ${Libs})
 
 
 #
@@ -499,3 +611,29 @@ add_custom_target(build-spokes
 #--test :
 #--	@./pdtest
 
+
+set(Tests
+#   chk++
+    master c99 perf
+    bufa bufb appdef gatsca filter checksum
+    usrtyp net fd hyper fixdnrm attr trans
+    cast typdef browse free
+    smp #dp
+)
+foreach(test ${Tests})
+    set(testname "${Package}.${test}")
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pdtest -n ${test}
+    )
+endforeach(test)
+
+
+set(Tests pipe socket pty bg bin multi )
+foreach(test ${Tests})
+    set(testname "${Package}.${test}")
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pdtest -o ${test}
+    )
+endforeach(test)

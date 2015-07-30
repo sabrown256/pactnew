@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "SX PML Polygon Test .........."
 set exe = $BinDir/sx
@@ -27,7 +27,7 @@ set rpf = none
 
       flog $Log rm -f $t*.diff $t*.ps
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       if ($xstatus == 0) then
          set i = $t.ps

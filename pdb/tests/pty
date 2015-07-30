@@ -5,7 +5,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set DPE = ""
 set msg = "PDBNet PTY Test ................"
@@ -23,7 +23,7 @@ set exe = $BinDir/pcexec
          set opt = ( -i -c 30 -t $TEST )
          set io  = pcexec.ptyp
 
-         source ../../../scripts/test-run
+         source $PSY_Base/scripts/test-run
 
 #         if ("$Valgrind" == "") then
 #            $CROSS_FE $exe $opt | tr -d "\015" > pcexec.ptyp
@@ -45,7 +45,7 @@ set exe = $BinDir/pcexec
          set opt = ( -c 30 -t $TEST )
          set io  = pcexec.ptyi
 
-         source ../../../scripts/test-run
+         source $PSY_Base/scripts/test-run
 
          $TEST_CHECK part -a pty_interrupt -e $xstatus -dt $dt -l -rpf "$rpf" none
 

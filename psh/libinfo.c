@@ -244,12 +244,13 @@ int report_info(char *root, int cmpl, int ltrl, int dbo,
 
 int build_makefile(char *root, char *arch, char *mkfile, int vrb)
    {int err;
-    char cmd[BFLRG], makef[BFLRG], etc[BFLRG];
+    char cmd[BFLRG], makef[BFLRG], etc[BFLRG], d[BFLRG];
 
     err = 0;
 
     snprintf(etc, BFLRG, "%s/etc", root);
     snprintf(makef, BFLRG, "%s", mkfile);
+    getcwd(d, BFLRG);
 
     snprintf(cmd, BFLRG, "csh -cf \"mkdir -p %s/obj >& /dev/null\"", arch);
     system(cmd);
@@ -263,7 +264,7 @@ int build_makefile(char *root, char *arch, char *mkfile, int vrb)
     snprintf(cmd, BFLRG, "echo PACTTmpDir = %s/obj >> %s", arch, makef);
     err |= system(cmd);
 
-    snprintf(cmd, BFLRG, "echo PACTSrcDir = ../.. >> %s", makef);
+    snprintf(cmd, BFLRG, "echo PACTSrcDir = %s >> %s", d, makef);
     err |= system(cmd);
 
     snprintf(cmd, BFLRG, "cat pre-Make >> %s", makef);

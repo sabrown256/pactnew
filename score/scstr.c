@@ -1384,8 +1384,8 @@ int SC_strings_print(FILE *fp, char **sa, const char *pre)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE_STRINGS - free the an array of strings SA
- *                 - and each string in the array
+/* SC_FREE_STRINGS - Free the NULL terminated array of strings SA
+ *                 - and each string in the array.
  *
  * #bind SC_free_strings fortran() python()
  */

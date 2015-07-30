@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "SX PDB SQLite Test ..........."
 set exe = $BinDir/sx
@@ -23,7 +23,7 @@ if (($HAVE_SQLITE == yes) && ($IBM_HW != BGP)) then
 
    flog $Log rm -f sxsqlite.log sxsqlite.res foo.sqlite
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if (($xstatus == 0) && ("$Valgrind" == "")) then
       set Ref = $FilesDir/ref/sxsqlite

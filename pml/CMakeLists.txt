@@ -8,9 +8,9 @@
 #
 # include "cpyright.h"
 #
-
+set(Package pml)
 set(LibName pml)
-set(TGTLib TRUE)
+set(TGTLib  pml)
 
 #--TGTLib = ${LibDir}/lib${LibName}.a
 #--TGTInc = ${Hdrs}
@@ -47,7 +47,7 @@ set(TGTLib TRUE)
 #
 # Required Libraries
 #
-#--Libs = ${LPML} ${LSCORE} ${MDLib}
+set(Libs pml score ${MDLib})
 
 #--targets :
 #--	@echo "Targets for PML"
@@ -76,6 +76,48 @@ set(TGTLib TRUE)
 set(Hdrs pml.h pml_int.h scope_constants.h scope_complex.h scope_quaternion.h scope_math.h)
 set(TGTInc ${Hdrs})
 
+
+#
+# patch FPE handling
+# XXX - see make-macros for options
+#--    if ("$HSY_FPU" == "x87") then
+#--       set lcc = ( $FPE_Exe $FPE_Flags )
+#--
+#--       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+#--       Note $STDOUT '          echo "'$lcc' -c mlfpex86.c -o mlfpex86.o" ; \'
+#--       Note $STDOUT '          '$lcc' -I${IncDir} -c ${PACTSrcDir}/mlfpex86.c -o mlfpex86.o ; \'
+#--       Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpex86.o 2> /dev/null ; \'
+#--       Note $STDOUT '          ${RM} mlfpex86.o 2> /dev/null )'
+#--
+#--    else if ("$HSY_FPU" == "ppc") then
+#--       set lcc = ( $FPE_Exe -g -Wall )
+#--       if ($?Bits == 1) then
+#--          set lcc = ( $lcc -m$Bits )
+#--       endif
+#--
+#--       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+#--       Note $STDOUT '          echo "'$lcc' -c mlfpeppc.c -o mlfpeppc.o" ; \'
+#--       Note $STDOUT '          '$lcc' -I${IncDir} -c ${PACTSrcDir}/mlfpeppc.c -o mlfpeppc.o ; \'
+#--       Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpeppc.o 2> /dev/null ; \'
+#--       Note $STDOUT '          ${RM} mlfpeppc.o 2> /dev/null )'
+#--    endif
+#--
+#--    if ($HAVE_GNU_FENV == TRUE) then
+#--       set lcc = ( $FPE_Exe -g -Wall )
+#--       if ($MAKE_Shared_Libs == TRUE) then
+#--          set lcc = ( $lcc -fPIC )
+#--       endif
+#--       Note $STDOUT '	@(cd ${PACTTmpDir} ; \'
+#--       Note $STDOUT '          '$lcc' -I${IncDir} -c ${PACTSrcDir}/mlfpegnu.c -o mlfpegnu.o ; \'
+#--       Note $STDOUT '          ${AR} ${AROpt} ${TGTLib} mlfpegnu.o 2> /dev/null ; \'
+#--       Note $STDOUT '          ${RM} mlfpegnu.o 2> /dev/null )'
+#--    endif
+#--    Note $STDOUT ""
+
+#
+set(patch-fpe  mlfpex86.c mlfpegnu.c)
+
+
 #
 # Object Files
 #
@@ -88,7 +130,7 @@ set(Srcs  mlconst.c mlmath.c mlsrch.c mlrand.c mlnls.c mlmatr.c
        mlfft.c mllsq.c mlfpe.c mloper.c mlgeom.c mlsort.c mlmm.c
        mlintm.c mlintp.c mlints.c
        mlchksm.c mlmesh.c mlmsrch.c mlcmsh.c mlmextr.c
-       mlvect.c mlsmp.c
+       mlvect.c mlsmp.c  ${patch-fpe}
 #       ${gcs}
     )
 
@@ -135,10 +177,23 @@ set(Srcs  mlconst.c mlmath.c mlsrch.c mlrand.c mlnls.c mlmatr.c
 add_custom_command(
     OUTPUT ${IncDir}/mlsrch.h
     DEPENDS template ${CMAKE_CURRENT_SOURCE_DIR}/mlsrch.t
-    COMMAND ${BinDir}/template ${CMAKE_CURRENT_SOURCE_DIR}/mlsrch.t -o ${IncDir}/mlsrch.h
+    COMMAND ${BinDir}/template
+        ${CMAKE_CURRENT_SOURCE_DIR}/mlsrch.t
+        -t ${DB_TYPES}
+        -o ${IncDir}/mlsrch.h
     COMMENT "template mlsrch.h"
     )
 LIST(APPEND hdrf ${IncDir}/mlsrch.h)
+
+LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc-pml.h)
+
+#Command: mv gf-pml.c ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gm-pml.f ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gs-pml.c ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gs-pml.h ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gp-pml.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-pml.h ../../../python/z-lnx-2.12-o/obj
+#Command: mv gh-pml.html ../../../doc
 
 #--IncAction = @pact generate
 set(do-bproto TRUE)
@@ -156,6 +211,9 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #
 #--chk++ :
 #--	${CXX} -c tests/chk++.cc -o ${PACTTmpDir}/chk++.o
+# XXX = want to compile only
+#add_executable(chk++ tml.c)
+#target_link_libraries(tml ${Libs})
 
 #
 # make new test executable
@@ -165,6 +223,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlmtx : tmlmtx.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlmtx.c -o ${BinDir}/tmlmtx" ; \
 #--	  ${CLD} ${LdFlags} tmlmtx.c -o ${BinDir}/tmlmtx ${Libs})
+add_executable(tmlmtx tmlmtx.c)
+target_link_libraries(tmlmtx ${Libs})
 
 #
 # test functions
@@ -174,6 +234,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlfn : tmlfn.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlfn.c -o ${BinDir}/tmlfn" ; \
 #--	  ${CLD} ${LdFlags} tmlfn.c -o ${BinDir}/tmlfn ${Libs})
+add_executable(tmlfn tmlfn.c)
+target_link_libraries(tmlfn ${Libs})
 
 #
 # test LR to AC mapping
@@ -201,6 +263,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlic : tmlic.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlic.c -o ${BinDir}/tmlic" ; \
 #--	  ${CLD} ${LdFlags} tmlic.c -o ${BinDir}/tmlic ${Libs})
+add_executable(tmlic tmlic.c)
+target_link_libraries(tmlic ${Libs})
 
 #--${BinDir}/tmlics : tmlics.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlics.c -o ${BinDir}/tmlics" ; \
@@ -214,6 +278,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlcg : tmlcg.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlcg.c -o ${BinDir}/tmlcg" ; \
 #--	  ${CLD} ${LdFlags} tmlcg.c -o ${BinDir}/tmlcg ${Libs})
+add_executable(tmlcg tmlcg.c)
+target_link_libraries(tmlcg ${Libs})
 
 #
 # test SVD solvers
@@ -223,6 +289,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlsvd : tmlsvd.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlsvd.c -o ${BinDir}/tmlsvd" ; \
 #--	  ${CLD} ${LdFlags} tmlsvd.c -o ${BinDir}/tmlsvd ${Libs})
+add_executable(tmlsvd tmlsvd.c)
+target_link_libraries(tmlsvd ${Libs})
 
 #
 # test EIGEN systems
@@ -232,6 +300,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlev : tmlev.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlev.c -o ${BinDir}/tmlev" ; \
 #--	  ${CLD} ${LdFlags} tmlev.c -o ${BinDir}/tmlev ${Libs})
+add_executable(tmlev tmlev.c)
+target_link_libraries(tmlev ${Libs})
 
 #
 # test polygon intersection
@@ -250,6 +320,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmli : tmli.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmli.c -o ${BinDir}/tmli" ; \
 #--	  ${CLD} ${LdFlags} tmli.c -o ${BinDir}/tmli ${Libs})
+add_executable(tmli tmli.c)
+target_link_libraries(tmli ${Libs})
 
 #
 # test ln norm
@@ -268,6 +340,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlck : tmlck.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlck.c -o ${BinDir}/tmlck" ; \
 #--	  ${CLD} ${LdFlags} tmlck.c -o ${BinDir}/tmlck ${Libs})
+add_executable(tmlck tmlck.c)
+target_link_libraries(tmlck ${Libs})
 
 #--${BinDir}/tmlcsm : tmlcsm.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlcsm.c -o ${BinDir}/tmlcsm" ; \
@@ -281,10 +355,15 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlfpe : tmlfpe.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlfpe.c -o ${BinDir}/tmlfpe" ; \
 #--	  ${CLD} ${LdFlags} tmlfpe.c -o ${BinDir}/tmlfpe ${Libs})
+add_executable(tmlfpe tmlfpe.c)
+target_link_libraries(tmlfpe ${Libs})
 
 #--${BinDir}/tmlnan : tmlnan.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlnan.c -o ${BinDir}/tmlnan" ; \
 #--	  ${CLD} ${LdFlags} tmlnan.c -o ${BinDir}/tmlnan ${Libs})
+add_executable(tmlnan tmlnan.c)
+target_link_libraries(tmlnan ${Libs})
+
 
 #
 # test performance
@@ -294,6 +373,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tmlpf : tmlpf.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tmlpf.c -o ${BinDir}/tmlpf" ; \
 #--	  ${CLD} ${LdFlags} tmlpf.c -o ${BinDir}/tmlpf ${Libs})
+add_executable(tmlpf tmlpf.c)
+target_link_libraries(tmlpf ${Libs})
 
 #
 # link 
@@ -328,3 +409,25 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--test :
 #--	@./mltest
 
+
+set(Tests
+    matrix eigen func interp perf
+    fpe nan solv svd csum cgsolv
+    # chk++  # XXX - compile only
+)
+
+foreach(test ${Tests})
+    set(testname "${Package}.${test}")
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/mltest ${test}
+    #   [CONFIGURATIONS <config>...]
+    #   [WORKING_DIRECTORY <dir>])
+    )
+
+#    set_property(TEST ${testname} PROPERTY 
+#        ENVIRONMENT
+#             PSY_Base=${PSY_Base}
+#    )
+
+endforeach(test)

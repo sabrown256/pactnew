@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "SX PDB Test .................."
 set exe = $BinDir/sx
@@ -21,7 +21,7 @@ set io  = sxpdb.res
 
    flog $Log cp $FilesDir/sxpdbg.scm .
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if (($xstatus == 0) && ("$Valgrind" == "")) then
       flog $Log (diff sxpdb.res $FilesDir/ref/sxpdb > sxpdb.res.diff)

@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/scheme/tests/common
 
 set msg = "SCHEME Basis Syntax Test ....."
 set exe = $BinDir/scheme
@@ -22,7 +22,7 @@ set io  = shmtst.res
 
       flog $Log cp $FilesDir/shmtst.m .
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       if ($xstatus == 0) then
          diff shmtst.res $FilesDir/ref/shmtst >! shmtst.res.diff

@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "ULTRA AXIS Test .............."
 set exe = $BinDir/ultra
@@ -21,7 +21,7 @@ set io  = ulaxs.log
 
    flog $Log $RM ulaxs.log ulaxs.err
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    flog $Log ($CROSS_FE $PSDIFF ulaxs.ps $RefDir/ulaxs.ps >&! ulaxs.ps.diff)
 

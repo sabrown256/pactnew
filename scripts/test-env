@@ -13,15 +13,21 @@ umask 007
 
 if ($?TestScrDir == 0) then
    setenv TestScrDir $cwd
-   foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
-      if (-f $f/functions-pact.csh) then
-         pushd $f >>& /dev/null
+#   foreach f (../scripts ../../scripts ../../../scripts ../../../../scripts)
+#      if (-f $f/functions-pact.csh) then
+#         pushd $f >>& /dev/null
+#         setenv TestScrDir $cwd
+#         setenv PSY_Base $cwd:h
+#         popd >>& /dev/null
+#         break
+#      endif
+#   end
+      if (-f $PSY_Base/scripts/functions-pact.csh) then
+         pushd $PSY_Base/scripts >>& /dev/null
          setenv TestScrDir $cwd
-         setenv PSY_Base $cwd:h
+#         setenv PSY_Base $cwd:h
          popd >>& /dev/null
-         break
       endif
-   end
 endif
 source $TestScrDir/functions-pact.csh
 setenv TEST_CHECK $TestScrDir/test-check
@@ -109,15 +115,27 @@ setenv ZeroSpace  "-z 2"
    setenv LibDir    $PSY_Root/lib
    setenv BinDir    $PSY_Root/bin
 
-   if ($?TestDir == 0) then
-# may be set by CMake
-      setenv TestDir   $PSY_Build/$Package/$PSY_TmpDir/test
+# TestBldDir - directory in which to build test
+# TestDir    - directory in which to run test
+   
+   setenv TestBldDir    $PSY_Build/$Package
+   if ("$PSY_Base" == "$PSY_Build") then
+# classic out-of-source build
+      setenv TestDir    $TestBldDir/$PSY_TmpDir/test
+      setenv MAKE       $BinDir/pact
+      setenv TestPrefix
+   else
+# CMake out-of-source build
+# Tests are compiled by 'make' and only run by 'make test'
+      setenv TestDir    $TestBldDir/test
+      setenv MAKE       no-op
+      setenv TestPrefix ${Package}.
    endif
+
    setenv FilesDir  $SrcDir/tests
    setenv RefDir    $FilesDir/ref
 
    setenv TIMER     $BinDir/timer
-   setenv MAKE      $BinDir/pact
    setenv DORUN     $BinDir/do-run
    setenv PSDIFF    $BinDir/ps-diff
    setenv PX        $PSY_Base/scripts/px
@@ -257,6 +275,8 @@ Note $Log "TestDir    = |$TestDir|"
 Note $Log "FilesDir   = |$FilesDir|"
 Note $Log "RefDir     = |$RefDir|"
 Note $Log "TestScrDir = |$TestScrDir|"
+Note $Log "TestBldDir = |$TestBldDir|"
+Note $Log "TestPrefix = |$TestPrefix|"
 
 Note $Log ""
 Note $Log "Executables:"

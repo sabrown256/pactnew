@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "PDBView Mesh Test ............"
 set exe = $BinDir/sx
@@ -21,7 +21,7 @@ set io  = pdbvmesh.res
 
    flog $Log rm -f pdbvmesh*.diff pdbvmesh*.ps
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if ($xstatus == 0) then
       foreach i (pdbvmesh.ps)

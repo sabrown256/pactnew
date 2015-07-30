@@ -8,7 +8,7 @@
 #
 # include "cpyright.h"
 #
-
+set(Package python)
 set(LibName py)
 
 # dummy target lib just to get to LibAction
@@ -22,9 +22,11 @@ set(TGTInc py_int.h pputil.h ppcommon.h)
 #--------------------------------------------------------------------------
 
 set(GenInc
-    ${PACTTmpDir}/gp-score.h ${PACTTmpDir}/gp-pml.h
-    ${PACTTmpDir}/gp-pdb.h ${PACTTmpDir}/gp-pgs.h
-    ${PACTTmpDir}/gp-panacea.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gp-score.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gp-pml.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gp-pdb.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gp-pgs.h
+    ${CMAKE_CURRENT_BINARY_DIR}/gp-panacea.h
 )
 
 #--${IncDir}/py_gen.h : ${GenInc}

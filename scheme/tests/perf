@@ -5,7 +5,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/scheme/tests/common
 
 set msg = "SCHEME Performance Test ......"
 set exe = $BinDir/scheme
@@ -28,7 +28,7 @@ set io  = flog
    set rpf = none
    set opt = ( $shopt -l $FilesDir/iperf.scm )
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    $TEST_CHECK part -a iperf_sfp -e $xstatus -l -dt $dt -rpf "$rpf" none
 

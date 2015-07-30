@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pml/tests/common
 
 set msg = "PML CG Solver Test ....."
 set exe = $BinDir/tmlcg
@@ -27,7 +27,7 @@ set io  = flog
       NoteD $Log ""
       NoteD $Log "                         Can't build PML CG Solver Test Program"
    else
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
    endif
 
 $TEST_CHECK part -a cgsolv -e $xstatus -dt $dt -x $exe none

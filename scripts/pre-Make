@@ -27,7 +27,7 @@ TGTScr = do-local do-stats do-automake distribute \
          scs-sync scs-revert scs-init \
          var-list winer loco who-does get-line frnsic stan \
          insert-text file-time change-vname exchf \
-         pwhere
+         pwhere bproto
 
 TGTEtc = csh-subroutines \
          functions-pact.csh functions-pact.sh functions-pact.pl
@@ -54,9 +54,7 @@ bindf =
 
 generate : ${bindf} ${hdrf}
 	pact scrinstall
-
-IncAction = sinstall ${TGTEtc} ${EtcDir}
-
+	sinstall ${TGTEtc} ${EtcDir}
 
 link :
 	sinstall do-batch.${JOBS_System} ${BinDir}/do-batch

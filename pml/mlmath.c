@@ -331,13 +331,22 @@ double PM_curve_len_3d(const double *x, const double *y,
 
 /*--------------------------------------------------------------------------*/
 
-/* PM_STATS_MEAN - compute mean, median, mode, and standard deviation
+/* PM_STATS_MEAN - Compute statistics for the N real values X.
+ *               - For each of the following arguments return
+ *               - the associated statistic if the pointer is non-NULL:
+ *               -    PMN    the mean of the X values
+ *               -    PMDN   the median of the X values
+ *               -    PMOD   the mode of the X values
+ *               -    PSTD   the standard deviation of the X values
  *
  * #bind PM_stats_mean fortran() scheme() python()
  */
 
-void PM_stats_mean(int n, const double *x, double *pmn, double *pmdn,
-		   double *pmod, double *pstd)
+void PM_stats_mean(int n, const double *x,
+		   double *pmn ARG(,out),
+		   double *pmdn ARG(,out),
+		   double *pmod ARG(,out),
+		   double *pstd ARG(,out))
    {int i, j, nh;
     double xc, xs, xsq, xmdn, xmn;
 
@@ -420,7 +429,13 @@ void PM_stats_mean(int n, const double *x, double *pmn, double *pmdn,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_HASHARR_STATS - compute statistics on the hash efficiency of HA
+/* PM_HASHARR_STATS - Compute statistics on the hash efficiency of HA.
+ *                  - For each of the following arguments return
+ *                  - the associated statistic if the pointer is non-NULL:
+ *                  -    PMN    the mean of the items per bucket
+ *                  -    PMDN   the median of the items per bucket
+ *                  -    PMOD   the mode of the items per bucket
+ *                  -    PSTD   the standard deviation of the items per bucket
  *
  * #bind PM_hasharr_stats fortran() scheme() python()
  */

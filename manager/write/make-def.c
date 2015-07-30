@@ -181,9 +181,9 @@ int main(int c, char **v)
     fprintf(fp, "PSY_Build  = %s\n", psy_build);
     fprintf(fp, "PSY_BldObj = %s\n", psy_bldobj);
     fprintf(fp, "PSY_BldTst = %s\n", psy_bldtst);
-    fprintf(fp, "PkgSource  = %s/${Package}\n", psy_base);
-    fprintf(fp, "PkgBuild   = %s/${Package}/%s\n", psy_base, psy_bldobj);
-    fprintf(fp, "PkgTest    = %s/${Package}/%s\n", psy_base, psy_bldtst);
+    fprintf(fp, "#PACTSrcDir is defined by smake/dmake\n");
+    fprintf(fp, "PACTTmpDir = ${PACTSrcDir}/%s\n", psy_bldobj);
+    fprintf(fp, "PACTTstDir = ${PACTSrcDir}/%s\n", psy_bldtst);
     fprintf(fp, "ScmDir     = ${PSY_Root}/scheme\n");
     fprintf(fp, "BinDir     = ${PSY_Root}/bin\n");
     fprintf(fp, "LibDir     = ${PSY_Root}/lib\n");

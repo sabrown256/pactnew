@@ -193,7 +193,11 @@ void *_SC_realloc_guarded(void *p, size_t nb)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_USE_GUARDED_MEM - setup to use mprotect'd memory
+/* SC_USE_GUARDED_MEM - Setup the SCORE memory manager to use
+ *                    - guarded memory allocations.  Guarded memory
+ *                    - allocations use mprotect to allocate memory at
+ *                    - page boundaries and help to detect memory
+ *                    - over and under writes.
  *
  * #bind SC_use_guarded_mem fortran() python()
  */

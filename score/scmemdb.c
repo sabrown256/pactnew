@@ -491,13 +491,13 @@ int _SC_mem_map(FILE *fp, int flag, int show, int lineno)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_MAP - print out a memory map to the given FILE
- *            - argument FLAG is a bit map determining which
- *            - sectors are reported
+/* SC_MEM_MAP - Print out a memory map to the given FILE.
+ *            - FLAG is a bit map determining which sectors are reported
  *            -    1  active blocks
  *            -    2  free blocks
  *            -    4  registered blocks
- *            -    8  non-accountable blocks reported
+ *            -    8  non-accountable blocks
+ *            - Return the number of blocks reported.
  *
  * #bind SC_mem_map fortran() scheme(memory-map) python()
  */
@@ -512,13 +512,14 @@ int SC_mem_map(FILE *fp, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_SS - print out memory map snapshots to a family of files
- *           - argument FLAG is a bit map determining which
- *            - sectors are reported
- *            -    1  active blocks
- *            -    2  free blocks
- *            -    4  registered blocks
- *            -    8  non-accountable blocks reported
+/* SC_MEM_SS - Print out memory map snapshots to a family of files with
+ *           - base file name BASE.
+ *           - FLAG is a bit map determining which sectors are reported
+ *           -    1  active blocks
+ *           -    2  free blocks
+ *           -    4  registered blocks
+ *           -    8  non-accountable blocks
+ *           - Return the number of blocks reported.
  *
  * #bind SC_mem_ss fortran() scheme(memory-snapshot) python()
  */
@@ -641,7 +642,7 @@ static long _SC_mem_monitor(int old, int lev, const char *id,
 /* SC_MEM_MONITOR - Monitor memory leaks.
  *                - A pair calls lets you track memory that leaks in or
  *                - out of the region between the calls.
- *                - Arguments:
+ *                - The arguments are:
  *                -    OLD   byte count from previous call
  *                -          -1 to initialize
  *                -    LEV   level of monitoring
@@ -651,6 +652,7 @@ static long _SC_mem_monitor(int old, int lev, const char *id,
  *                -          4 - non-accountable blocks included
  *                -    ID    identifier for temporary files
  *                -    MSG   user allocated space to return error message
+ *                - Return number of bytes in named memory blocks.
  *
  * #bind SC_mem_monitor fortran() scheme(memory-monitor) python()
  */
@@ -857,7 +859,7 @@ long SC_mem_object_trace(long nb, int type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_PRINT - print the mem_descriptor info for the given pointer
+/* SC_MEM_PRINT - Print the mem_descriptor info for the given pointer P.
  *
  * #bind SC_mem_print fortran() python()
  */

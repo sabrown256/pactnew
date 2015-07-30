@@ -70,6 +70,17 @@ dbmget $WLog AF_LONG_DOUBLE_IO^           \
 
        Note $WLog "Build local dmake"
 
+       flog $WLog pushd $PSY_Base/scripts
+
+# always remove and start clean in case there is toxic rubble
+# left over from a failed build
+# NOTE: the pact link may not be in place so remove may not invoke
+# clean - therefore do both separately
+       flog $WLog $MAKE -i -na 1 clean
+       flog $WLog $MAKE -i -na 1 remove
+       flog $WLog $MAKE -i -na 1 generate
+       flog $WLog popd
+
        flog $WLog pushd $PSY_Base/score
 
 # always remove and start clean in case there is toxic rubble

@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/fortran/tests/common
 
 set msg = "PANACEA API Test ..................."
 set exe = $BinDir/tpath
@@ -27,7 +27,7 @@ if ($xstatus != 0) then
    NoteD $Log ""
    NoteD $Log "                         Can't build PANACEA API Tests ($xstatus)"
 else
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 endif
 
 $TEST_CHECK part -a panacea -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"

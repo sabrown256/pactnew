@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/scheme/tests/common
 
 set msg = "SCHEME Memory Test ..........."
 set exe = $BinDir/scheme
@@ -33,7 +33,7 @@ set io  = flog
 
    flog $Log cp $FilesDir/mmtst.scm .
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    set rpf = ( $rpf '#tmp#' mmtst.scm )
 
@@ -54,7 +54,7 @@ set io  = flog
 
    flog $Log cp $FilesDir/tailr.scm .
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    set rpf = ( $rpf '#tmp#' tailr.scm )
 

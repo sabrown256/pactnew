@@ -5,7 +5,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDBNET Background Test ........."
 

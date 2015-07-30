@@ -8,32 +8,62 @@
 # include "cpyright.h"
 #
 
+unalias *
+
 @ err = 0
 
-#set cc = ( $argv )
+set gen = TRUE
+set bld = TRUE
+
+while ($#argv > 0)
+   switch ($1)
+      case -h:
+           echo ""
+           echo "Usage: build-ext [-h]"
+           echo "   h   this help message"
+           echo ""
+           echo ""
+           exit(1)
+      default:
+           breaksw
+   endsw
+   shift
+end
+
+#set exe    = `which pact`
+#set bindir = $exe:h
+#set etcdir = $bindir:h/etc
+
+#source $etcdir/env-pact.csh
+#source $etcdir/functions-pact.csh
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
+# GENERATE - make the stub files and directories if non exist
+
+if ($gen == TRUE) then
 
 # generate stubs if no extensions directory exists
-if (!(-d extensions)) then
-   mkdir extensions
-endif
-
-pushd extensions >>& /dev/null
+   if (!(-d extensions)) then
+      mkdir extensions
+   endif
 
 # write sxext.c
-if (!(-f sxext.c)) then
-   echo "Rebuilding extensions/sxext.c"
-   cat >&! sxext.c << EOF
+   if (!(-f extensions/sxext.c)) then
+      echo "Rebuilding extensions/sxext.c"
+      cat >&! extensions/sxext.c << EOF
 #include "cpyright.h"
 #include "sx_int.h"
 void SX_install_ext_funcs(SS_psides *si)
    {return;}
 EOF
-endif
+   endif
 
 # write pre-Make
-if (!(-f pre-Make)) then
-   echo "Rebuilding extensions/pre-Make"
-   cat >&! pre-Make << EOF
+   if (!(-f extensions/pre-Make)) then
+      echo "Rebuilding extensions/pre-Make"
+      cat >&! extensions/pre-Make << EOF
 TGTLib = \${LibDir}/libsx.a
 UniFlags =
 CcFlags  = \${CDebug} -I\${IncDir} \${MDInc} \${MDGInc}
@@ -43,24 +73,32 @@ CCAnnounce = \${CCompiler} \${CDebug} \${Shared_CC_Flags} \${CFLAGS}
 CCAnnounce = \${CCompiler} \${CDebug}
 InstallDep = \${TGTLib}
 BinDep = \${Hdrs} \${TGTLib}
-Hdrs = ../sx_int.h
+Hdrs = \${PACTSrcDir}/sx_int.h
 Objs = sxext.o
 ArObjs = \${TGTLib}(sxext.o)
 \${Objs} : \${Hdrs}
 \${ArObjs} : \${Hdrs}
 EOF
+   endif
+
 endif
 
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
+
 # compile the extensions
-pact -na 1 devlib
-@ err = $status
 
-popd >>& /dev/null
+if ($bld == TRUE) then
+   pushd extensions >>& /dev/null
 
-#$cc
+   pact -na 1 devlib
+   @ err = $status
+
+   popd >>& /dev/null
+endif
+
+#--------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 
 exit($err)
-
-#--------------------------------------------------------------------------
-#--------------------------------------------------------------------------
 

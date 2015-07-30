@@ -11,7 +11,12 @@
 setenv Package panacea
 setenv Test    ""
 set vgdirs = ( score )
-source ../scripts/test-env
+
+set ldir   = `dirname $0`
+set ldir   = `cd $ldir && pwd`       # ensure absolute path
+setenv PSY_Base `dirname $ldir`
+source $PSY_Base/scripts/test-env
+unset ldir
 
 set Tests = ""
 

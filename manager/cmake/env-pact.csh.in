@@ -46,7 +46,7 @@ setenv CC_Linker gcc
 setenv CC_Optimize "-g -O -Wunused -Wno-uninitialized"
 setenv CC_Optimize_Default "-g -O0 -Wall"
 setenv CC_Profile -pg
-setenv CC_Shared "-fPIC -fPIC -fPIC"
+setenv CC_Shared -fPIC
 setenv CC_Version -v
 setenv CROSS_COMPILE FALSE
 setenv CROSS_FE 
@@ -63,7 +63,7 @@ setenv Cfg_CC_Flags "-pipe -ffloat-store -std=gnu99 -fsignaling-nans -Wno-unknow
 setenv Cfg_CC_Inc 
 setenv Cfg_FC_Exe gfortran
 setenv Cfg_FC_Flags "-ffloat-store -ffree-form -fsignaling-nans -m64 -fPIC"
-setenv Cfg_LD_Flags "-Wl,--disable-new-dtags -rdynamic -Wl,--disable-new-dtags -rdynamic -Wl,--disable-new-dtags -rdynamic"
+setenv Cfg_LD_Flags "-Wl,--disable-new-dtags -rdynamic"
 setenv Cfg_LD_Lib 
 setenv Cfg_LD_RPath -Wl,-rpath,/usr/lib:/home/taylor16/gapps/gcc-4.9.0/lib64:/home/taylor16/gapps/gcc-4.9.0/lib:/home/taylor16/pact/cmake/dev/lnx-2.12-o/lib
 setenv Cfg_Lex_Flags 
@@ -174,6 +174,9 @@ setenv PSY_ASRoot /usr/local
 setenv PSY_AnaDir /home/taylor16/pact/cmake/manager/analyze
 setenv PSY_Arch lnx-2.12-o
 setenv PSY_Base /home/taylor16/pact/cmake
+setenv PSY_BldObj
+setenv PSY_BldTst test
+setenv PSY_Build @PSY_Build@
 setenv PSY_CONFIG_PATH "local/ax local std"
 setenv PSY_Cfg gen/lnx-2.12-o/empress
 setenv PSY_CfgCmd "-g -epy /home/taylor16/testzzz-ets-4.6.3-4.3f/bin/python,/home/taylor16/testzzz-ets-4.6.3-4.3f3/bin/python3"

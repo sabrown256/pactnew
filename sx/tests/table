@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "PDBView Table Test ..........."
 set exe = $BinDir/sx
@@ -29,7 +29,7 @@ endif
 
    flog $Log rm -f pdbvtbl.log pdbvtbl.pdb pdbvtbl.asc pdbvtbl.err pdbvtbl.tmp
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if ($xstatus == 0) then
       grep -i "error" pdbvtbl.tmp > pdbvtbl.err

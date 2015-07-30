@@ -429,12 +429,14 @@ void _SC_print_block_info(FILE *fp, SC_heap_des *ph,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_INFO - return the mem_descriptor info for the given pointer
+/* SC_MEM_INFO - Return the mem_descriptor info for the pointer P.
+ *             - Information is returned via non-NULL arguments:
  *             -    PL  byte length
  *             -    PT  data type index
  *             -    PR  reference count
  *             -    PN  allocated name
- *             - return TRUE iff P is valid
+ *             - Return TRUE if P was allocated with the SCORE
+ *             - memory manager and FALSE otherwise.
  *
  * #bind SC_mem_info fortran() python()
  */
@@ -485,8 +487,11 @@ int SC_mem_info(const void *p, long *pl, int *pt, int *pr, char **pn)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_REG_MEM - register a piece of memory for the purpose
- *            - of memory accounting
+/* SC_REG_MEM - Register a block of memory P for the purpose
+ *            - of memory accounting. LENGTH is the number of bytes
+ *            - to which P points and NAME is the name to be assigned to
+ *            - the block.
+ *            - Return TRUE if successful and FALSE otherwise.
  *
  * #bind SC_reg_mem fortran()
  */
@@ -531,8 +536,9 @@ int SC_reg_mem(const void *p, long length, const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_DEREG_MEM - deregister a piece of memory for the purpose
- *              - of memory accounting
+/* SC_DEREG_MEM - Deregister a block of memory P for the purpose
+ *              - of memory accounting.
+ *              - Return TRUE if successful and FALSE otherwise.
  *
  * #bind SC_dereg_mem fortran()
  */
@@ -667,12 +673,15 @@ static int _SC_mem_chk_block(SC_heap_des *ph, mem_descriptor *desc,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_CHK - check out all aspects of managed memory
- *            - if bit #1 of TYP is 1 include the allocated memory
- *            - if bit #2 of TYP is 1 include the freed memory
- *            - if bit #3 of TYP is 1 include the registered memory
- *            - return values
- *            -   > 0  total blocks in requested memory pools
+/* SC_MEM_CHK - Check out all aspects of managed memory blocks
+ *            - according to TYP which is a bit array indicating
+ *            - which sectors of memory are to be scanned.
+ *            - The bits of TYP specify:
+ *            -    1  include allocated memory blocks
+ *            -    2  include freed memory blocks
+ *            -    4  include registered memory blocks
+ *            - Return values
+ *            -   > 0  total blocks in requested memory sectors
  *            -  -1    corrupt active pool
  *            -  -2    corrupt free pool
  *            -  -3    both pools corrupt
@@ -722,14 +731,13 @@ long SC_mem_chk(int typ)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MEM_TRACE - return the number of active chunks of memory managed
- *              - by the system
- *              - the given pointer must have been allocated by _SC_ALLOC_N
- *              - return -1 if the forward and backward counts differ
- *              - return -2 if a NULL pointer occurs in the chain
- *              - return -3 if the link count exceeds the number of blocks
- *              - return -4 if a corrupted header is detected
- *              -           also prints name of block allocated
+/* SC_MEM_TRACE - Return the number of active blocks of memory managed
+ *              - by the SCORE memory manager.
+ *              - Return values
+ *              -   > 0  total blocks in requested memory sectors
+ *              -  -1    corrupt active pool
+ *              -  -2    corrupt free pool
+ *              -  -3    both pools corrupt
  *
  * #bind SC_mem_trace fortran() scheme(memory-trace) python()
  */
@@ -747,8 +755,9 @@ int SC_mem_trace(void)
 
 /*--------------------------------------------------------------------------*/
 
-/* SC_IS_SCORE_PTR - return TRUE iff the given pointer P
- *                 - points to space allocated by SCORE
+/* SC_IS_SCORE_PTR - Return TRUE if the given pointer P
+ *                 - points to space allocated by the SCORE memory manager
+ *                 - and FALSE otherwise.
  *
  * #bind SC_is_score_ptr fortran() python()
  */
@@ -771,9 +780,9 @@ int SC_is_score_ptr(const void *p)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_ARRLEN - return the length of an array which was allocated
- *           - with _SC_ALLOC_N
- *           - return -1L on error
+/* SC_ARRLEN - Return the number of bytes in the memory block pointed to by P.
+ *           - If P was not allocated with the SCORE memory manager
+ *           - return -1.
  *
  * #bind SC_arrlen fortran() python()
  */
@@ -791,7 +800,11 @@ long SC_arrlen(const void *p)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MARK - change the reference count by n
+/* SC_MARK - Change the reference count of the memory block
+ *         - pointed to by P by N.
+ *         - Return the new reference count.
+ *         - If P was not allocated with the SCORE memory manager
+ *         - return -1.
  *
  * #bind SC_mark fortran() python()
  */

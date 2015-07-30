@@ -9,15 +9,15 @@ expect: 3
 )
 
 list SCM files
--> (../../shprm1.c
- ../../shprm2.c
- ../../shprm3.c
- ../../shprm4.c
- ../../shprm5.c
+-> (/shprm1.c
+ /shprm2.c
+ /shprm3.c
+ /shprm4.c
+ /shprm5.c
 )
 
 test pipelines without a shell
 expect: shprm2.c shprm3.c
--> (../../shprm2.c
- ../../shprm3.c
+-> (/shprm2.c
+ /shprm3.c
 )

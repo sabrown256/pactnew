@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "ULTRA Master Test ............"
 set exe = $BinDir/ultra
@@ -21,7 +21,7 @@ set io  = ultest.tmp
 
    flog $Log $RM ultest.log ultest.pdb ultest.asc
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
  
    if (($xstatus == 0) && ("$Valgrind" == "")) then
       flog $Log (grep -i "error" ultest.tmp >&! ultest.err)

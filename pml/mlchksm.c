@@ -495,22 +495,25 @@ long PM_md5_hash(void *key, int size)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_CHECKSUM - compute a checksum on an array PARR which is NI items long
- *             - and BPI bytes per item
- *             - BOFF is a bit offset for the first item
- *             - NBTS is the number of bits for the checksum units
- *             - 29 is a good choice for NBTS
- *             - for applications such as computing a checksum for
- *             - a file more than one call can be made:
+/* PM_CHECKSUM - Compute an integer checksum on an array PARR which
+ *             - is NI items long and BPI bytes per item.
+ *             - BOFF is a bit offset for the first item.
+ *             - NBTS is the number of bits for the checksum units -
+ *             - 29 is a good choice for NBTS.
+ *             - PRMDR is a running remainder of the bit length.
+ *             - For applications such as computing a checksum of
+ *             - a file, more than one call can be made:
  *             -   
  *             -   sum  = 0;
  *             -   rmdr = 0;
  *             -   while (TRUE)
- *             -      {PM_checksum(&sum, &rmdr, in, boff, ni, bpi, 29);
- *             -        ... get next in, boff, ni, and bpi ...
+ *             -      {PM_checksum(&sum, &rmdr, bf, boff, ni, bpi, 29);
+ *             -        ... get next bf, boff, ni, and bpi ...
  *             -      };
+ *             -
+ *             - The checksum is computed and returned in PSUM.
  *
- * #bind PM_checksum_array fortran() scheme() python()
+ * #bind PM_checksum fortran() scheme() python()
  */
 
 void PM_checksum(long *psum, int *prmdr, void *parr, int boff,

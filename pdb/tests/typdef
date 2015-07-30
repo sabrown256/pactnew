@@ -10,7 +10,7 @@
 
 unalias *
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDB Typedef Test ..................."
 set exe = $BinDir/tpdtd
@@ -21,7 +21,7 @@ NoteD $Log ""
 NoteD $Log -n "                    $msg"
 Note $Log ""
 
-source ../../../scripts/test-run
+source $PSY_Base/pdb/../scripts/test-run
 
 if (-f out.pdb) then
    flog $Log ls -l out.pdb

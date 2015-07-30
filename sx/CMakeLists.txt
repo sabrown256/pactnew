@@ -7,8 +7,9 @@
 # include "cpyright.h"
 #
 
+set(Package sx)
 set(LibName sx)
-set(TGTLib FALSE)
+set(TGTLib  sx)
 
 #--TGTLib = ${LibDir}/lib${LibName}.a
 #--TGTExe = ${BinDir}/sx
@@ -54,6 +55,7 @@ set(TGTScr
 #
 #--CcFlags = -I${IncDir} -I. ${MDInc} ${MDGInc}
 #--LdFlags = -L${LibDir} ${LDFLAGS}
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 #--ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} ${CcFlags}
 
@@ -195,7 +197,10 @@ set(GenInc
 add_custom_command(
     OUTPUT ${IncDir}/sxpdbd.h
     DEPENDS template ${CMAKE_CURRENT_SOURCE_DIR}/sxpdbd.t
-    COMMAND ${BinDir}/template ${CMAKE_CURRENT_SOURCE_DIR}/sxpdbd.t -o ${IncDir}/sxpdbd.h
+    COMMAND ${BinDir}/template
+        ${CMAKE_CURRENT_SOURCE_DIR}/sxpdbd.t
+        -t ${DB_TYPES}
+        -o ${IncDir}/sxpdbd.h
     COMMENT "template sxpdbd.t -o ${IncDir}/sxpdbd.h"
     )
 LIST(APPEND hdrf ${IncDir}/sxpdbd.h)
@@ -203,6 +208,11 @@ LIST(APPEND hdrf ${IncDir}/sxpdbd.h)
 #--hdrf = ${IncDir}/sxpdbd.h
 
 # language bindings
+
+#Command: mv gf-sx.c ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gm-sx.f ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gp-sx.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-sx.h ../../../python/z-lnx-2.12-o/obj
 
 #--IncAction = @pact generate
 set(do-bproto TRUE)

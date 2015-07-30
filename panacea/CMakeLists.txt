@@ -6,9 +6,9 @@
 #
 # include "cpyright.h"
 #
-
+set(Package panacea)
 set(LibName panacea)
-set(TGTLib FALSE)
+set(TGTLib  panacea)
 
 #--TGTLib = ${LibDir}/lib${LibName}.a
 #--TGTExe = ${BinDir}/toul
@@ -124,7 +124,10 @@ set(Srcs
 add_custom_command(
     OUTPUT ${IncDir}/pasrc.h
     DEPENDS template ${CMAKE_CURRENT_SOURCE_DIR}/pasrc.t
-    COMMAND ${BinDir}/template ${CMAKE_CURRENT_SOURCE_DIR}/pasrc.t -o ${IncDir}/pasrc.h
+    COMMAND ${BinDir}/template
+        ${CMAKE_CURRENT_SOURCE_DIR}/pasrc.t
+        -t ${DB_TYPES}
+        -o ${IncDir}/pasrc.h
     COMMENT "template pasrc.t -o ${IncDir}/pasrc.h"
     )
 LIST(APPEND hdrf ${IncDir}/pasrc.h)
@@ -137,6 +140,14 @@ LIST(APPEND hdrf ${IncDir}/pasrc.h)
 #--	@cat ${GenInc} > ${IncDir}/panacea_gen.h
 
 #--hdrf = ${IncDir}/pasrc.h ${IncDir}/panacea_gen.h
+
+#Command: mv gf-panacea.c ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gm-panacea.f ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gs-panacea.c ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gs-panacea.h ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gp-panacea.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-panacea.h ../../../python/z-lnx-2.12-o/obj
+#Command: mv gh-panacea.html ../../../doc
 
 #--IncAction = @pact generate
 set(do-bproto TRUE)
@@ -209,3 +220,11 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--test :
 #--	@./patest
 
+#set(Tests gen abc)
+foreach(test ${Tests})
+    set(testname "${Package}.${test}")
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/patest ${test}
+    )
+endforeach(test)

@@ -269,23 +269,35 @@ static void _SC_hasharr_init(hasharr *ha, const char *lm)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_MAKE_HASHARR - make an inhomogeneous hasharr
+/* SC_MAKE_HASHARR - Make and return an inhomogeneous hasharr with hash
+ *                 - modulus SZ.  LM indicates the kind of keys used in
+ *                 - the hash:
+ *                 -    SC_HA_ADDR_KEY   hash based on an address 
+ *                 -    SC_HA_NAME_KEY   hash based on a character string
+ *                 - If DOCFL is TRUE entries should be installed with
+ *                 - documentation. MEMFL is a bit array specifying
+ *                 - actions for entries in the hasharr
+ *                 -   bit  action
+ *                 -    1   entries are marked SC_PERMANENT
+ *                 -    2   entries are non-accountable
+ *                 -    4   thread locks NOT used on accesses
+ *                 - Return the new hasharr if successful and NULL otherwise.
  *
  * #bind SC_make_hasharr fortran() scheme() python()
  */
 
-hasharr *SC_make_hasharr(int sz, int docflag, const char *lm, int flags)
+hasharr *SC_make_hasharr(int sz, int docfl, const char *lm, int memfl)
    {hasharr *ha;
     haelem **tb;
 
 /* allocate a new hash array */
-    ha = CPMAKE(hasharr, flags);
+    ha = CPMAKE(hasharr, memfl);
     if (ha != NULL)
-       {tb = CPMAKE_N(haelem *, sz, flags);
+       {tb = CPMAKE_N(haelem *, sz, memfl);
         if (tb != NULL)
            {ha->size     = sz;
-	    ha->memfl    = flags;
-            ha->docp     = docflag;
+	    ha->memfl    = memfl;
+            ha->docp     = docfl;
             ha->table    = tb;
             ha->hash     = NULL;
             ha->comp     = NULL;
@@ -331,12 +343,14 @@ static void _SC_hasharr_free_elements(hasharr *ha)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_CLEAR - make an empty hasharr out of ha
- *                  - apply F with A to each haelem of HA in order to
- *                  - free objects installed by application
- *                  - then free all of the hash elements
- *                  - leaves a pristine hash array
- *                  - for new installs, lookups, ...
+/* SC_HASHARR_CLEAR - Empty hasharr HA.  First apply F with A to each
+ *                  - element of HA to free objects installed by application.
+ *                  - Next free all of the hash elements.  Finally,
+ *                  - re-initialize HA.  This leaves a pristine hash array
+ *                  - for new installs, lookups, and so on.
+ *                  - The prototype for F is:
+ *                  -    int f(haelem *hp, void *a)
+ *                  - Return TRUE if successful and FALSE otherwise.
  *
  * #bind SC_hasharr_clear fortran() scheme() python()
  */
@@ -358,9 +372,11 @@ int SC_hasharr_clear(hasharr *ha ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_FREE_HASHARR - release a hasharr
- *                 - like SC_hasharr_clear except that the
- *                 - hash array is freed and cannot be used again
+/* SC_FREE_HASHARR - Release hasharr HA. Like SC_hasharr_clear except that
+ *                 - the hash array is freed and cannot be used again.
+ *                 - The prototype for F is:
+ *                 -    int f(haelem *hp, void *a)
+ *                 - Return TRUE if successful and FALSE otherwise.
  *
  * #bind SC_free_hasharr fortran() scheme() python()
  */
@@ -420,11 +436,14 @@ long SC_hasharr_prune(hasharr *ha,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_INSTALL - install OBJ of type TYPE in HA under KEY
+/* SC_HASHARR_INSTALL - Install OBJ of type TYPE in HA under KEY
  *                    - FLAGS is a bit array with the following meanings:
- *                    -   bit 1   mark OBJ if TRUE
- *                    -   bit 2   lookup existing entry and reuse
- *                    -   bit 4   free existing hp->def before assigning
+ *                    -    bit   action
+ *                    -     1    mark OBJ if TRUE
+ *                    -     2    lookup existing entry and reuse
+ *                    -     4    free existing hp->def before assigning
+ *                    - Return a pointer to the newly created hash element
+ *                    - if successful and return NULL otherwise.
  *
  * #bind SC_hasharr_install fortran() scheme() python()
  */
@@ -547,7 +566,9 @@ int SC_hasharr_next(const hasharr *ha, long *pi,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_LOOKUP - lookup the haelem for the given KEY
+/* SC_HASHARR_LOOKUP - Lookup the element of HA for the given KEY.
+ *                   - Return the element if successful and return
+ *                   - NULL otherwise.
  *
  * #bind SC_hasharr_lookup fortran() scheme() python()
  */
@@ -587,7 +608,9 @@ haelem *SC_hasharr_lookup(const hasharr *ha ARG(,,cls), const void *key)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_DEF_LOOKUP - lookup the actual object for the given KEY
+/* SC_HASHARR_DEF_LOOKUP - Lookup the actual object in HA for the given KEY.
+ *                       - Return the object if successful and return
+ *                       - NULL otherwise.
  *
  * #bind SC_hasharr_def_lookup fortran() scheme() python()
  */
@@ -607,7 +630,8 @@ void *SC_hasharr_def_lookup(const hasharr *ha ARG(,,cls), const void *key)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_GET - return the Nth element of HA
+/* SC_HASHARR_GET - Return the Nth element of HA if successful and
+ *                - return NULL otherwise.
  *
  * #bind SC_hasharr_get fortran() scheme() python()
  */
@@ -624,7 +648,7 @@ void *SC_hasharr_get(const hasharr *ha, long n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_GET_N - return the number of elements in HA
+/* SC_HASHARR_GET_N - Return the number of elements in HA.
  *
  * #bind SC_hasharr_get_n fortran() scheme() python()
  */
@@ -726,8 +750,10 @@ static int _SC_splice_out_haelem(hasharr *ha, const void *key,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_REMOVE - remove the entry corresponding to the specified key 
- *                   - return TRUE iff successfully removed 
+/* SC_HASHARR_REMOVE - Remove the entry of HA corresponding to the
+ *                   - specified KEY. 
+ *                   - Return TRUE if successfully removed and return
+ *                   - FALSE otherwise.
  *
  * #bind SC_hasharr_remove fortran() scheme() python()
  */
@@ -770,11 +796,12 @@ int SC_hasharr_remove(hasharr *ha ARG(,,cls), const void *key)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_HASHARR_DUMP - return an array of strings which are the
- *                 - hash keys matching PATT and TYPE
- *                 - no sorting is done but holes are compressed out
- *                 - the return array is terminated by a NULL entry
- *                 - caller should do SC_free_strings on result when done
+/* SC_HASHARR_DUMP - Return an array of strings which are the
+ *                 - hash keys of HA matching PATT and TYPE.
+ *                 - No sorting is done but holes are compressed out.
+ *                 - The return array is terminated by a NULL entry and the
+ *                 - caller should do SC_free_strings on the
+ *                 - result when done.
  *
  * #bind SC_hasharr_dump fortran() scheme() python()
  */

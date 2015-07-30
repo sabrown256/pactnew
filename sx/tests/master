@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "PDBView Master Test .........."
 set exe = $BinDir/sx
@@ -21,7 +21,7 @@ set io  = pdbvtest.tmp
 
    flog $Log rm -f pdbvtest.log pdbvtest.pdb pdbvtest.asc pdbvtest.err pdbvtest.tmp
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if ($xstatus == 0) then
       grep -i "error" pdbvtest.tmp > pdbvtest.err

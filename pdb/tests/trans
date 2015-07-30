@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 InitLog Log $TestDir/log.trans.$LogSfx
 
@@ -49,7 +49,7 @@ else
          Note $Log "   $ostd   $file"
 
          set opt = ( $ostd $TFile -f $file )
-         source ../../../scripts/test-run
+         source $PSY_Base/scripts/test-run
 
          if ($xstatus >= 254) then
             NoteD $Log -n "o"
@@ -97,7 +97,7 @@ else
          Note $Log "   $istd   $file   $ref"
 
          set opt = ( $istd $file -f $res )
-         source ../../../scripts/test-run
+         source $PSY_Base/scripts/test-run
 
          if ($xstatus >= 254) then
             NoteD $Log -n "o"

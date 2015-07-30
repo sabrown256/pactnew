@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/scheme/tests/common
 
 set msg = "SCHEME Shell Test ............"
 set exe = $BinDir/scheme
@@ -22,7 +22,7 @@ set exe = $BinDir/scheme
 
       set t0 = `$TIMER -r`
 
-      $CROSS_FE $FilesDir/shenv.scm >&! shenv.res
+      $CROSS_FE $FilesDir/shenv.scm | sed "s|$SrcDir||" >&! shenv.res
       set xstatus = $status
       diff shenv.res $FilesDir/ref/shenv >&! shenv.res.diff
       set dstatus = $status

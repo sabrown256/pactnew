@@ -215,9 +215,6 @@ static int method_1(statedes *st, int c, char **v, char *pmname)
        {snprintf(s, BFLRG, "echo \"include %s/etc/make-def\" ; ", st->root);
 	nstrcat(cmd, BFLRG, s);
 
-        snprintf(s, BFLRG, "echo \"PACTTmpDir = %s\" ; ", st->tmpdir);
-	nstrcat(cmd, BFLRG, s);
-
         snprintf(s, BFLRG, "echo \"PACTSrcDir = %s\" ; ", st->srcdir);
 	nstrcat(cmd, BFLRG, s);
 

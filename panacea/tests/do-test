@@ -4,7 +4,12 @@
 #
 
 set Package = panacea
-source ../../scripts/functions-pact.csh
+
+set ldir   = `dirname $0`
+set ldir   = `cd $ldir && pwd`       # ensure absolute path
+setenv PSY_Base `cd $ldir/../.. && pwd`
+source $PSY_Base/scripts/functions-pact.csh
+unset ldir
 
 set exe = $BinDir/panache
 set io  = flog
@@ -45,7 +50,7 @@ EOF
    Note $Log " "
 
    set opt = ( pkg.dict )
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
 #   set xstatus = $status
    if ($xstatus == 0) then
@@ -67,7 +72,7 @@ EOF
    Note $Log " "
 
    set opt = ( code.dict )
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    @ lerr = $xstatus
    if ($lerr == 0) then

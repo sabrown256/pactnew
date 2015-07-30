@@ -30,7 +30,7 @@ static SC_ntree
  *     - or -1 for the node itself
  */
 
-static int cmp(void *a, void *b)
+static int cmp(const void *a, const void *b)
    {int i, relate;
     char *ca, *cb;
 

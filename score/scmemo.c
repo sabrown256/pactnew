@@ -76,7 +76,12 @@ void *_SC_realloc_over(void *p, size_t nb)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_USE_OVER_MEM - setup to use override memory functions
+/* SC_USE_OVER_MEM - Setup the SCORE memory manager to use overridden
+ *                 - memory functions.  Normally it uses the standard
+ *                 - malloc, free, and realloc from the standard C library.
+ *                 - These can be overridden by functions from another
+ *                 - dynamically linked shared library.  See the
+ *                 - discussion of RTLD_NEXT in the dlsym man page.
  *
  * #bind SC_use_over_mem fortran() python()
  */

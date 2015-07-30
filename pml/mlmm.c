@@ -352,8 +352,17 @@ PM_set *PM_copy_set(PM_set *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_MAKE_SET_ALT - given the name, shape, and elements of a set
- *                 - build the set structure and fill it
+/* PM_MAKE_SET_ALT - Build a set from the given information:
+ *                 -    NAME   the name of the set
+ *                 -    TYPE   the type of the set element components
+ *                 -    ND     the number of dimensions of the set
+ *                 -    DIML   the dimensions of the set
+ *                 -    NDE    the number of dimensions of the set elements
+ *                 -    ELML   the NDE set element component arrays
+ *                 - If CP is TRUE make copies of ELML to keep in the set,
+ *                 - otherwise use ELML for the set element components.
+ *                 - Return the newly built set if successful and
+ *                 - return NULL otherwise.
  *
  * #bind PM_make_set_alt fortran() scheme() python()
  */
@@ -547,7 +556,9 @@ PM_set *PM_mk_set(const char *name, const char *type, int cp, long ne,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_REL_SET - release the storage associated with a set
+/* PM_REL_SET - Free SET and its associated storage except for the
+ *            - element component arrays.  If MFL is TRUE then free
+ *            - the element component arrays.
  *
  * #bind PM_rel_set fortran() scheme() python()
  */
@@ -1252,9 +1263,19 @@ void PM_promote_array(C_array *a, const char *ntyp, int flag)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_MAKE_MAPPING - given a domain, range, and attributes bind them
- *                 - all together in a freshly allocated PM_mapping
- *                 - and return a pointer to it
+/* PM_MAKE_MAPPING - Build a new mapping from the arguments:
+ *                 -    NAME       the name of the mapping
+ *                 -    CAT        the kind of mapping
+ *                 -               PM_LR_S for logically rectangular or
+ *                 -               PM_AC_S for arbitrarily connected
+ *                 -    DOMAIN     the domain set of the mapping
+ *                 -    RANGE      the range set of the mapping
+ *                 -    CENTERING  the relative centering of the domain
+ *                 -               and range sets
+ *                 -    NEXT       the next mapping in a linked list
+ *                 -               of mappings
+ *                 - Return the newly built mapping if successful and
+ *                 - return NULL otherwise.
  *
  * #bind PM_make_mapping fortran() scheme() python()
  */
@@ -1323,7 +1344,11 @@ PM_mapping *PM_build_grotrian(const char *name, const char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PM_REL_MAPPING - release the given mapping and its sets
+/* PM_REL_MAPPING - Free mapping F and its associated storage except for
+ *                - the element component arrays of the domain and range.
+ *                - If RLD is TRUE then free the domain element component
+ *                - arrays and if RLR is TRUE then free the range element
+ *                - component arrays.
  *
  * #bind PM_rel_mapping fortran() scheme() python()
  */

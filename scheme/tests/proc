@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/scheme/tests/common
 
 if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
    set msg = "SCHEME Proc Test ............."
@@ -20,7 +20,7 @@ if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
    NoteD $Log -n "                    $msg"
    Note $Log ""
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    set rpf = ( $rpf shproc.res shproc.res.diff )
 

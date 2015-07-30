@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "SX OPER Test ................."
 set exe = $BinDir/sx
@@ -20,7 +20,7 @@ set io  = sxoper.res
    Note $Log ""
 
    if ("$MPI" == "") then
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
       touch sxoper-foo.ps
       set rpf = ( $rpf sxoper.res arr.dat sxoper*.ps )
       rm -f sxoper-foo.ps

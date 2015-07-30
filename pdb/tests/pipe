@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDBNet Pipe Test ..............."
 set exe = $BinDir/pcexec
@@ -23,7 +23,7 @@ set exe = $BinDir/pcexec
       set opt = ( -i -c 30 -p $TEST )
       set io  = pcexec.refp
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a pipe_poll -e $xstatus -dt $dt -l -rpf "$rpf" none
 
@@ -34,7 +34,7 @@ set exe = $BinDir/pcexec
       set opt = ( -c 30 -p $TEST )
       set io  = pcexec.refi
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a pipe_interrupt -e $xstatus -dt $dt -l -rpf "$rpf" none
 

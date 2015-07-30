@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/panacea/tests/common
 
 set msg = "PANACEA ABC Test .............."
 

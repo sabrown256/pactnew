@@ -11,11 +11,11 @@
 unalias *
 
 set ldir   = `dirname $0`
-set psy_id = `$ldir/cfgman use`
-set root   = $ldir:h/dev/$psy_id
+set ldir   = `cd $ldir && pwd`       # ensure absolute path
+set root   = `dirname $ldir`         # .../dev/<arch>
 
 source $root/etc/env-pact.csh
-source $ldir/functions-pact.csh
+source $root/etc/functions-pact.csh
 
 unset ldir
 unset root
@@ -27,11 +27,11 @@ set d   = $d:t
 set tgt  = premk
 set vrb  = FALSE
 set flst = ""
-set dst  = $PSY_TmpDir/obj
-set tmpd = $dst
-set logd = $cwd/$dst
+set dst  = $cwd/$PSY_BldObj
+set move = TRUE
+#set tmpd = $dst
+set logd = $dst
 set excl = ""
-set reld = ../../..
 
 while ($#argv > 0)
    switch ($1)
@@ -39,6 +39,10 @@ while ($#argv > 0)
            shift
            set dst  = $1
            set logd = $dst
+	   set move = FALSE
+           breaksw
+      case -move:
+           set move = TRUE
            breaksw
       case -excl:
            shift
@@ -54,6 +58,8 @@ while ($#argv > 0)
            echo "   f   generate prototypes for specified files"
            echo "   h   this help message"
            echo "   m   generate prototypes from pre-Make files (default)"
+           echo "   move distribute files to other packages."
+           echo "        Default TRUE, -d will reset to FALSE."
            echo "   root root of out-of-source build"
            echo "   v   verbose operation"
            echo ""
@@ -64,12 +70,13 @@ while ($#argv > 0)
       case -v:
            set vrb = TRUE
            breaksw
-      case -root:
+      case -log:
            shift
-           set logd = $dst
-	   set tmpd = .
-           set reld = ..
+           set logd = $1
            breaksw
+      case -*:
+           echo "Unknown option: $1"
+	   exit(1)
       default:
            set flst = ( $flst $1 )
            breaksw
@@ -83,7 +90,7 @@ end
 set opt = "-l"
 set opt = ""
 
-InitLog Log $logd/bproto
+InitLog Log $logd/bproto.log
 
 flog $Log set path = ( $PSY_ScrDir $path )
 
@@ -533,8 +540,8 @@ Note $Log ""
    NoteD $Log "done"
 
 # only move generated files if DST equals TMPD
-   if ($dst == $tmpd) then
-      flog $Log pushd $tmpd
+   if ($move == TRUE) then
+      flog $Log pushd $dst
       Note $Log "DB_TYPES = `printenv DB_TYPES`"
 
       flog $Log blang $opt -b $cbind:t -c $cproto:t -dv $cder:t -d $cdoc:t -f $fproto:t -w $fwrap:t -t $DB_TYPES
@@ -543,14 +550,14 @@ Note $Log ""
 # move all fortran stuff to the fortran package
       if ($d != fortran) then
          if (-f gf-$d.c) then
-            set ldst =  $reld/fortran/$tmpd
+            set ldst =  $PSY_Build/fortran/$PSY_BldObj
             if (!(-d $ldst)) then
                flog $Log mkdir -p $ldst
             endif
             flog $Log mv gf-$d.c $ldst
          endif
          if (-f gm-$d.f) then
-            set ldst =  $reld/fortran/$tmpd
+            set ldst =  $PSY_Build/fortran/$PSY_BldObj
             if (!(-d $ldst)) then
                flog $Log mkdir -p $ldst
             endif
@@ -562,7 +569,7 @@ Note $Log ""
       if ($d != sx) then
          foreach s (c h)
             if (-f gs-$d.$s) then
-               set ldst =  $reld/sx/$tmpd
+               set ldst =  $PSY_Build/sx/$PSY_BldObj
                if (!(-d $ldst)) then
                   flog $Log mkdir -p $ldst
                endif
@@ -575,7 +582,7 @@ Note $Log ""
       if ($d != python) then
          foreach s (c h)
             if (-f gp-$d.$s) then
-               set ldst =  $reld/python/$tmpd
+               set ldst =  $PSY_Build/python/$PSY_BldObj
                if (!(-d $ldst)) then
                   flog $Log mkdir -p $ldst
                endif

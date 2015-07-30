@@ -6,13 +6,37 @@
 #
 # include "cpyright.h"
 #
-
+set(Package scheme)
 set(LibName scheme)
-set(TGTLib FALSE)
+set(TGTLib  scheme)
 
 #--TGTLib = ${LibDir}/lib${LibName}.a
 #--TGTExe = ${BinDir}/scheme
 set(TGTInc scheme.h scheme_int.h)
+
+# C syntax mode specifications
+#--HCSyn = scope_parse_cc.h
+#--Oc    = shgrc.o shcsup.o
+set(Arc shgrc.c  shcsup.c)
+
+# Fortran syntax mode specifications
+#--HFSyn = scope_parse_f.h
+#--Of    = shgrf.o shfsup.o
+set(Arf shgrf.c shfsup.c)
+
+# Basis syntax mode specifications
+#--HMSyn = scope_parse_m.h
+#--Om    = shgrm.o shmsup.o
+set(Arm shgrm.c shmsup.c)
+
+##################################################
+# make-def
+#
+# Site Dependent Syntax Modes
+#
+set(SyntaxModes  ${Arc} ${Arf} ${Arm})
+set(SyntaxScheme applications/csynt.scm applications/fsynt.scm applications/msynt.scm)
+##################################################
 
 set(TGTScm
     applications/runt.scm applications/lang.scm
@@ -28,6 +52,7 @@ set(TGTScm
 #--LdFlags = -L${LibDir} ${LDFLAGS}
 
 #--ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # files to Save for Backup (pact save)
 #--SaveFiles = *.c *.h *.scm
@@ -45,7 +70,7 @@ set(TGTScm
 #--BinObj = ${LdFlags} shmain.c
 
 # required Libraries
-#--Libs = ${LSCHEME} ${LPDB} ${LPML} ${LSCORE} ${MDLib} ${MDE_Lib}
+set(Libs scheme pdb pml score ${MDLib} ${MDE_Lib})
 
 
 #--targets :
@@ -61,10 +86,40 @@ set(TGTScm
 # headers Files
 set(Hdrs ${TGTInc})
 
-# C syntax mode specifications
-#--HCSyn = scope_parse_cc.h
-#--Oc    = shgrc.o shcsup.o
-#--Arc   = ${TGTLib}(shgrc.o) ${TGTLib}(shcsup.o)
+macro(do_lex_bison lexfile yaccfile)
+    set(lex_in ${CMAKE_CURRENT_SOURCE_DIR}/${lexfile}.l)
+    set(lex_tmp ${CMAKE_CURRENT_BINARY_DIR}/tmp-${lexfile}.c)
+    set(lex_out ${CMAKE_CURRENT_BINARY_DIR}/${lexfile}.c)
+
+    set(yacc_in ${CMAKE_CURRENT_SOURCE_DIR}/${yaccfile}.y)
+    set(yacc_tmp ${CMAKE_CURRENT_BINARY_DIR}/tmp-${yaccfile}.c)
+    set(yacc_out ${CMAKE_CURRENT_BINARY_DIR}/${yaccfile}.c)
+#
+# Create custom command for flex/lex (note the outputs)
+#
+    ADD_CUSTOM_COMMAND(
+        COMMAND ${LEX_EXECUTABLE} -o${lex_tmp} ${lex_in}
+        COMMAND sed \"s|lex.yy.c|${lexfile}.c|\" ${lex_tmp} | sed \"s|yy|${lexfile}_|g\" > ${lex_out}
+#            -P${lexfile}_
+        DEPENDS ${lex_in}
+        OUTPUT ${lex_out}
+    )
+
+#
+# Create custom commands for bison/yacc (note the DEPENDS)
+#
+    ADD_CUSTOM_COMMAND(
+        COMMAND ${YACC_EXECUTABLE} -o${yacc_tmp} ${yacc_in}
+        COMMAND sed \"s|y.tab.c|${yaccfile}.c|\" ${yacc_tmp} | sed \"s|yy|${yaccfile}_|g\" > ${yacc_out}
+#            -p ${yaccfile}_ 
+        DEPENDS ${yacc_in} ${lex_out}
+        OUTPUT ${yacc_out}
+    )
+endmacro(do_lex_bison)
+
+do_lex_bison(shlrc shgrc)
+do_lex_bison(shlrf shgrf)
+do_lex_bison(shlrm shgrm)
 
 #--${TGTLib}(shgrc.o) : shlrc.l shgrc.y
 #--	@(cd ${PACTTmpDir} ; \
@@ -88,11 +143,6 @@ set(Hdrs ${TGTInc})
 
 #--csynt : ${TGTLib}(shgrc.o)
 
-# Fortran syntax mode specifications
-#--HFSyn = scope_parse_f.h
-#--Of    = shgrf.o shfsup.o
-#--Arf   = ${TGTLib}(shgrf.o) ${TGTLib}(shfsup.o)
-
 #--${TGTLib}(shgrf.o) : shlrf.l shgrf.y
 #--	@(cd ${PACTTmpDir} ; \
 #--	  ${RM} lex.yy.c y.tab.c shlrf.c shgrf.c errlog ; \
@@ -114,11 +164,6 @@ set(Hdrs ${TGTInc})
 
 #--${Of}  : ${HFSyn}
 #--${Arf} : ${HFSyn}
-
-# Basis syntax mode specifications
-#--HMSyn = scope_parse_m.h
-#--Om    = shgrm.o shmsup.o
-#--Arm   = ${TGTLib}(shgrm.o) ${TGTLib}(shmsup.o)
 
 #--${TGTLib}(shgrm.o) : shlrm.l shgrm.y
 #--	@(cd ${PACTTmpDir} ; \
@@ -157,6 +202,7 @@ set(Srcs
     shtty.c shint.c sharr.c shstrg.c shchr.c shlarg.c
     shprc1.c shprc2.c shsynt.c shvar.c
     ${gcs}
+    ${Arc} ${Arf} ${Arm}
 )
 
 
@@ -194,6 +240,7 @@ set(Srcs
 # headers
 
 #--GenInc = ${PACTTmpDir}/gc-scheme.h
+LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc-scheme.h)
 
 #--${IncDir}/scheme_gen.h : ${GenInc}
 #--	@echo "build scheme_gen.h"
@@ -201,6 +248,14 @@ set(Srcs
 #--	@cat ${GenInc} > ${IncDir}/scheme_gen.h
 
 #--hdrf = ${IncDir}/scheme_gen.h
+
+#Command: mv gf-scheme.c ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gm-scheme.f ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gs-scheme.c ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gs-scheme.h ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gp-scheme.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-scheme.h ../../../python/z-lnx-2.12-o/obj
+#Command: mv gh-scheme.html ../../../doc
 
 #--IncAction = @pact generate
 set(do-bproto TRUE)
@@ -229,6 +284,10 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--scheme :
 #--	touch shmain.c
 #--	pact install
+add_executable(scheme-bin shmain.c)
+set_target_properties(scheme-bin
+  PROPERTIES OUTPUT_NAME scheme)
+target_link_libraries(scheme-bin ${Libs})
 
 #
 # link 
@@ -265,3 +324,17 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--test :
 #--	@./shtest
 
+set(Tests 
+    mem perf
+    string numer
+    proc gexec shell
+    csynt bsynt
+)
+
+foreach(test ${Tests})
+    set(testname "${Package}.${test}")
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/shtest ${test}
+    )
+endforeach(test)

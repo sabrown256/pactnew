@@ -137,6 +137,9 @@ setenv EtcDir  $PSY_Root/etc
 #             Note $STDOUT '	@/bin/csh -c "(cd '$p' ; echo '"''"' ; echo '"'"'pact generate in '$p' for '$sid"'"' ; source ${Env'$n'} ; ${PACT'$n'} -rcr generate)"'
              Note $STDOUT '	@(cd '$p' ; printf "\npact generate in %s for %s\n" '$p $sid' ; ${PACT'$n'} -a '$sid' -rcr generate)'
           end
+          if ($p == scripts) then
+             Note $STDOUT '	${BARRIER}'
+          endif
           if ($p == score) then
              Note $STDOUT '	${BARRIER}'
           endif

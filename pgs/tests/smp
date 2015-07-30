@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pgs/tests/common
 
 set msg = "PGS Parallel Test ......"
 set exe = $BinDir/tgsa
@@ -34,7 +34,7 @@ set exe = $BinDir/tgsa
       set opt = ( $opt -f -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       set rpf = ( $rpf gscgmt.cgm )
 
@@ -55,7 +55,7 @@ set exe = $BinDir/tgsa
       set opt = ( $opt -s -A -B -D -E -F -1 -2 -3 -4 -5 -6 -7 -9 -10 -11 -12 )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       set rpf = ( $rpf gscgmt.cgm )
 

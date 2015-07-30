@@ -675,10 +675,11 @@ char *SC_search_file(char **path, const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_ADVANCE_NAME - increment a sequential name by one
- *                 - assumes name is of the form:
+/* SC_ADVANCE_NAME - Assuming a name S is of the form
  *                 -    <base>.[a-zA-Z]dd
  *                 -    d = [0-9a-zA-Z]
+ *                 - increment the name by one.
+ *                 - Most often used in connection with file family names.
  *
  * #bind SC_advance_name fortran() scheme() python()
  */
@@ -862,7 +863,9 @@ int SC_remove(const char *s)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_PAUSE - give the user a chance to think about things
+/* SC_PAUSE - Wait for input from the terminal.
+ *          - Intended to give the user a chance to think about things
+ *          - before proceeding with execution.
  *
  * #bind SC_pause fortran() python()
  */

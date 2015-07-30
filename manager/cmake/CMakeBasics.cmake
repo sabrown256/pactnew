@@ -42,9 +42,33 @@
 #
 ###############################################################################
 
+include(CMakeParseArguments)
+
 ################################
 # Standard Build Layout
 ################################
+
+# PACT_SOURCE_DIR and PACT_BINARY_DIR created by cmake
+
+set (PACT_MANAGER_DIR ${PACT_SOURCE_DIR}/manager)
+set (PSY_MngDir ${PACT_SOURCE_DIR}/manager)
+set (PACT_ANALYZE_BINARY_DIR ${PACT_BINARY_DIR}/bin/analyze)
+set (PACT_ANALYZE_SOURCE_DIR ${PACT_SOURCE_DIR}/manager/cmake)
+
+set (PSY_Base    ${PACT_SOURCE_DIR})
+set (PSY_ScrDir  ${PACT_SOURCE_DIR}/scripts)
+set (PSY_Build   ${PACT_BINARY_DIR})
+if(NOT PSY_Root)
+  set (PSY_Root    ${PACT_BINARY_DIR} CACHE STRING "" FORCE) 
+endif()
+set (ScmDir  ${PSY_Root}/scheme)
+set (BinDir  ${PSY_Root}/bin)
+set (LibDir  ${PSY_Root}/lib)
+set (IncDir  ${PSY_Root}/include)
+set (EtcDir  ${PSY_Root}/etc)
+set (Man1Dir ${PSY_Root}/man/man1)
+set (Man3Dir ${PSY_Root}/man/man3)
+set (LogDir  ${PSY_Root}/log)
 
 ##
 ## Defines the layout of the build directory. Namely,
@@ -52,42 +76,24 @@
 ## where to store libraries (static or shared), the location of the
 ## bin directory for all executables and the location for fortran moudules.
 ##
-
-## Set the path where all the header will be stored
- set(HEADER_INCLUDES_DIRECTORY
-     ${PROJECT_BINARY_DIR}/include/
-     CACHE PATH
-     "Directory where all headers will go in the build tree"
-     )
- include_directories(${HEADER_INCLUDES_DIRECTORY})
-
- ## Set the path where all the libraries will be stored
- set(LIBRARY_OUTPUT_PATH
-     ${PROJECT_BINARY_DIR}/lib
-     CACHE PATH
-     "Directory where compiled libraries will go in the build tree"
-     )
-
- ## Set the path where all the executables will go
- set(EXECUTABLE_OUTPUT_PATH
-     ${PROJECT_BINARY_DIR}/bin
-     CACHE PATH
-     "Directory where executables will go in the build tree"
-     )
+include_directories(${IncDir})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LibDir})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LibDir})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BinDir})
 
  ## Set the Fortran module directory
- set(CMAKE_Fortran_MODULE_DIRECTORY
-     ${PROJECT_BINARY_DIR}/lib
-     CACHE PATH
-     "Directory where all Fortran modules will go in the build tree"
-     )
+set(CMAKE_Fortran_MODULE_DIRECTORY
+    ${IncDir}
+    CACHE PATH
+    "Directory where all Fortran modules will go in the build tree"
+)
 
 ## Mark as advanced
-mark_as_advanced(
-     LIBRARY_OUTPUT_PATH
-     EXECUTABLE_OUTPUT_PATH
-     CMAKE_Fortran_MODULE_DIRECTORY
-     )
+#mark_as_advanced(
+#     LIBRARY_OUTPUT_PATH
+#     EXECUTABLE_OUTPUT_PATH
+#     CMAKE_Fortran_MODULE_DIRECTORY
+#     )
 
 
 ################################
@@ -429,37 +435,74 @@ mark_as_advanced(
 ##
 ## copy_headers_copy( hdrs dest )
 ##------------------------------------------------------------------------------
-macro(copy_headers_target proj hdrs dest)
+#--macro(copy_headers_target proj hdrs dest)
+#--
+#--add_custom_target(copy_headers_${proj}
+#--     COMMAND ${CMAKE_COMMAND}
+#--             -DHEADER_INCLUDES_DIRECTORY=${dest}
+#--             -DLIBHEADERS="${hdrs}"
+#--             -DTGTLIB=${proj}
+#--             -P ${CMAKE_MODULE_PATH}/copy_headers.cmake
+#--
+#--     DEPENDS
+#--        ${hdrs}
+#--
+#--     WORKING_DIRECTORY
+#--        ${PROJECT_SOURCE_DIR}/${proj}
+#--
+#--     COMMENT
+#--        "copy headers ${proj}"
+#--     )
+#--     
+#--     # add any passed source files to the running list for this project
+#--     foreach(hdr ${hdrs})
+#--         if(IS_ABSOLUTE)
+#--             list(APPEND "${PROJECT_NAME}_ALL_SOURCES" "${hdr}")
+#--         else()
+#--             list(APPEND "${PROJECT_NAME}_ALL_SOURCES" "${CMAKE_CURRENT_SOURCE_DIR}/${proj}/${hdr}")
+#--         endif()
+#--     endforeach()
+#--
+#--     set("${PROJECT_NAME}_ALL_SOURCES" "${${PROJECT_NAME}_ALL_SOURCES}" CACHE STRING "" FORCE )    
+#--     
+#--endmacro(copy_headers_target)
+#--
+#--
 
-add_custom_target(copy_headers_${proj}
-     COMMAND ${CMAKE_COMMAND}
-             -DHEADER_INCLUDES_DIRECTORY=${dest}
-             -DLIBHEADERS="${hdrs}"
-             -DTGTLIB=${proj}
-             -P ${CMAKE_MODULE_PATH}/copy_headers.cmake
+##############################
+# make-def
+#LDPath     = -L/home/taylor16/gapps/gcc-4.9.0/lib64 -L/home/taylor16/gapps/gcc-4.9.0/lib -L/home/taylor16/pact/cmake/dev/lnx-2.12-o/lib -L/usr/lib64 -L/usr/lib
+#LDRPath    = -Wl,-rpath,/home/taylor16/gapps/gcc-4.9.0/lib64:/home/taylor16/gapps/gcc-4.9.0/lib:/home/taylor16/pact/cmake/dev/lnx-2.12-o/lib:/usr/lib64:/usr/lib
+#LDFLAGS    = -Wl,--disable-new-dtags -rdynamic ${LDRPath} ${LDPath}
+#LXFLAGS    = -fPIC -w -m64 -fPIC
+#MDInc      =   
+set(MDLib  -lz -lc -lm)
+#DPInc      = 
+#DPLib      = 
+#MDI_Inc    = -I/usr/include/openssl
+#MDI_Lib    = -lsqlite3 -lssl
+set(MDE_Lib  /usr/lib64/libbfd.a -liberty -ldl)
+#FLib       = 
 
-     DEPENDS
-        ${hdrs}
 
-     WORKING_DIRECTORY
-        ${PROJECT_SOURCE_DIR}/${proj}
+##############################
 
-     COMMENT
-        "copy headers ${proj}"
-     )
-     
-     # add any passed source files to the running list for this project
-     foreach(hdr ${hdrs})
-         if(IS_ABSOLUTE)
-             list(APPEND "${PROJECT_NAME}_ALL_SOURCES" "${hdr}")
-         else()
-             list(APPEND "${PROJECT_NAME}_ALL_SOURCES" "${CMAKE_CURRENT_SOURCE_DIR}/${proj}/${hdr}")
-         endif()
-     endforeach()
+# Copy file to dest directory using sinstall
+macro(sinstall_file file dest)
+    set(infile  ${CMAKE_CURRENT_SOURCE_DIR}/${file})
+    add_custom_target(
+        ${file}
+        COMMAND ${PSY_ScrDir}/sinstall ${infile} ${dest}
+        DEPENDS ${infile}
+#        COMMENT "XXXXXXXXX  Install ${file}"
+    )
+endmacro(sinstall_file)
 
-     set("${PROJECT_NAME}_ALL_SOURCES" "${${PROJECT_NAME}_ALL_SOURCES}" CACHE STRING "" FORCE )    
-     
-endmacro(copy_headers_target)
+
+
+
+
+
 
 
 
@@ -481,24 +524,6 @@ include(CheckFunctionExists)
 #legacy  [OUTPUT_VARIABLE <var>]
 #        [ARGS <args>...])
 
-# PACT_SOURCE_DIR and PACT_BINARY_DIR created by cmake
-
-set (PACT_MANAGER_DIR ${PACT_SOURCE_DIR}/manager)
-set (PACT_ANALYZE_BINARY_DIR ${PACT_BINARY_DIR}/bin/analyze)
-set (PACT_ANALYZE_SOURCE_DIR ${PACT_SOURCE_DIR}/manager/cmake)
-
-set (PSY_Base    ${PACT_SOURCE_DIR})
-set (PSY_ScrDir  ${PACT_SOURCE_DIR}/scripts)
-set (PSY_Root    ${PACT_BINARY_DIR})
-set (ScmDir ${PSY_Root}/scheme)
-set (BinDir ${PSY_Root}/bin)
-set (LibDir ${PSY_Root}/lib)
-set (IncDir ${PSY_Root}/include)
-set (EtcDir ${PSY_Root}/etc)
-set (Man1Dir ${PSY_Root}/man/man1)
-set (Man3Dir ${PSY_Root}/man/man3)
-set (LogDir ${PSY_Root}/log)
-
 
 # from dsys
 file (STRINGS ${PACT_MANAGER_DIR}/.pact-version PACT_VERSION)
@@ -506,8 +531,8 @@ file (STRINGS ${PACT_MANAGER_DIR}/.pact-version PACT_VERSION)
 exec_program(${PACT_SCRIPTS_DIR}/system-id
              OUTPUT_VARIABLE PACT_PSY_Arch)
 
-exec_program(${PACT_SCRIPTS_DIR}/nbin -d
-             OUTPUT_VARIABLE PACT_Bits)
+#!!exec_program(${PACT_SCRIPTS_DIR}/nbin -d
+#!!             OUTPUT_VARIABLE PACT_Bits)
 
 
 
@@ -638,9 +663,13 @@ foreach(file env-pact.csh env-pact.dk env-pact.mdl env-pact.sh)
                  @ONLY)
 endforeach()
 
+# copied by dsys
+set (DB_TYPES ${EtcDir}/types.db)
+file(COPY ${PSY_MngDir}/types.db DESTINATION ${EtcDir})
+
 # install cpyright.h for compiles
 #file(COPY cpyright.h DESTINATION ${HEADER_INCLUDES_DIRECTORY})
-configure_file(cpyright.h ${PACT_BINARY_DIR}/include/cpyright.h COPYONLY)
+configure_file(cpyright.h ${IncDir}/cpyright.h COPYONLY)
 configure_file(manager/types.db ${EtcDir}/types.db COPYONLY)
 
 
@@ -653,3 +682,7 @@ configure_file(manager/types.db ${EtcDir}/types.db COPYONLY)
 add_library( libm SHARED IMPORTED )
 set_target_properties( libm PROPERTIES
     IMPORTED_LOCATION /lib/libm.so.6)
+
+
+set(YACC_EXECUTABLE  /usr/bin/yacc)
+set(LEX_EXECUTABLE   /usr/bin/lex)

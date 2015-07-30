@@ -9,20 +9,16 @@
 
 unalias *
 
-set pact   = `which perdb`
-set bindir = $pact:h
-set lbase  = $bindir:h
-set devinc = $lbase/include
-set devetc = $lbase/etc
+set ldir   = `dirname $0`            # may be relative path
+set ldir   = `cd $ldir && pwd`       # ensure absolute path
+set root   = `dirname $ldir`         # .../dev/<arch>
+set devinc = $root/include
 
-if (-d ../scripts) then
-   source ../scripts/functions-pact.csh
-else
-   source $devetc/functions-pact.csh
-endif
+source $root/etc/functions-pact.csh
+set path = ( $root/bin $path )
 
-unset bindir
-unset lbase
+unset ldir
+unset root
 
 @ nerr  = 0
 @ nwarn = 0
@@ -73,6 +69,9 @@ while ($#argv > 0)
            shift
            set api = $1
            breaksw
+      case -*:
+           echo "Unknown option: $1"
+	   exit(1)
       default:
            set def = $1
            breaksw

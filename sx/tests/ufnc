@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "ULTRA FNC Test ..............."
 set exe = $BinDir/ultra
@@ -27,7 +27,7 @@ set io  = ulfnc.log
       flog $Log $cross_fe $exe $opt
       set xstatus = $status
    else
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
    endif
 
    flog $Log (grep -i "error" ulfnc.log >&! ultest.err)

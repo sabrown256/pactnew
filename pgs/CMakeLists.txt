@@ -8,9 +8,9 @@
 #
 # include "cpyright.h"
 #
-
+set(Package pgs)
 set(LibName pgs)
-set(TGTLib FALSE)
+set(TGTLib  pgs)
 
 #--TGTLib = ${LibDir}/lib${LibName}.a
 #--TGTInc = ${Hdrs} ${XHdr}
@@ -24,6 +24,7 @@ set(TGTLib FALSE)
 #--LdFlags = -L${LibDir} ${LDFLAGS}
 
 #--ACFlags = -avrb ${AODC} ${CFLAGS} ${Shared_CC_Flags} -I. ${CcFlags}
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 #
 # Files to Save for Backup (pact save)
@@ -42,10 +43,6 @@ set(TGTLib FALSE)
 #--BinDep = ${TGTLib}
 #--BinObj =
 
-#
-# Required Libraries
-#
-#--Libs = ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
 
 #--targets :
 #--	@echo "Targets for PGS"
@@ -76,9 +73,9 @@ set(TGTLib FALSE)
 #
 # Headers Files
 #
-#--Hdrs   = pgs.h pgs_int.h pgs_old.h scope_cgm.h scope_raster.h
-#--MpgHdr = scope_mpeg.h
-#--XHdr   = scope_x11.h
+set(Hdrs pgs.h pgs_int.h pgs_old.h scope_cgm.h scope_raster.h)
+set(MpgHdr scope_mpeg.h)
+set(XHdr   scope_x11.h)
 
 set(TGTInc ${Hdrs} ${XHdr})
 
@@ -96,6 +93,20 @@ set(SJPG gsdv_jpg.c)
 set(SMPG gsdv_mpg.c gspr_mpg.c gsmpeg.c)
 set(SPNG gsdv_png.c)
 
+##############################
+# make-def
+#
+# Site Dependent Graphics Information
+#
+set(GRAPHICS_Flags  -DOGL -DX11)
+set(MDGInc         )
+set(MDGLib      -lGL -lX11 -lpng -ljpeg)
+set(GRDevicesS  ${SPS} ${SCGM} ${SMPG} ${SPNG} ${SJPG} ${SOGL} ${SX})
+set(GRDevicesO  ${ArPS} ${ArCGM} ${ArMPG} ${ArPNG} ${ArJPG} ${ArOGL} ${ArX})
+
+set(GRAPHICS_Windows X)
+##############################
+
 set(Srcs
     gsdv.c gspr.c gsacc.c gsvsp.c gsdv_im.c gsevmn.c
     gsdv_rst.c gspr_rst.c gsdlr.c gsaux.c gsmm.c gsattr.c
@@ -107,6 +118,12 @@ set(Srcs
 #    ${gcs}
 )
 
+
+#
+# Required Libraries
+#
+#--Libs = ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${MDLib}
+set(Libs pgs ${MDGLib} pdb pml score ${MDLib})
 
 #--gco = gc-pgs.o
 
@@ -177,12 +194,16 @@ set(Srcs
 add_custom_command(
     OUTPUT ${IncDir}/gsimag.h
     DEPENDS template gsimag.t
-    COMMAND ${BinDir}/template ${CMAKE_CURRENT_SOURCE_DIR}/gsimag.t -o ${IncDir}/gsimag.h
+    COMMAND ${BinDir}/template
+        ${CMAKE_CURRENT_SOURCE_DIR}/gsimag.t
+        -t ${DB_TYPES}
+        -o ${IncDir}/gsimag.h
     COMMENT "template gsimag.t -o ${IncDir}/gsimag.h"
     )
 LIST(APPEND hdrf ${IncDir}/gsimag.h)
 
 #--GenInc = ${PACTTmpDir}/gc-pgs.h
+LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc-pgs.h)
 
 #--${IncDir}/pgs_gen.h : ${GenInc}
 #--	@echo "build pgs_gen.h"
@@ -190,6 +211,14 @@ LIST(APPEND hdrf ${IncDir}/gsimag.h)
 #--	@cat ${GenInc} > ${IncDir}/pgs_gen.h
 
 #set(hdrf ${IncDir}/gsimag.h ${IncDir}/pgs_gen.h)
+
+#Command: mv gf-pgs.c ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gm-pgs.f ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gs-pgs.c ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gs-pgs.h ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gp-pgs.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-pgs.h ../../../python/z-lnx-2.12-o/obj
+#Command: mv gh-pgs.html ../../../doc
 
 #--IncAction = @pact generate
 set(do-bproto TRUE)
@@ -230,6 +259,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tgsa : tgsa.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tgsa.c -o ${BinDir}/tgsa" ; \
 #--	  ${CLD} ${LdFlags} tgsa.c -o ${BinDir}/tgsa ${Libs})
+add_executable(tgsa tgsa.c)
+target_link_libraries(tgsa ${Libs})
 
 #
 # query event utility
@@ -286,6 +317,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tgstr : tgstr.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tgstr.c -o ${BinDir}/tgstr" ; \
 #--	  ${CLD} ${LdFlags} tgstr.c -o ${BinDir}/tgstr ${Libs})
+add_executable(tgstr tgstr.c)
+target_link_libraries(tgstr ${Libs})
 
 #
 # curve drawing test
@@ -380,6 +413,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tgslax : tgslax.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tgslax.c -o ${BinDir}/tgslax" ; \
 #--	  ${CLD} ${LdFlags} tgslax.c -o ${BinDir}/tgslax ${Libs})
+add_executable(tgslax tgslax.c)
+target_link_libraries(tgslax ${Libs})
 
 #
 # grotrian test
@@ -389,6 +424,8 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tgsgrt : tgsgrt.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tgsgrt.c -o ${BinDir}/tgsgrt" ; \
 #--	  ${CLD} ${LdFlags} tgsgrt.c -o ${BinDir}/tgsgrt ${Libs})
+add_executable(tgsgrt tgsgrt.c)
+target_link_libraries(tgsgrt ${Libs})
 
 #
 # inform
@@ -403,6 +440,16 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--test :
 #--	@./gstest
 
+set(Tests trans axis rendlr rendac grot mpeg smp)
+foreach(test ${Tests})
+    set(testname "${Package}.${test}")
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gstest ${test}
+    )
+endforeach(test)
+
+
 #
 # MPEG test
 #
@@ -411,8 +458,12 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--${BinDir}/tgsmpg1 : tgsmpg1.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tgsmpg1.c -o ${BinDir}/tgsmpg1" ; \
 #--	  ${CLD} ${LdFlags} tgsmpg1.c -o ${BinDir}/tgsmpg1 ${Libs})
+add_executable(tgsmpg1 tgsmpg1.c)
+target_link_libraries(tgsmpg1 ${Libs})
 
 #--${BinDir}/tgsmpg2 : tgsmpg2.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tgsmpg2.c -o ${BinDir}/tgsmpg2" ; \
 #--	  ${CLD} ${LdFlags} tgsmpg2.c -o ${BinDir}/tgsmpg2 ${Libs})
+add_executable(tgsmpg2 tgsmpg2.c)
+target_link_libraries(tgsmpg2 ${Libs})
 

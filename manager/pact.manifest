@@ -6,10 +6,11 @@
 #
 
 # package list
-# except for psh and scripts, ordered by number of lines of code
+# except for psh, scripts and score, ordered by number of lines of code
 # for parallel load balancing
 pkg psh scripts
-pkg pgs score pdb pml sx python
+pkg score
+pkg pgs pdb pml sx python
 pkg scheme panacea fortran scc
 
 bin atdbg do-net detect pcexec ps-diff ncpu scheme sx

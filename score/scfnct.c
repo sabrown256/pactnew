@@ -35,8 +35,9 @@ struct tm *SC_localtime(const time_t *t, struct tm *tms)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_DATE - return a string with the time and date as defined by the
- *         - ANSI function ctime
+/* SC_DATE - Return a string with the time and date as defined by the
+ *         - ANSI function ctime.  The string is dynamically allocated
+ *         - and the caller is responsible for freeing it.
  *
  * #bind SC_date fortran() scheme(date) python()
  */
@@ -118,8 +119,8 @@ char *SC_datef(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_CPU_TIME - return the cpu time used in seconds and microseconds
- *               SINCE THE FIRST CALL!
+/* SC_CPU_TIME - Return the CPU time used in seconds and microseconds
+ *             - since the first call.  The first call returns zero.
  *
  * #bind SC_cpu_time fortran() scheme(cpu-time) python()
  */
@@ -185,8 +186,8 @@ double SC_cpu_time(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* SC_WALL_CLOCK_TIME - return the wall clock time in seconds and microseconds
- *                      SINCE THE FIRST CALL!
+/* SC_WALL_CLOCK_TIME - Return the wall clock time in seconds and microseconds
+ *                    - since the first call.  The first call returns zero.
  *
  * #bind SC_wall_clock_time fortran() scheme(wall-clock-time) python()
  */

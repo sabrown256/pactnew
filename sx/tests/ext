@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "SX Extension Test ............"
 set exe = $BinDir/sx
@@ -18,7 +18,7 @@ NoteD $Log -n "                    $msg"
 if (($CROSS_COMPILE == FALSE) && ($HaveIPC == YES)) then
    Note $Log ""
 
-   set ExtDir = ../../applications/extensions
+   set ExtDir = $PSY_Base/sx/applications/extensions
    if ((-d $ExtDir) && (-x $ExtDir/do-test)) then
 
       flog $Log pushd $ExtDir

@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pgs/tests/common
 
 set msg = "PGS Trans Test ........."
 set exe = $BinDir/tgstr
@@ -28,7 +28,7 @@ set io  = ftee
       NoteD $Log "                         Can't build PGS Trans Test Program"
       NoteD $Log "                    ${msg}FAILED"
    else
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
    endif
 
 $TEST_CHECK part -a trans -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"

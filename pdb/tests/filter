@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDB Filter Test ...................."
 set exe = $BinDir/tpdf
@@ -19,7 +19,7 @@ NoteD $Log ""
 NoteD $Log "                    $msg"
 Note $Log ""
 
-source ../../../scripts/test-run
+source $PSY_Base/scripts/test-run
 
 $TEST_CHECK part -a filter -e $xstatus -dt $dt -x $exe -rpf "$rpf" "$msg"
 

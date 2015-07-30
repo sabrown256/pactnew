@@ -6,10 +6,8 @@
 #
 # include "cpyright.h"
 #
+set(Package psh)
 set(LibName psh)
-
-# create binaries in $(TOP)/bin
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
 
 set(POSIXHdrs posix.h posix-unix.h posix-msw.h posix-beos.h)
 set(ANSIHdrs  ansic.h)
@@ -172,13 +170,30 @@ set(TGTInc ${StdHdrs})
 include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 
 #--IncAction = sinstall ${IncFiles} ${IncDir}/shell
+
+# Make a target for each include file
+foreach(file ${IncFiles})
+    set(infile  ${CMAKE_CURRENT_SOURCE_DIR}/${file})
+    set(outfile ${IncDir}/shell/${file})
+    add_custom_command(
+        OUTPUT ${outfile}
+        COMMAND ${CMAKE_COMMAND} -E copy ${infile} ${outfile}
+        MAIN_DEPENDENCY ${infile}
+        COMMENT "Copy ${file}"
+    )
+    LIST(APPEND IncFiles_LIST ${outfile})
+endforeach(file)
+
 add_custom_target(incinstall_psh_shell
-  COMMAND ${PSY_ScrDir}/sinstall ${IncFiles} ${IncDir}/shell
-  DEPENDS ${IncFiles}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "incinstall shell in psh  DEBUG ${IncFiles}"
+    DEPENDS ${IncFiles_LIST}
+    COMMENT "incinstall shell in ${Package}"
 )
 add_dependencies(incinstall_psh incinstall_psh_shell)
+
+# installed by 'dsys config'
+add_custom_target(pact-build-tools
+    DEPENDS pco perdb gexec elide blang rpath template
+)
 
 #--#
 #--# Run the PSH test suite
@@ -186,42 +201,44 @@ add_dependencies(incinstall_psh incinstall_psh_shell)
 #--test :
 #--	@./pstest
 
-set(TestList ext do-net elide blang templ regx pcsh perdb inf)
+set(Tests 
+# from psh/tests/ext
+    ext-job ext-pipe ext-int
+    ext-fnc ext-file ext-var ext-fan ext-spec
 
 # list from psh/pstest
-set(Tests 
-    ext perdb
+    perdb
     do-net elide blang templ
 #   info do-net elide blang templ
     regx pcsh dorun verify
 #   pco
 )
 
-# from psh/tests/ext
-set(lst job pipe int fnc file var fan spec)
-
-##add_test(
-##    NAME ext-job
-##    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/ext-job-cmake
-##      -base ${PSY_Base}
-###   [CONFIGURATIONS <config>...]
-###   [WORKING_DIRECTORY <dir>])
-##)
-###set_property(TEST ext-job PROPERTY 
-###    ENVIRONMENT TestScrDir=${PSY_ScrDir}
-####Log
-####RefDir
-###)
-
-add_test(
-    NAME ext-job
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pstest.cmake 
-       -base ${PSY_Base} -root ${PSY_Root} ext-job
-#   [CONFIGURATIONS <config>...]
-#   [WORKING_DIRECTORY <dir>])
-)
-#set_property(TEST ext-job PROPERTY 
-#    ENVIRONMENT
-#         PSY_Base=${PSY_Base}
-#         PSY_Root=${PSY_Root}
+# simplified for testing
+#set(Tests 
+#    perdb
 #)
+
+foreach(test ${Tests})
+    set(testname psh.${test})
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/pstest.cmake 
+           -base  ${PSY_Base}
+           -build ${PSY_Build}
+           -root  ${PSY_Root}
+           ${test}
+    #   [CONFIGURATIONS <config>...]
+    #   [WORKING_DIRECTORY <dir>])
+    )
+
+    set_property(TEST ${testname} PROPERTY 
+        ENVIRONMENT
+#             TestScrDir=${PSY_ScrDir}
+             TestDir=${CMAKE_CURRENT_BINARY_DIR}/test
+#             PSY_TmpDir=.
+             PSY_Base=${PSY_Base}
+#             PSY_Root=${PSY_Root}
+    )
+
+endforeach(test)

@@ -6,6 +6,7 @@
 #
 # include "cpyright.h"
 #
+set(Package doc)
 
 #--HTML    = *.html *.gif unix-README
 #--HTMLDir = /usr/gapps/pact/distributions/web

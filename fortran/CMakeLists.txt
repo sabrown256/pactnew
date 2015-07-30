@@ -8,8 +8,9 @@
 #
 # include "cpyright.h"
 #
-
+set(Package fortran)
 set(LibName fpact)
+set(TGTLib  fpact)
 
 #--TGTLib = ${LibDir}/lib${LibName}.a
 #--TGTInc = noinc
@@ -92,6 +93,8 @@ set(CSrcs
     fasxa.c
 )
 
+set(Srcs ${CSrcs} ${FSrcs})
+
 #
 # Object Files
 #
@@ -134,6 +137,14 @@ set(CSrcs
 #--	sinstall *.mod ${IncDir}
 #--	@rm -f dummy.mod ${IncDir}/dummy.mod
 #--	@rm -rf ${PSY_TmpDir}
+
+
+#Command: mv gs-fortran.c ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gs-fortran.h ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gp-fortran.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-fortran.h ../../../python/z-lnx-2.12-o/obj
+#Command: mv gh-fortran.html ../../../doc
+
 
 #--${PACTTmpDir}/gm-${LibName}.f : ${PACTSrcDir}/flibc.f
 #--	@../scripts/bproto
@@ -257,3 +268,11 @@ set(CSrcs
 #--test :
 #--	@./fatest
 
+set(Tests score pdb pgs panacea)
+foreach(test ${Tests})
+    set(testname "${Package}.${test}")
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/fatest ${test}
+    )
+endforeach(test)

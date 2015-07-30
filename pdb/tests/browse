@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDB Browse Test ...................."
 set exe = $BinDir/tpdls
@@ -19,7 +19,7 @@ NoteD $Log ""
 NoteD $Log -n "                    $msg"
 Note $Log ""
 
-source ../../../scripts/test-run
+source $PSY_Base/scripts/test-run
 
 # cleanout all previous test files
 # no further tests will need them

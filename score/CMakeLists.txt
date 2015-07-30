@@ -9,8 +9,9 @@
 # include "cpyright.h"
 #
 
+set(Package score)
 set(LibName score)
-set(TGTLib TRUE)
+set(TGTLib  score)
 
 #--TGTLib = ${LibDir}/lib${LibName}.a
 #--MMLib = ${LibDir}/libpsmm.a
@@ -51,10 +52,10 @@ set(TGTLib TRUE)
 #
 # Required Libraries
 #
-#--Libs  = ${LSCORE} ${MDLib}
-#--MLibs = ${LSCORE} ${LMM} ${MDLib}
-#--DLibs = ${LSCORE} ${MDE_Lib} ${MDLib}
-#--OLibs = ${LSCORE} -losmm ${MDE_Lib} ${MDLib}
+set(Libs  score ${MDLib})
+set(MLibs score psmm ${MDLib})
+set(DLibs score ${MDE_Lib} ${MDLib})
+set(OLibs score osmm ${MDE_Lib} ${MDLib})
 
 add_custom_target(targets
     COMMAND ${CMAKE_COMMAND} -E echo "Targets for SCORE\n"
@@ -160,8 +161,11 @@ set(Srcs ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs}
 #--	  ${CROSS_FE} template -gc -t ${EtcDir}/types.db -o ${PACTTmpDir}/gc_type.c)
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gc_type.c
-    DEPENDS template
-    COMMAND template -gc -t ${EtcDir}/types.db -o ${CMAKE_CURRENT_BINARY_DIR}/gc_type.c
+    DEPENDS ${BinDir}/template
+    COMMAND ${BinDir}/template
+        -gc
+        -t ${DB_TYPES}
+        -o ${CMAKE_CURRENT_BINARY_DIR}/gc_type.c
     COMMENT "template gc_type.c"
     )
 LIST(APPEND GSrcs ${CMAKE_CURRENT_BINARY_DIR}/gc_type.c)
@@ -176,6 +180,7 @@ add_custom_command(
     COMMENT "template gc_type.h"
     )
 LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc_type.h)
+#LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc_score.h)
 
 #--${IncDir}/scfnca.h : scfnca.t
 #--	@(echo "template scfnca.t -o ${IncDir}/scfnca.h" ;  \
@@ -183,7 +188,9 @@ LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc_type.h)
 add_custom_command(
     OUTPUT ${IncDir}/scfnca.h
     DEPENDS template ${CMAKE_CURRENT_SOURCE_DIR}/scfnca.t
-    COMMAND ${BinDir}/template ${CMAKE_CURRENT_SOURCE_DIR}/scfnca.t -o ${IncDir}/scfnca.h
+    COMMAND ${BinDir}/template ${CMAKE_CURRENT_SOURCE_DIR}/scfnca.t
+            -t ${DB_TYPES}
+            -o ${IncDir}/scfnca.h
     COMMENT "template scfnca.h"
     )
 LIST(APPEND hdrf ${IncDir}/scfnca.h)
@@ -191,6 +198,26 @@ LIST(APPEND hdrf ${IncDir}/scfnca.h)
 #--IncAction = @pact generate
 set(ExcludeType  -excl omp_lockdes)
 #set(LExcludeType ${ExcludeType})
+
+
+#Command: mv gf-score.c ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gm-score.f ../../../fortran/z-lnx-2.12-o/obj
+#Command: mv gs-score.c ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gs-score.h ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gp-score.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-score.h ../../../python/z-lnx-2.12-o/obj
+#Command: mv gh-score.html ../../../doc
+set(bproto-output
+#    ${PSY_build}/score/gc-score.c
+#    ${PSY_build}/score/gc-score.h
+    ${PSY_build}/fortran/gf-score.c
+    ${PSY_build}/fortran/gm-score.f
+    ${PSY_build}/sx/gs-score.c
+    ${PSY_build}/sx/gs-score.h
+    ${PSY_build}/python/gp-score.c
+    ${PSY_build}/python/gp-score.h
+#    ${PSY_base}/doc/gh-score.html
+)
 set(do-bproto TRUE)
 
 include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
@@ -200,8 +227,12 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
 add_custom_command(
     OUTPUT ${IncDir}/bfd.api
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bfd.def
-    COMMAND ${PSY_ScrDir}/import-api ${CMAKE_CURRENT_SOURCE_DIR}/bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api -basedir ${PSY_Base} -root ${PSY_Root}
+    DEPENDS ${BinDir}/import-api ${CMAKE_CURRENT_SOURCE_DIR}/bfd.def
+    COMMAND ${BinDir}/import-api
+       ${CMAKE_CURRENT_SOURCE_DIR}/bfd.def
+       ${MDE_Inc}
+       ${LDPath}
+       -o ${IncDir}/bfd.api
     COMMENT "import-api bfd.def -o ${IncDir}/bfd.api"
     )
 add_custom_target(import_bfd
@@ -224,6 +255,7 @@ add_dependencies(score import_bfd)
 #--          ${CC} -c ${PACTSrcDir}/$< -o scmemr.o ; \
 #--          ${AR} ${AROpt} ${MMLib} scmemr.o 2> /dev/null ; \
 #--          ${RM} scmemr.o 2> /dev/null )
+add_library(psmm scmemr.c)
 
 #--mmlib :
 #--	pact ${MMLib}
@@ -238,6 +270,7 @@ add_dependencies(score import_bfd)
 #--	  echo "${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ scmemo.o -L${LibDir} -lscore" ; \
 #--	  ${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ scmemo.o ${Shared_LD_Lib} -L${LibDir} -lscore ; \
 #--          ${RM} scmemo.o 2> /dev/null )
+add_library(osmm SHARED scmemo.c)
 
 #--omlib :
 #--	pact ${OMLib}
@@ -257,7 +290,7 @@ add_dependencies(score import_bfd)
 #--	@(echo "${CCAnnounce} scfcsc.c -o ${BinDir}/fcscan" ; \
 #--	  ${CLD} ${LdFlags} scfcsc.c -o ${BinDir}/fcscan ${Libs})
 add_executable(fcscan scfcsc.c)
-target_link_libraries(fcscan score -lm)
+target_link_libraries(fcscan ${Libs})
 
 #
 # PTIME
@@ -266,7 +299,7 @@ target_link_libraries(fcscan score -lm)
 #--	@(echo "${CCAnnounce} sctime.c -o ${BinDir}/ptime" ; \
 #--	  ${CLD} ${LdFlags} sctime.c -o ${BinDir}/ptime ${Libs})
 add_executable(ptime sctime.c)
-target_link_libraries(ptime score -lm)
+target_link_libraries(ptime ${Libs})
 
 #
 # NCPU
@@ -275,7 +308,7 @@ target_link_libraries(ptime score -lm)
 #--	@(echo "${CCAnnounce} scncpu.c -o ${BinDir}/ncpu" ; \
 #--	  ${CLD} ${LdFlags} scncpu.c -o ${BinDir}/ncpu ${Libs})
 add_executable(ncpu scncpu.c)
-target_link_libraries(ncpu score -lm)
+target_link_libraries(ncpu ${Libs})
 
 #
 # LATENCY
@@ -286,7 +319,7 @@ target_link_libraries(ncpu score -lm)
 
 #--latency : ${BinDir}/latency
 add_executable(latency sclatnt.c)
-target_link_libraries(latency score -lm)
+target_link_libraries(latency ${Libs})
 
 #
 # PS-DIFF
@@ -295,7 +328,7 @@ target_link_libraries(latency score -lm)
 #--	@(echo "${CCAnnounce} scpsd.c -o ${BinDir}/ps-diff" ; \
 #--	  ${CLD} ${LdFlags} scpsd.c -o ${BinDir}/ps-diff ${Libs})
 add_executable(ps-diff scpsd.c)
-target_link_libraries(ps-diff score -lm)
+target_link_libraries(ps-diff ${Libs})
 
 #
 # DMNZ
@@ -304,7 +337,7 @@ target_link_libraries(ps-diff score -lm)
 #--	@(echo "${CCAnnounce} scdmnz.c -o ${BinDir}/dmnz" ; \
 #--	  ${CLD} ${LdFlags} scdmnz.c -o ${BinDir}/dmnz ${Libs})
 add_executable(dmnz scdmnz.c)
-target_link_libraries(dmnz score -lm)
+target_link_libraries(dmnz ${Libs})
 
 #
 # PROPR
@@ -313,7 +346,7 @@ target_link_libraries(dmnz score -lm)
 #--	@(echo "${CCAnnounce} scprpr.c -o ${BinDir}/propr" ; \
 #--	  ${CLD} ${LdFlags} scprpr.c -o ${BinDir}/propr ${Libs})
 add_executable(propr scprpr.c)
-target_link_libraries(propr score -lm)
+target_link_libraries(propr ${Libs})
 
 #
 # HSERVE
@@ -322,7 +355,7 @@ target_link_libraries(propr score -lm)
 #--	@(echo "${CCAnnounce} schsru.c -o ${BinDir}/hserve" ; \
 #--	  ${CLD} ${LdFlags} schsru.c -o ${BinDir}/hserve ${Libs})
 add_executable(hserve schsru)
-target_link_libraries(hserve score -lm)
+target_link_libraries(hserve ${Libs})
 
 #
 # DSK-SPACE
@@ -333,7 +366,7 @@ target_link_libraries(hserve score -lm)
 #--	@(echo "${CCAnnounce} scdsk.c -o ${BinDir}/dspace" ; \
 #--	  ${CLD} ${LdFlags} scdsk.c -o ${BinDir}/dspace ${Libs})
 add_executable(dspace scdsk.c)
-target_link_libraries(dspace score -lm)
+target_link_libraries(dspace ${Libs})
 
 #
 # ERROR
@@ -344,7 +377,7 @@ target_link_libraries(dspace score -lm)
 #--	${CLD} ${LdFlags} tscer.c -o ${BinDir}/tscer ${Libs}
 #--#	${CCCfe} ${LdFlags} tscer.c -o ${BinDir}/tscer ${Libs}
 add_executable(tscer tscer.c)
-target_link_libraries(tscer score -lm)
+target_link_libraries(tscer ${Libs})
 
 #
 # EXEC SERVER
@@ -358,7 +391,7 @@ target_link_libraries(tscer score -lm)
 #--${BinDir}/tscpgrp : ${TGTLib} tscpgrp.c
 #--	${CCCfe} ${LdFlags} tscpgrp.c -o ${BinDir}/tscpgrp ${Libs}
 add_executable(tscpgrp tscpgrp.c)
-target_link_libraries(tscpgrp score -lm)
+target_link_libraries(tscpgrp ${Libs})
 
 #
 # MPI
@@ -369,13 +402,13 @@ target_link_libraries(tscpgrp score -lm)
 #--	@(echo "${CCAnnounce} scwrap.c -o ${BinDir}/mpi-io-wrap" ; \
 #--	  make-wrap ${CCCfg} ${LdFlags} scwrap.c -o ${BinDir}/mpi-io-wrap ${Libs})
 add_executable(mpi-io-wrap scwrap.c)
-target_link_libraries(mpi-io-wrap score -lm)
+target_link_libraries(mpi-io-wrap ${Libs})
 
 #--${BinDir}/sctty : ${TGTLib} sctty.c
 #--	@(echo "${CCAnnounce} sctty.c -o ${BinDir}/sctty" ; \
 #--	  ${CC} ${LdFlags} sctty.c -o ${BinDir}/sctty ${Libs} ${DPLib})
 add_executable(sctty sctty.c)
-target_link_libraries(sctty score -lm)
+target_link_libraries(sctty ${Libs})
 
 #
 # shared memory parallel test
@@ -385,6 +418,8 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tscthr : tscthr.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tscthr.c -o ${BinDir}/tscthr" ; \
 #--	  ${CLD} ${LdFlags} tscthr.c -o ${BinDir}/tscthr ${Libs})
+add_executable(tscthr tscthr.c)
+target_link_libraries(tscthr ${Libs})
 
 #--${BinDir}/tsctl : tsctl.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tsctl.c -o ${BinDir}/tsctl" ; \
@@ -414,18 +449,24 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tscmtr : tscmtr.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tscmtr.c -o ${BinDir}/tscmtr" ; \
 #--	  ${CLD} ${LdFlags} tscmtr.c -o ${BinDir}/tscmtr ${MLibs})
+add_executable(tscmtr tscmtr.c)
+target_link_libraries(tscmtr score ${MLibs})
 
 #--memprf : ${MMLib} ${BinDir}/tscmpf
 
 #--${BinDir}/tscmpf : tscmpf.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tscmpf.c -o ${BinDir}/tscmpf" ; \
 #--	  ${CLD} ${LdFlags} tscmpf.c -o ${BinDir}/tscmpf ${Libs})
+add_executable(tscmpf tscmpf.c)
+target_link_libraries(tscmpf ${Libs})
 
 #--memovr : ${OMLib} ${BinDir}/tscmo
 
 #--${BinDir}/tscmo : ${TGTLib} tscmo.c
 #--	@(echo "${CCAnnounce} tscmo.c -o ${BinDir}/tscmo" ; \
 #--	  ${CLD} ${LdFlags} tscmo.c -o ${BinDir}/tscmo ${OLibs})
+add_executable(tscmo tscmo.c)
+target_link_libraries(tscmo score ${OLibs})
 
 #
 # hash/alist test
@@ -435,6 +476,8 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tsca : ${TGTLib} tsca.c
 #--	@(echo "${CCAnnounce} tsca.c -o ${BinDir}/tsca" ; \
 #--	  ${CLD} ${LdFlags} tsca.c -o ${BinDir}/tsca ${Libs})
+##add_executable(tsca tsca.c) # XXX - compile errors
+##target_link_libraries(tsca score ${Libs})
 
 #--${BinDir}/tsctr : ${TGTLib} tsctr.c
 #--	@(echo "${CCAnnounce} tsctr.c -o ${BinDir}/tsctr" ; \
@@ -448,6 +491,8 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tscrs : ${TGTLib} tscrs.c
 #--	@(echo "${CCAnnounce} tscrs.c -o ${BinDir}/tscrs" ; \
 #--	  ${CLD} ${LdFlags} tscrs.c -o ${BinDir}/tscrs ${Libs})
+add_executable(tscrs tscrs.c)
+target_link_libraries(tscrs ${Libs})
 
 #
 # io file test
@@ -457,10 +502,14 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tscio : tscio.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tscio.c -o ${BinDir}/tscio" ; \
 #--	  ${CLD} ${LdFlags} tscio.c -o ${BinDir}/tscio ${Libs})
+add_executable(tscio tscio.c)
+target_link_libraries(tscio ${Libs})
 
 #--${BinDir}/tscbf : tscbf.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tscbf.c -o ${BinDir}/tscbf" ; \
 #--	  ${CLD} ${LdFlags} tscbf.c -o ${BinDir}/tscbf ${Libs})
+add_executable(tscbf tscbf.c)
+target_link_libraries(tscbf ${Libs})
 
 #
 # mapped file test
@@ -470,6 +519,8 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tscmf : tscmf.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tscmf.c -o ${BinDir}/tscmf" ; \
 #--	  ${CLD} ${LdFlags} tscmf.c -o ${BinDir}/tscmf ${Libs})
+add_executable(tscmf tscmf.c)
+target_link_libraries(tscmf ${Libs})
 
 #
 # isprint test
@@ -489,6 +540,8 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tscrtr : ${TGTLib} tscrtr.c
 #--	@(echo "${CCAnnounce} tscrtr.c -o ${BinDir}/tscrtr" ; \
 #--	  ${CLD} ${LdFlags} tscrtr.c -o ${BinDir}/tscrtr ${DLibs})
+add_executable(tscrtr tscrtr.c)
+target_link_libraries(tscrtr score ${DLibs})  # XXX add link libraries
 
 #
 # large file types
@@ -525,6 +578,9 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tsctyp : ${TGTLib} tsctyp.c
 #--	@(echo "${CCAnnounce} tsctyp.c -o ${BinDir}/tsctyp" ; \
 #--	  ${CLD} ${LdFlags} tsctyp.c -o ${BinDir}/tsctyp ${Libs})
+add_executable(tsctyp tsctyp.c)
+target_link_libraries(tsctyp ${Libs})
+
 
 #
 # comprehensive test suite
@@ -536,6 +592,8 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/tscstr : ${TGTLib} tscstr.c
 #--	@(echo "${CCAnnounce} tscstr.c -o ${BinDir}/tscstr" ; \
 #--	  ${CLD} ${LdFlags} tscstr.c -o ${BinDir}/tscstr ${Libs})
+add_executable(tscstr tscstr.c)
+target_link_libraries(tscstr ${Libs})
 
 #--${BinDir}/tscctl : ${TGTLib} tscctl.c
 #--	@(echo "${CCAnnounce} tscctl.c -o ${BinDir}/tscctl" ; \
@@ -556,10 +614,19 @@ target_link_libraries(sctty score -lm)
 #--${BinDir}/dmake : ${TGTLib} scmkut.c
 #--	@(echo "${CCAnnounce} ${LdFlags} scmkut.c -o ${BinDir}/dmake" ; \
 #--	  ${CLD} -I../psh ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs})
+add_executable(dmake scmkut.c)
+target_link_libraries(dmake ${Libs})
+
+add_custom_target(link-dmake
+    DEPENDS dmake
+    COMMAND ln -s ${BinDir}/dmake ${BinDir}/pact
+)
 
 #--${BinDir}/tscar : ${TGTLib} tscar.c
 #--	@(echo "${CCAnnounce} tscar.c -o ${BinDir}/tscar" ; \
 #--	  ${CLD} ${LdFlags} tscar.c -o ${BinDir}/tscar ${Libs})
+add_executable(tscar tscar.c)
+target_link_libraries(tscar ${Libs})
 
 #--${BinDir}/tscdl : ${TGTLib} tscdl.c
 #--	@(echo "${CCAnnounce} tscdl.c -o ${BinDir}/tscdl" ; \
@@ -584,6 +651,7 @@ target_link_libraries(sctty score -lm)
 #--	@smake build
 #--	@acc ${ACFlags} ${LdFlags} scmkut.c -o ${BinDir}/dmake ${Libs}
 
+#  run by manager/write/dmake
 #dmake :
 #	@echo "import-api bfd.def -o ${IncDir}/bfd.api"
 #	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
@@ -630,3 +698,25 @@ target_link_libraries(sctty score -lm)
 #--test :
 #--	@./sctest
 
+set(Tests
+    type sharp ar mk mkinfo error mpi
+    array   #   lookup XXX - compile errors
+    heap mor mprf resrc retrc
+    smp mmap io buf
+)
+
+foreach(test ${Tests})
+    set(testname "${Package}.${test}")
+    add_test(
+        NAME ${testname}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/sctest ${test}
+    #   [CONFIGURATIONS <config>...]
+    #   [WORKING_DIRECTORY <dir>])
+    )
+
+#    set_property(TEST ${testname} PROPERTY 
+#        ENVIRONMENT
+#             PSY_Base=${PSY_Base}
+#    )
+
+endforeach(test)

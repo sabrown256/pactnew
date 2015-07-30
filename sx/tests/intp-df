@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set make_ps = FALSE
 
@@ -36,7 +36,7 @@ else
       set opt = ( $pvopt -l intp-df.scm )
       set io  = intp-df.dat
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a intp-df_run -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ err = $err + $status
@@ -51,7 +51,7 @@ else
       set opt = ( -q -e -s -l intp-df-proc.scm )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a intp-df_conv -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ err = $err + $status
@@ -70,7 +70,7 @@ else
       set opt = ( $opt -M 1 2 7 8 9 10 15 16 17 18 23 24 25 26 31 )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a intp-df_diff -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ err = $err + $status
@@ -85,7 +85,7 @@ else
       set opt = ( -q -e -l intp-df-plot.scm )
       set io  = flog
 
-      source ../../../scripts/test-run
+      source $PSY_Base/scripts/test-run
 
       $TEST_CHECK part -a intp-df_plot -e $xstatus -dt $dt -x $exe -l -rpf "$rpf" none
       @ err = $err + $status

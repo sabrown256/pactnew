@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/pdb/tests/common
 
 set msg = "PDB Free Test ......................"
 set exe = $BinDir/tpdfr
@@ -18,7 +18,7 @@ set io  = flog
 NoteD $Log ""
 NoteD $Log -n "                    $msg"
 
-source ../../../scripts/test-run
+source $PSY_Base/scripts/test-run
 
 set rpf = ( $rpf nat-nat.db1 )
 

@@ -190,14 +190,17 @@ int SC_load_ave(double *av)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* SC_FREE_MEM - return the free memory on the current host
- *             - the results are returned in MEM which is NI long
- *             - depending on NI
+/* SC_FREE_MEM - Return information about the free memory on the current
+ *             - host.  The results are returned in MEM which is NI long.
+ *             - If NI is less than 4 only certain entries are obtained.
+ *             - Memory information here is that determined by the
+ *             - operating system and is measured in bytes.
+ *             - Depending on NI the following are returned:
  *             -    MEM[0] = the total system memory
  *             -    MEM[1] = the free memory
  *             -    MEM[2] = the total swap memory
  *             -    MEM[3] = the free swap memory
- *             - return TRUE iff successful
+ *             - Return TRUE if successful and FALSE otherwise.
  *
  * #bind SC_free_mem fortran() scheme(free-mem) python()
  */

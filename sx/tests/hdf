@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "SX PDB HDF5 Test ............."
 set exe = $BinDir/sx
@@ -23,7 +23,7 @@ if ($HAVE_HDF5 == yes) then
 
    flog $Log rm -f sxhdf.log sxhdf.res foo.hdf
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    if (($xstatus == 0) && ("$Valgrind" == "")) then
       set ref = $FilesDir/ref/sxhdf

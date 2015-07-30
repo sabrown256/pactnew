@@ -8,7 +8,7 @@
 # include "cpyright.h"
 #
 
-source ../../tests/common
+source $PSY_Base/sx/tests/common
 
 set msg = "ULTRA FFT Test ..............."
 set exe = $BinDir/ultra
@@ -21,7 +21,7 @@ set io  = ulfft.log
 
    flog $Log $RM ulfft.log ulfft.err
 
-   source ../../../scripts/test-run
+   source $PSY_Base/scripts/test-run
 
    flog $Log (grep -i "error" ulfft.log >&! ulfft.err)
 

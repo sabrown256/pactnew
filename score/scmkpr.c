@@ -1206,12 +1206,9 @@ int SC_parse_premake(anadep *state, char *fname)
 	CFREE(s);};
 	
     if (rv == TRUE)
-       {s = SC_dsnprintf(TRUE, "PACTTmpDir = %s/obj", state->arch);
+       {s = SC_dsnprintf(TRUE, "PACTSrcDir = %s", state->srcdir);
 	SC_make_def_var(state, s, -1);
-	CFREE(s);
 
-	s = SC_dsnprintf(TRUE, "PACTSrcDir = ../..");
-	SC_make_def_var(state, s, -1);
 	CFREE(s);
 
         if (state->show_flags == TRUE)
