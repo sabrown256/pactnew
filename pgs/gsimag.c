@@ -965,9 +965,13 @@ static void _PG_render_palette(PG_device *dev, PG_palette *pal,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_PALETTE_N - display the palette
- *                   - place it exactly where requested iff
- *                   - EXACT is TRUE
+/* PG_DRAW_PALETTE_N - Draw the current palette of the device DEV.
+ *                   - Place it exactly where requested if EXACT is TRUE,
+ *                   - otherwise place it according to the rendering
+ *                   - and the viewport size and shape.
+ *                   - DBX specifies where the palette image is to be drawn.
+ *                   - RBX specifies where the axis labelling the range
+ *                   - values is to be drawn.
  *
  * #bind PG_draw_palette_n fortran() scheme() python()
  */
@@ -1038,9 +1042,9 @@ void PG_draw_palette_n(PG_device *dev ARG(,,cls),
 	    rbx[1] += 0.5*toler*rbx[1];};};
 
     if (ndc[0] == ndc[1])
-       {ndc[0]  = ndc[1] - wid;
-        hvf   = VERTICAL;
-        scale = (dbx[3] - dbx[2])/(rbx[1] - rbx[0] + SMALL);
+       {ndc[0] = ndc[1] - wid;
+        hvf    = VERTICAL;
+        scale  = (dbx[3] - dbx[2])/(rbx[1] - rbx[0] + SMALL);
 
 	xl[0] = dbx[0];
 	xl[1] = dbx[2];
@@ -1264,7 +1268,18 @@ int _PG_byte_bit_map(unsigned char *bf, int nx, int ny, int complmnt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_MAKE_IMAGE_N - initialize an image
+/* PG_MAKE_IMAGE_N - Allocate, initialize and return an image with
+ *                 - width W, height, H, and bits per pixel, BPP.
+ *                 - The pixel values are contained in the array Z
+ *                 - which is of type, TYPE.
+ *                 - Other arguments specifying the image:
+ *                 -    LABEL    image name
+ *                 -    ND       dimension of image data
+ *                 -    CS       coordinate system of the image domain
+ *                 -    DBX      specifies where the palette image
+ *                 -             is to be drawn
+ *                 -    RBX      specifies where the axis labelling the range
+ *                 -    PALETTE  palette in which the image is to be rendered
  *
  * #bind PG_make_image_n fortran() scheme() python()
  */

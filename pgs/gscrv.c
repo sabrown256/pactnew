@@ -514,7 +514,7 @@ void PG_draw_data_ids(PG_device *dev, double *x, double *y,
 
 static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
                           double lnwid, int lnsty, int scatter, int marker,
-                          int l, pcons *info)
+                          int lmt, pcons *info)
    {int i, tn;
     double *px, *py;
     double x0[PG_SPACEDM], x1[PG_SPACEDM], x2[PG_SPACEDM], dx[PG_SPACEDM];
@@ -534,7 +534,7 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
     r[0] = x[0];
     r[1] = x[1];
 
-    if (l == 0)
+    if (lmt == 0)
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, CARTESIAN_2D);};
  
@@ -629,7 +629,7 @@ static void PG_error_plot(PG_device *dev, double **x, int n, int lncol,
 /* PG_RECT_PLOT - make a Cartesian plot */
 
 void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
-                  double lnwid, int lnsty, int scatter, int marker, int l)
+                  double lnwid, int lnsty, int scatter, int marker, int lmt)
    {int tn, clp, st;
     double wd, ymn;
     double *r[PG_SPACEDM];
@@ -644,7 +644,7 @@ void PG_rect_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     r[0] = x;
     r[1] = y;
 
-    if (l == 0)
+    if (lmt == 0)
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, CARTESIAN_2D);};
  
@@ -827,7 +827,7 @@ void PG_histogram_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 /* PG_INSEL_PLOT - make an Inselberg plot */
  
 void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int lncol,
-                   double lnwid, int lnsty, int l)
+                   double lnwid, int lnsty, int lmt)
    {int i, ndim;
     double tn, o, xsep;
     double x1[PG_SPACEDM], x2[PG_SPACEDM];
@@ -844,7 +844,7 @@ void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     r[0] = x;
     r[1] = y;
 
-   if (l == 0)
+   if (lmt == 0)
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, INSEL);};
  
@@ -891,7 +891,7 @@ void PG_insel_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 /* PG_POLAR_PLOT - make a polar plot */
  
 void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
-                   double lnwid, int lnsty, int scatter, int marker, int l)
+                   double lnwid, int lnsty, int scatter, int marker, int lmt)
    {int i;
     double rc, tc;
     double xc[PG_SPACEDM], xco[PG_SPACEDM];
@@ -907,7 +907,7 @@ void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
     r[0] = x;
     r[1] = y;
 
-    if (l == 0)
+    if (lmt == 0)
        {PG_set_limits_n(dev, 2, WORLDC, n, r, PLOT_CARTESIAN);
         PG_axis(dev, POLAR);};
  
@@ -967,13 +967,18 @@ void PG_polar_plot(PG_device *dev, double *x, double *y, int n, int lncol,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_PLOT_CURVE - dispatch to the desired curve plotting routine
+/* PG_PLOT_CURVE - Draw the curve defined by the N points (X,Y) to the
+ *               - current frame of the device DEV.  INFO is an
+ *               - association list of rendering attributes and their
+ *               - values.  If LMT is 0 the world coordinate system
+ *               - of the current window of DEV is set by the limits of
+ *               - the (X,Y) data and a set of axes is drawn.
  *
  * #bind PG_plot_curve fortran() scheme() python()
  */
 
 void PG_plot_curve(PG_device *dev ARG(,,cls),
-		   double *x, double *y, int n, pcons *info, int l)
+		   double *x, double *y, int n, pcons *info, int lmt)
    {int lncol, lnsty, scatter, marker, start, hiddn;
     int ofc, fcol;
     double lnwid;
@@ -1005,28 +1010,28 @@ void PG_plot_curve(PG_device *dev ARG(,,cls),
        switch (pty)
 	  {case PLOT_INSEL :
 	        PG_insel_plot(dev, x, y, n,
-			      lncol, lnwid, lnsty, l);
+			      lncol, lnwid, lnsty, lmt);
 		break;
 
 	   case PLOT_POLAR :
 	        PG_polar_plot(dev, x, y, n, lncol, lnwid, lnsty,
-			      scatter, marker, l);
+			      scatter, marker, lmt);
 		break;
 
 	   case PLOT_HISTOGRAM :
 	        PG_histogram_plot(dev, x, y, n, lncol, lnwid, lnsty,
-				  scatter, marker, start, l);
+				  scatter, marker, start, lmt);
 		break;
 
 	   case PLOT_SCATTER   :
            case PLOT_CARTESIAN :
                 PG_rect_plot(dev, x, y, n, lncol, lnwid, lnsty,
-			     scatter, marker, l);
+			     scatter, marker, lmt);
 		break;
 
 	   case PLOT_ERROR_BAR :
                 PG_error_plot(dev, r, n, lncol, lnwid, lnsty,
-			      scatter, marker, l, info);
+			      scatter, marker, lmt, info);
 		break;
 
 	   default :

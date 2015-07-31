@@ -1257,7 +1257,10 @@ static void _PG_dispatch_3d(PG_device *dev, PG_graph *data, int range_dim)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DRAW_GRAPH - main graph plotting control routine
+/* PG_DRAW_GRAPH - Draw the graph DATA in the current frame of the device DEV.
+ *               - This is an abstract, general renderer.  The graph DATA
+ *               - contains the mapping of domain and range sets as well as
+ *               - the rendering attributes desired.
  *
  * #bind PG_draw_graph fortran() scheme() python()
  */

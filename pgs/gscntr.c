@@ -56,7 +56,9 @@ int _PG_get_fill_contour_color(PG_device *dev, int l, int n)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_CONTOUR_LEVELS - compute an array of contour levels
+/* PG_CONTOUR_LEVELS - Compute an array of NLEV contour levels with values
+ *                   - between FMN and FMX and spaced with ratio R apart.
+ *                   - Return the contour levels in LEV.
  *
  * #bind PG_contour_levels fortran() scheme() python()
  */
@@ -522,14 +524,19 @@ static void _PG_iso_nc_lr_2d(PG_device *dev, double *a,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_ISO_NC_LR - plot iso-contours for the function A on the
- *                   - Logical-Rectangular mesh specified by coordinates
- *                   - X and Y which is IMX by JMX and node centered
- *                   - plot NLEV contour levels specified in LEV
- *                   - if ID is non-zero label the contour levels starting
- *                   - with ID as the first character
- *                   - the mesh topology is always ignored and is there
- *                   - to be call compatible with the AC version
+/* PG_DRAW_ISO_NC_LR - Draw iso-contours for the mapping {X} -> {A} in
+ *                   - the current frame of the device DEV.
+ *                   - The remaining arguments are:
+ *                   -    NDD    the dimension of the domain specified by X
+ *                   -    LEV    the array of contour levels
+ *                   -    NLEV   the number of contour levels
+ *                   -    ID     an identifier for the set of contours
+ *                   -           useful when plotting more than one set
+ *                   -           of contours in a frame
+ *                   -    CNNCT  connectivity information for
+ *                   -           arbitrarily connected meshes
+ *                   -    ALIST  assocation list of rendering
+ *                   -           attributes and their values
  *
  * #bind PG_draw_iso_nc_lr fortran() scheme() python()
  */

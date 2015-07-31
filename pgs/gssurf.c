@@ -1325,10 +1325,27 @@ void PG_surface_plot(PG_device *dev, PG_graph *data, ...)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_SURFACE_N - draw a surface plot given a known mesh type, a
- *                   - suitable scanning function, and a scalar array
- *                   - rotate to view angle, plot with hidden line
- *                   - algorithm, and shade if requested
+/* PG_DRAW_SURFACE_N - Draw a surface specified by the NN points of
+ *                   - the mapping {R} -> {A1,A2} on the current frame
+ *                   - of the device DEV.
+ *                   - The remaining arguments are:
+ *                   -    EXTR        not used
+ *                   -    VA          the Euler view angles
+ *                   -    WIDTH       mesh line width  
+ *                   -    COLOR       mesh line color
+ *                   -    STYLE       mesh line style
+ *                   -    PTY         rendering, one of:
+ *                   -                   PLOT_FILL       shaded surface
+ *                   -                   PLOT_WIRE_MESH  wire frame mesh
+ *                   -    NAME        name of graph constructed
+ *                   -                from R, A1, and A2
+ *                   -    MESH_TYPE   mesh type, one of:
+ *                   -                   PM_LR_S   logical rectangular
+ *                   -                   PM_AC_S   arbitrarily connected
+ *                   -    CNNCT       connectivity information for
+ *                   -                arbitrarily connected meshes
+ *                   -    ALIST       assocation list of rendering
+ *                   -                attributes and their values
  *
  * #bind PG_draw_surface_n fortran() scheme() python()
  */

@@ -288,9 +288,12 @@ static void _PG_draw_vct_zc_ac(PG_device *dev, double **u, double **r,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_VECTOR_N - draw N ND vectors in CS
+/* PG_DRAW_VECTOR_N - Draw N ND dimensional vectors (X,U) in the current
+ *                  - frame of the device DEV.  The vectors (X,U) are
+ *                  - specified in coordinate system CS.
+ *                  - The vectors are defined by:
  *                  -   X base points of vectors
- *                  -   U vectors
+ *                  -   U displacements from the base points
  *
  * #bind PG_draw_vector_n fortran() scheme() python()
  */

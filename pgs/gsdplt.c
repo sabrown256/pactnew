@@ -1047,7 +1047,9 @@ PG_picture_desc *PG_setup_picture_mesh(PG_device *dev, PG_graph *data,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DOMAIN_PLOT - plot the mesh of the given domain set
+/* PG_DOMAIN_PLOT - Draw the mesh of the given domain set, DOM, on the
+ *                - current frame of the device DEV.  The range set, RAN,
+ *                - may be used for purposes such as annotation of points.
  *
  * #bind PG_domain_plot fortran() scheme() python()
  */
