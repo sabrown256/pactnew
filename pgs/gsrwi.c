@@ -249,9 +249,10 @@ static int PG_write_interface_object(FILE *fp, PG_interface_object *iob,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_WRITE_INTERFACE - write out the interface descriptions to the
- *                    - given file
- *                    - return TRUE iff successful
+/* PG_WRITE_INTERFACE - Write out an ASCII description of all the
+ *                    - interface objects associated with device DEV
+ *                    - to the file NAME.
+ *                    - Return TRUE if successful and return FALSE otherwise.
  *
  * #bind PG_write_interface fortran() scheme() python()
  */
@@ -629,9 +630,10 @@ static PG_interface_object *_PG_read_interface_object(PG_device *dev, FILE *fp,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_READ_INTERFACE - read in the interface descriptions from the
- *                   - given file
- *                   - return TRUE iff successful
+/* PG_READ_INTERFACE - Read in the descriptions of a set interface objects
+ *                   - to associate with the device DEV from
+ *                   - the file NAME.
+ *                   - Return TRUE iff successful, and return FALSE otherwise.
  *
  * #bind PG_read_interface fortran() scheme() python()
  */

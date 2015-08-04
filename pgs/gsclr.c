@@ -1551,8 +1551,8 @@ int PG_select_color(PG_device *dev, int n, double *a, double *extr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FGET_PALETTE - return the palette of DEV specified by NAME
- *                 - if NAME is NULL return current palette
+/* PG_FGET_PALETTE - Return the palette of device DEV specified by NAME.
+ *                 - If NAME is NULL return current palette.
  *
  * #bind PG_fget_palette fortran() scheme() python()
  */
@@ -1579,9 +1579,10 @@ PG_palette *PG_fget_palette(PG_device *dev ARG(,,cls), const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FSET_PALETTE - set the color palette of the given device
- *                 - return the named palette if successful
- *                 - return NULL otherwise
+/* PG_FSET_PALETTE - Set the color palette of the device DEV to the
+ *                 - one specified by NAME.
+ *                 - Return the named palette if successful, and
+ *                 - return NULL otherwise.
  *
  * #bind PG_fset_palette fortran() scheme() python()
  */
@@ -1924,7 +1925,11 @@ static void _PG_pal_mouse_ev_hand(PG_device *dev, PG_event *ev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SHOW_PALETTES - display the palettes for the given device
+/* PG_SHOW_PALETTES - Display the all of the defined palettes for
+ *                  - the device DEV.  TYPE is "WINDOW" for video terminal
+ *                  - devices, and any other value is for hardcopy devices.
+ *                  - If WBCK is TRUE use a white background otherwise
+ *                  - use a black background.
  *
  * #bind PG_show_palettes fortran() scheme(pg-show-palettes) python()
  */

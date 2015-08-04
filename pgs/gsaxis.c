@@ -571,8 +571,9 @@ static void _PG_aux_axis(PG_device *dev, int axis_type)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_AXIS - draw the axes
- *         - the information for this is set up by a setlimits call
+/* PG_AXIS - Draw a set of AXIS_TYPE axes in the current frame of device DEV.
+ *         - The specifications for this is derived from the viewport and
+ *         - world coordinate systems of the frame.
  *
  * #bind PG_axis fortran() scheme() python()
  */
@@ -1240,9 +1241,9 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, const char *fmt)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_AXIS_N - draw and label a plot axis
- *                - this routine will produce labels and
- *                - ticks or just ticks, depending on the arguments.
+/* PG_DRAW_AXIS_N - Draw a single axis on the current frame of device DEV.
+ *                - This will produce labels and ticks or just ticks,
+ *                - depending on the arguments.
  *                -
  *                -    XL         - world coordinate of beginning end
  *                -    XR         - world coordinate of terminating end
@@ -1252,38 +1253,42 @@ static int _PG_draw_label(PG_device *dev, PG_axis_def *ad, const char *fmt)
  *                -               - internally VW are ordered into VO and
  *                -               - the order of TN changed if needed
  *                -               - VW are world coordinate values
- *                -    sc         - an additional scale factor which is
+ *                -    SC         - an additional scale factor which is
  *                -                 used, for example, when doing an
  *                -                 Inselberg axis in which the range may
  *                -                 correspond to one apropriate for
  *                -                 the perpendicular dimension
- *                -    format     - specifies the format in the standard C way
- *                -    tick_type  - types of ticks
+ *                -    FORMAT     - specifies the format in the standard C way
+ *                -    TICK_TYPE  - types of ticks
  *                -                 AXIS_TICK_RIGHT    - ticks on right
  *                -                 AXIS_TICK_LEFT     - ticks on left
  *                -                 AXIS_TICK_STRADDLE - ticks straddle (both)
- *                -    label_type - types of labels
+ *                -    LABEL_TYPE - types of labels
  *                -                 AXIS_TICK_RIGHT - labels on right
  *                -                 AXIS_TICK_LEFT  - labels on left
  *                -                 AXIS_TICK_NONE  - no labels
  *                -                 AXIS_TICK_ENDS  - labels at ends of axis
- *                -    tickdef    - specifies the labels and ticks
- *                -                 AXIS_TICK_MAJOR - major ticks
- *                -                 AXIS_TICK_MINOR - minor ticks
- *                -                 AXIS_TICK_LABEL - labels
+ *                -    FLAG       - if TRUE return the axis description,
+ *                -               - if FALSE return NULL.
+ *                -    TICKDEF    - up to three of the following to specify
+ *                -                 the labels and ticks
+ *                -                    AXIS_TICK_MAJOR - major ticks
+ *                -                    AXIS_TICK_MINOR - minor ticks
+ *                -                    AXIS_TICK_LABEL - labels
+ *                - The final argument must be zero.
  *                -
- *                - An axis is a directed line segment (from Xl to Xr) with ticks
- *                - The label values as defined by VW, TN, and ticks
- *                - associate with the line segment as follows:
+ *                - An axis is a directed line segment (from Xl to Xr) with
+ *                - optional tick marks. The label values as defined by
+ *                - VW, TN, and ticks associate with the line segment as
+ *                - follows:
  *                -
  *                -      XL                                       XR
  *                -      .------------------------------------------>
  *                -        |                                      |
  *                - en[0] <-> vw[0] = v(tn[0])             en[1] <-> vw[1] = v(tn[1])
  *                -   
- *                - (rotations done by theta)
  *                - EN cannot be magnitudes only because the interval (-1, 1)
- *                - would have en[0] = en[1]
+ *                - would have en[0] = en[1].
  *                - This is independent of tick type!
  *
  * #bind PG_draw_axis_n fortran() scheme() python()
@@ -1376,7 +1381,10 @@ PG_axis_def *PG_draw_axis_n(PG_device *dev ARG(,,cls),
 
 /*--------------------------------------------------------------------------*/
 
-/* PG_AXIS_3 - draw a set of axes for a surface plot
+/* PG_AXIS_3 - Draw a set of 3D axes on the current frame of device DEV.
+ *           - This is used for a surface plot for example.  The
+ *           - end points of the axes are specified by X and are drawn
+ *           - on the box DATABOX.  NP is currently unused.
  *
  * #bind PG_axis_3 fortran() scheme() python()
  */
@@ -1435,7 +1443,7 @@ void PG_axis_3(PG_device *dev ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FGET_AXIS_DECADES - get the number of decades for axis plotting
+/* PG_FGET_AXIS_DECADES - Return the number of decades for log scale axes.
  *
  * #bind PG_fget_axis_decades fortran() scheme() python()
  */
@@ -1450,7 +1458,7 @@ double PG_fget_axis_decades(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FSET_AXIS_DECADES - set the number of decades for axis plotting
+/* PG_FSET_AXIS_DECADES - Set the number of decades for log scale axes.
  *
  * #bind PG_fset_axis_decades fortran() scheme() python()
  */
