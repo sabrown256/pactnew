@@ -77,9 +77,9 @@ void PG_print_label_set(double *pyo, PG_device *dev, int nlabs,
     char label[MAXLINE], bf[MAXLINE], *face, *style, *s;
     PG_palette *pl;
     PG_dev_geometry *g;
-    static double tol = HUGE;
+    static double tol = -1.0;
 
-    if (tol == HUGE)
+    if (tol == -1.0)
        tol = 10.0*PM_machine_precision();
 
     if (dev == NULL)

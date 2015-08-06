@@ -116,8 +116,8 @@ void PG_draw_multiple_line(PG_device *dev, int nlines,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_LINE_N - draw ND dimensional line segment (X1, X2) in 
- *                - coordinate system CS
+/* PG_DRAW_LINE_N - Draw ND dimensional line segment (X1, X2) in 
+ *                - coordinate system CS on current frame of device DEV.
  *
  * #bind PG_draw_line_n fortran() scheme() python()
  */
@@ -162,7 +162,8 @@ void PG_draw_line_n(PG_device *dev ARG(,,cls), int nd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DRAW_POLYLINE_N - draw a ND polyline in CS
+/* PG_DRAW_POLYLINE_N - Draw a ND polyline of N points X in coordinate
+ *                    - system CS on current frame of device DEV.
  *
  * #bind PG_draw_polyline_n fortran() scheme() python()
  */
@@ -213,16 +214,19 @@ void PG_draw_polyline_n(PG_device *dev ARG(,,cls), int nd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_PROJECTED_POLYLINE_N - rotate disjoint line segments
- *                              - and draw the projection in the X-Y
- *                              - plane
- *                              - segments specified in CS coordinates
+/* PG_DRAW_PROJECTED_POLYLINE_N - In the current frame of the device DEV,
+ *                              - rotate, project, and draw N disjoint line
+ *                              - segments defined by the points X which
+ *                              - are ND dimensional and specified in the
+ *                              - coordinate system CS.  The rotation
+ *                              - is by the current view_angle of DEV.
+ *                              - The projection is done onto the X-Y plane.
  *                              - N is the number of segments hence half
- *                              - the number of points
+ *                              - the number of points.
  *                              - X[2*i] is one endpoint of the ith segment
- *                              - and X[2*i+1] is the other endpoint
+ *                              - and X[2*i+1] is the other endpoint.
  *                              - CLIP specifies wether the set is clipped
- *                              - to the viewport limits
+ *                              - to the viewport limits.
  *
  * #bind PG_draw_projected_polyline_n fortran() scheme() python()
  */
@@ -263,8 +267,10 @@ void PG_draw_projected_polyline_n(PG_device *dev ARG(,,cls), int nd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_DISJOINT_POLYLINE_N - draws disjoint ND dimensional line
- *                             - segments specified in CS coordinates
+/* PG_DRAW_DISJOINT_POLYLINE_N - In the current frame of the device DEV,
+ *                             - draw N disjoint line segments defined by
+ *                             - the points X which are ND dimensional and
+ *                             - specified in the coordinate system CS.
  *                             - N is the number of segments hence half
  *                             - the number of points
  *                             - X[2*i] is one endpoint of the ith segment
@@ -299,11 +305,12 @@ void PG_draw_disjoint_polyline_n(PG_device *dev ARG(,,cls), int nd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_RAD - draw a radial line from RMIN to RMAX along the direction
- *             - A given with respect to positive x axis
- *             - (increasing counter-clockwise)
- *             - angle units (radians or degrees) specified by UNIT
- *             - from central point (X, Y)
+/* PG_DRAW_RAD - In the current frame of the device DEV,
+ *             - draw a radial line from RMIN to RMAX along the
+ *             - direction A given with respect to positive x axis
+ *             - (increasing counter-clockwise) from central point (X, Y).
+ *             - If UNIT is DEGREE the angle A is in degrees otherwise
+ *             - it is taken to be in radians.
  *
  * #bind PG_draw_rad fortran() scheme(pg-draw-radius) python()
  */
@@ -333,11 +340,12 @@ void PG_draw_rad(PG_device *dev ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_ARC - draw an arc with radius, R, from angles A1 to A2
+/* PG_DRAW_ARC - In the current frame of the device DEV,
+ *             - draw an arc with radius, R, from angles A1 to A2
  *             - given with respect to positive x axis
- *             - (increasing counter-clockwise)
- *             - angle units (radians or degrees) specified by UNIT
- *             - from central point (X, Y)
+ *             - (increasing counter-clockwise) from central point (X, Y).
+ *             - If UNIT is DEGREE the angles are in degrees otherwise
+ *             - they are taken to be in radians.
  *
  * #bind PG_draw_arc fortran() scheme() python()
  */

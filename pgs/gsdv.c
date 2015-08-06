@@ -45,11 +45,10 @@ gcontdes
  
 /*--------------------------------------------------------------------------*/
  
-/* PG_OPEN_DEVICE - open the graphics device DEV at (XF,YF) on
- *                - the physical device
- *                - the device shape is DXF by DYF
- *                - all quantities are fractions of the physical device
- *                - size
+/* PG_OPEN_DEVICE - Open the graphics device DEV at (XF,YF) on
+ *                - the physical device.  The device shape is DXF by DYF.
+ *                - All quantities are fractions of the physical device size.
+ *                - Return DEV if successful and return NULL otherwise.
  *
  * #bind PG_open_device fortran() scheme() python()
  */
@@ -57,41 +56,39 @@ gcontdes
 PG_device *PG_open_device(PG_device *dev ARG(,,cls),
 			  double xf, double yf,
 			  double dxf, double dyf)
-   {
+   {PG_device *dv;
+
+    dv = NULL;
 
 #ifdef HAVE_WINDOW_DEVICE 
     if (dev != NULL)
        {if (dev->open_screen != NULL)
-           if ((*dev->open_screen)(dev, xf, yf, dxf, dyf) == NULL)
-	      return(NULL);
+	   dv = (*dev->open_screen)(dev, xf, yf, dxf, dyf);
+
+	if (dv != NULL)
 
 /* connect I/O to graphical functions */
-	if (!SC_get_line_cmp(PG_wind_fgets))
-	   {if (SC_get_line_cmp(io_gets))
-	       SC_set_get_line(dev->ggets);};
+	   {if (!SC_get_line_cmp(PG_wind_fgets))
+	       {if (SC_get_line_cmp(io_gets))
+		   SC_set_get_line(dev->ggets);};
 
-	if (!SC_put_line_cmp(PG_wind_fprintf))
-	   {if (SC_put_line_cmp(io_printf))
-	       SC_set_put_line(PG_fprintf);};
+	    if (!SC_put_line_cmp(PG_wind_fprintf))
+	       {if (SC_put_line_cmp(io_printf))
+		   SC_set_put_line(PG_fprintf);};
 
-	if (!SC_put_string_cmp(PG_wind_fputs))
-	   {if (SC_put_string_cmp(io_puts))
-	       SC_set_put_string(PG_fputs);};};
+	    if (!SC_put_string_cmp(PG_wind_fputs))
+	       {if (SC_put_string_cmp(io_puts))
+		   SC_set_put_string(PG_fputs);};};};
 
 #else
-    PG_device *dv;
 
     if (dev != NULL)
        {if (dev->open_screen != NULL)
-           {if (strcmp(dev->name, "WINDOW") == 0)
-	       return(NULL);
-            else
-	      {dv = (*dev->open_screen)(dev, xf, yf, dxf, dyf);
-	       if (dv == NULL)
-		  return(NULL);};};};
+           {if (strcmp(dev->name, "WINDOW") != 0)
+	       dv = (*dev->open_screen)(dev, xf, yf, dxf, dyf);};};
 #endif
 
-    return(dev);}
+    return(dv);}
  
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
@@ -119,7 +116,11 @@ void PG_device_filename(char *fname, long nc,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_QUERY_DEVICE - query some physical device characteristics
+/* PG_QUERY_DEVICE - Query the device DEV for some physical
+ *                 - device characteristics:
+ *                 -    PDX  device width
+ *                 -    PDY  device height
+ *                 -    PNC  number of colors supported
  *
  * #bind PG_query_device fortran() scheme() python()
  */
@@ -138,7 +139,9 @@ void PG_query_device(PG_device *dev ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_QUERY_WINDOW - query the window shape
+/* PG_QUERY_WINDOW - Query the device DEV for its physical shape:
+ *                 -   PDX  device width
+ *                 -   PDY  device height
  *
  * #bind PG_query_window fortran() scheme() python()
  */
@@ -248,8 +251,9 @@ void _PG_remove_device(PG_device *dev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_WRITE_N - print formatted output
- *            - at the specified coordinates in CS
+/* PG_WRITE_N - Print formatted output to the device DEV
+ *            - at the ND dimensional point X specified in the
+ *            - coordinate system CS.
  *
  * #bind PG_write_n fortran() scheme() python()
  */

@@ -29,7 +29,7 @@ struct testdes_s
     int debug_mode;};
 
 static double
- dfmx = -HUGE;
+ dfmx = -1.0e100;
 
 static int
  dbg = TRUE;

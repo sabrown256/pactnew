@@ -13,7 +13,9 @@
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_TEXT_EXT_N - return the text extent in NDC of the given string
+/* PG_GET_TEXT_EXT_N - Find the text extent of string S on device DEV.
+ *                   - Return the result in the ND dimensional vector P
+ *                   - specified in coordinate system CS.
  *
  * #bind PG_get_text_ext_n fortran() scheme() python()
  */
@@ -568,12 +570,12 @@ void _PG_rl_markers(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DEF_MARKER - define a marker character and return an index into
- *               - an internal list of markers
- *               - a marker is defined in terms of a list of line segments
- *               - in a box (-1, -1) to (1, 1)
- *               - a scale factor may be separately specified
- *               - the marker made contains copies of the input arrays
+/* PG_DEF_MARKER - Define a marker character and return an index into
+ *               - an internal list of markers.
+ *               - A marker is defined in terms of a list of N line segments
+ *               - (XA,YA) to (XB,YB) in a box (-1, -1) to (1, 1).
+ *               - A scale factor may be separately specified.
+ *               - The marker made contains copies of the input arrays.
  *
  * #bind PG_def_marker fortran() scheme() python()
  */
@@ -844,7 +846,9 @@ static void _PG_draw_markers_3(PG_device *dev, PG_coord_sys cs,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DRAW_MARKERS_N - draw N ND markers at CS points R
+/* PG_DRAW_MARKERS_N - Draw markers specified by MARKER on device DEV
+ *                   - at N points R. The points have dimension ND and
+ *                   - are specified in coordinate system CS.
  *
  * #bind PG_draw_markers_n fortran() scheme() python()
  */
@@ -869,7 +873,8 @@ void PG_draw_markers_n(PG_device *dev ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
  
-/* PG_DRAW_BOX_N - draw the BOX in the specified coordinates
+/* PG_DRAW_BOX_N - Draw the ND dimensional BOX on device DEV.
+ *               - The BOX is specified in the coordinate system CS.
  *
  * #bind PG_draw_box_n fortran() scheme() python()
  */
@@ -917,8 +922,11 @@ void PG_draw_box_n(PG_device *dev ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FILL_POLYGON_N - draw an ND polygon with N nodes R in CS
- *                   - and fill the interior with COLOR
+/* PG_FILL_POLYGON_N - Draw an ND polygon with N points R on device DEV
+ *                   - and fill the interior with COLOR.
+ *                   - The points are specified in coordinate system CS.
+ *                   - If MAPPED is TRUE the colors are mapped to ones
+ *                   - that are guaranteed to be visible.
  *
  * #bind PG_fill_polygon_n fortran() scheme() python()
  */

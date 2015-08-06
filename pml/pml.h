@@ -16,7 +16,6 @@
 #include "scope_constants.h"
 #include "pml_gen.h"
 
-#define TOLERANCE             1.0e-10
 #define PM_SPACEDM            3         /* maximum spatial dimension */
 
 #ifndef HYPOT
@@ -30,6 +29,12 @@
 #define PM_AC_S                 PM_gs.tnames[0]
 #define PM_LR_S                 PM_gs.tnames[1]
 #define PM_N_TYPES              2
+
+#undef SMALL
+#undef HUGE
+#define SMALL      PM_gs.limits[0]
+#define HUGE       PM_gs.limits[1]
+#define TOLERANCE  PM_gs.limits[2]
 
 /*--------------------------------------------------------------------------*/
 
@@ -679,7 +684,7 @@ struct s_sort_link
     sort_link *next;};
 
 struct s_PM_scope_public
-   {
+   {double limits[3];
 
 /* non-zero initial value variables */
     PM_field *fp_opers;

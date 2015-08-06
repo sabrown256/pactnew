@@ -359,14 +359,14 @@ object *SX_mode_text(SS_psides *si)
 void SX_setup_viewspace(PG_device *dev, double mh)
    {int i, imn, imx;
     double labsp, nvh, nvoy;
-    static double obx[PG_BOXSZ] = { -HUGE, -HUGE, -HUGE, -HUGE, -HUGE, -HUGE};
+    static double obx[PG_BOXSZ] = { 1.0, -1.0, 1.0, -1.0, 1.0, -1.0 };
     static int traditional = TRUE;
 
 /* remember the original view height in order to be able to
  * reference label-space against that value
  * otherwise label-space 0.5 followed by label-space 0.0 goes bad
  */
-    if (obx[0] == -HUGE)
+    if ((obx[0] == 1.0) && (obx[1] == -1.0))
        PG_box_copy(3, obx, SX_gs.view_x);
 
     PG_get_attrs_glb(TRUE,

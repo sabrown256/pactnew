@@ -840,9 +840,10 @@ void PG_trans_points(const PG_device *dev, int n, int nd,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_TRANS_POINT - convert a ND point XI in ICS to XO in OCS
- *                - NOTE: vectors in PC are really integer but are
- *                - represented here as double
+/* PG_TRANS_POINT - Convert an ND dimensional point XI in coordinate
+ *                - system ICS to XO in coordinate system OCS.
+ *                - NOTE: Vectors in PC are really integer but are
+ *                - represented here as double.
  *
  * #bind PG_trans_point fortran() scheme() python()
  */
@@ -1436,7 +1437,8 @@ void _PG_fix_wtos(PG_device *dev, int wh)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FGET_AXIS_LOG_SCALE - return the settings of the log axis flags
+/* PG_FGET_AXIS_LOG_SCALE - Return the log axis flags of the device DEV
+ *                        - in the ND dimensional vector IFLG.
  *
  * #bind PG_fget_axis_log_scale fortran() scheme(pg-get-axis-log-scale) python()
  */
@@ -1457,7 +1459,8 @@ void PG_fget_axis_log_scale(const PG_device *dev ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FSET_AXIS_LOG_SCALE - make sure that a log scale is handled correctly
+/* PG_FSET_AXIS_LOG_SCALE - Set the log axis flags of the device DEV from
+ *                        - the ND dimensional vector IFLG.
  *
  * #bind PG_fset_axis_log_scale fortran() scheme(pg-set-axis-log-scale!) python()
  */
@@ -1611,7 +1614,8 @@ static INLINE void _PG_set_space_WC(PG_device *dev, int nd, double *wc)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_GET_VIEWSPACE - return the viewspace limits
+/* PG_GET_VIEWSPACE - Return the viewspace limits of the device DEV
+ *                  - in BOX specified in coordinate system CS.
  *
  * #bind PG_get_viewspace fortran() scheme() python()
  */
@@ -1655,10 +1659,12 @@ void PG_get_viewspace(const PG_device *dev ARG(,,cls), PG_coord_sys cs,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SET_VIEWSPACE - set the view space from the given extremal box
- *                  - if CS == BOUNDC set BND
- *                  - if CS == WORLDC set WC
- *                  - if CS == NORMC  set NDC
+/* PG_SET_VIEWSPACE - Set the view space from the given extremal
+ *                  - ND dimensional BOX.  The sector of the view space
+ *                  - to be set is specified by CS:
+ *                  -    BOUNDC  viewport bounding box, BND
+ *                  -    WORLDC  world coordinate limits, WC
+ *                  -    NORMC   normalize coordinate limits, NDC
  *
  * #bind PG_set_viewspace fortran() scheme() python()
  */
@@ -2073,8 +2079,13 @@ void PG_viewport_frame(const PG_device *dev, int nd, double *ndc)
 
 /*--------------------------------------------------------------------------*/
 
-/* PG_FGET_VIEW_ANGLE - get the view angle in degrees if CNV is TRUE
- *                    - otherwise in radians
+/* PG_FGET_VIEW_ANGLE - Get the view angle of device DEV.  If CNV is
+ *                    - TRUE the angles are defined in degrees otherwise
+ *                    - they are in radians.  The view angles are returned
+ *                    - in any of the following which are non-NULL:
+ *                    -    PT  the Euler angle theta
+ *                    -    PP  the Euler angle phi
+ *                    -    PC  the Euler angle chi
  *
  * #bind PG_fget_view_angle fortran() scheme() python()
  */
@@ -2103,7 +2114,13 @@ void PG_fget_view_angle(const PG_device *dev ARG(,,cls), int cnv,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FSET_VIEW_ANGLE - set the view angle in degrees for DEV
+/* PG_FSET_VIEW_ANGLE - Set the view angle of device DEV.  If CNV is
+ *                    - TRUE the angles are defined in degrees otherwise
+ *                    - they are in radians.  The view angles are returned
+ *                    - in any of the following which are non-NULL:
+ *                    -    PT  the Euler angle theta
+ *                    -    PP  the Euler angle phi
+ *                    -    PC  the Euler angle chi
  *
  * #bind PG_fset_view_angle fortran() scheme() python()
  */
@@ -2144,8 +2161,13 @@ void PG_fset_view_angle(PG_device *dev ARG(,,cls), int cnv ARG(TRUE,in),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FGET_LIGHT_ANGLE - get the lighting angle in degrees if CNV is TRUE
- *                     - otherwise in radians
+/* PG_FGET_LIGHT_ANGLE - Get the lighting angle of device DEV.  If CNV is
+ *                     - TRUE the angles are defined in degrees otherwise
+ *                     - they are in radians.  The view angles are returned
+ *                     - in any of the following which are non-NULL:
+ *                     -    PT  the Euler angle theta
+ *                     -    PP  the Euler angle phi
+ *                     -    PC  the Euler angle chi
  *
  * #bind PG_fget_light_angle fortran() scheme(pg-get-light-angle) python()
  */
@@ -2169,8 +2191,13 @@ void PG_fget_light_angle(const PG_device *dev ARG(,,cls),
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_FSET_LIGHT_ANGLE - set the light angle in degrees for DEV
- *                     - return the old values thru the arguments
+/* PG_FSET_LIGHT_ANGLE - Set the lighting angle of device DEV.  If CNV is
+ *                     - TRUE the angles are defined in degrees otherwise
+ *                     - they are in radians.  The view angles are returned
+ *                     - in any of the following which are non-NULL:
+ *                     -    PT  the Euler angle theta
+ *                     -    PP  the Euler angle phi
+ *                     -    PC  the Euler angle chi
  *
  * #bind PG_fset_light_angle fortran() scheme(pg-set-light-angle!) python()
  */

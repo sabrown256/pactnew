@@ -92,9 +92,15 @@ void PG_rl_all(void)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_MAKE_GRAPH_1D - assemble a bunch of stuff together in a graph struct
- *                  - which will describe a 1d graph and return a pointer
- *                  - to it
+/* PG_MAKE_GRAPH_1D - Assemble a graph from the following arguments:
+ *                  -    LABEL   the name or label for the graph
+ *                  -    N       the number of 1D points
+ *                  -    (X,Y)   the points of the graph
+ *                  -    XNAME   the name of the X values
+ *                  -    YNAME   the name of the Y values
+ *                  - If CP is TRUE the graph is made with copies of (X,Y).
+ *                  - Return the graph if successful and
+ *                  - return NULL otherwise.
  *
  * #bind PG_make_graph_1d fortran() scheme() python()
  */
@@ -124,7 +130,22 @@ PG_graph *PG_make_graph_1d(int id, const char *label, int cp, int n,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_MAKE_GRAPH_R2_R1 - assemble a bunch of stuff together in a graph struct
+/* PG_MAKE_GRAPH_R2_R1 - Assemble a graph from the following arguments:
+ *                     -    ID         the identifier of the graph, e.g. 'A'
+ *                     -    LABEL      the name or label for the graph
+ *                     -    (IMX,JMX)  the shape of the domain of the graph
+ *                     -    (X,Y)      the points of the domain of the graph
+ *                     -    R          the points of the range of the graph
+ *                     -    CENTERING  the relative centering of the
+ *                     -               domain and range
+ *                     -    DNAME      the name of the X values
+ *                     -    RNAME      the name of the Y values
+ *                     - If CP is TRUE the graph is made with copies of
+ *                     - (X,Y) and R.
+ *                     - Return the graph if successful and
+ *                     - return NULL otherwise.
+
+ assemble a bunch of stuff together in a graph struct
  *                     - which will describe a mapping from R2 to R1 
  *                     - and return a pointer to it
  *
@@ -328,9 +349,8 @@ void PG_rl_graph(PG_graph *g, int rld, int rlr)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_REGISTER_DEVICE - let users add their own devices
- *                    - to do so they must register a setup function
- *                    - under the device name
+/* PG_REGISTER_DEVICE - Register a device described by FNC under NAME.
+ *                    - This lets users add their own devices.
  *
  * #bind PG_register_device fortran() scheme() python()
  */
@@ -636,15 +656,17 @@ static PG_device *PG_make_raw_device(const char *name, const char *type,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_MAKE_DEVICE - initialize a graphical device
- *                - NAME - a desriptive name of the device
- *                -        WINDOW - display screen window
- *                -        PS     - PostScript
- *                -        CGM    - CGM device
- *                -        RASTER - raster device
- *                - TYPE - a qualifier for the device
- *                -        MONOCHROME - black and white display
- *                -        COLOR      - color display
+/* PG_MAKE_DEVICE - Initialize a graphical device from arguments:
+ *                -    NAME  - a desriptive name of the device
+ *                -            WINDOW - display screen window
+ *                -            PS     - PostScript
+ *                -            CGM    - CGM device
+ *                -            RASTER - raster device
+ *                -    TYPE  - a qualifier for the device
+ *                -            MONOCHROME - black and white display
+ *                -            COLOR      - color display
+ *                -    TITLE - a title for the device
+ *                - Return the device if successful and return NULL otherwise.
  *
  * #bind PG_make_device fortran() scheme() python()
  */
@@ -775,7 +797,11 @@ PG_view_attributes *PG_make_view_attributes(PG_device *dev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_SAVE_VIEW_ATTRIBUTES - save the view attributes */
+/* PG_SAVE_VIEW_ATTRIBUTES - Save the view_attributes of device DEV
+ *                         - to D.
+ *
+ * #bind PG_save_view_attributes fortran() scheme() python()
+ */
 
 void PG_save_view_attributes(PG_view_attributes *d, PG_device *dev)
    {int id;
@@ -798,8 +824,8 @@ void PG_save_view_attributes(PG_view_attributes *d, PG_device *dev)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_RESTORE_VIEW_ATTRIBUTES - restore the PG_view_attributes to the
- *                            - graphical device
+/* PG_RESTORE_VIEW_ATTRIBUTES - Restore the view_attributes D to the
+ *                            - device DEV.
  *
  * #bind PG_restore_view_attributes fortran() scheme() python()
  */

@@ -304,13 +304,13 @@ static void _PG_find_registered(PG_interface_object *iob, haelem **php,
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_REGISTER_CALLBACK - assign a name to a call back function
- *                      - this lets the read and write connect names
- *                      - with call back functions
+/* PG_REGISTER_CALLBACK - Assign NAME to a specified call back function.
+ *                      - This lets the read and write of interfaces connect
+ *                      - names with call back functions.
  *                      - NOTE: this is not a vararg function, we are using
  *                      - varargs to defeat type checking on the function
  *                      - pointers which is inappropriate for this general
- *                      - purpose mechanism
+ *                      - purpose mechanism.
  *
  * #bind PG_register_callback fortran() scheme() python()
  */
@@ -355,9 +355,12 @@ PFVoid PG_lookup_callback(const char *name)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_REGISTER_VARIABLE - assign a name to a call back variable
- *                      - this lets the read and write connect names
- *                      - with call back variables
+/* PG_REGISTER_VARIABLE - Assign NAME to a call back variable of type TYPE.
+ *                      - This lets the read and write of interfaces
+ *                      - connect names with call back variables.
+ *                      - The initial value of the variable is VAR and
+ *                      - the values of the variable are in the range
+ *                      - (VN, NX).
  *
  * #bind PG_register_variable fortran() scheme() python()
  */
@@ -617,8 +620,8 @@ void PG_draw_interface_object(PG_interface_object *iob)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-/* PG_DRAW_INTERFACE_OBJECTS - draw all of the visible interface objects
- *                           - which belong to the given device
+/* PG_DRAW_INTERFACE_OBJECTS - Draw all of the visible interface objects
+ *                           - which belong to the device DEV.
  *
  * #bind PG_draw_interface_objects fortran() scheme() python()
  */

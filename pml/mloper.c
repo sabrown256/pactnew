@@ -26,7 +26,8 @@ PM_field
                    (PFVoid) PM_ltimes, (PFVoid) PM_ldivide};
 
 PM_scope_public
- PM_gs = { &_fp_opers, &_int_opers, &_long_opers,
+ PM_gs = { { 1.0e-100, 1.0e100, 1.0e-10 },
+           &_fp_opers, &_int_opers, &_long_opers,
 	   { "Arbitrarily-Connected", "Logical-Rectangular" },
 	 };
 
