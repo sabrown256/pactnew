@@ -89,28 +89,89 @@ set(Libs pdb pml score ${MDLib})
 # Spokes
 # XXX - simulate build-spokes
 #
+##################################################
 # hdf5.def
 set(hdf5_src
-#    spokes/hdf5/trhdf5.c
+    spokes/hdf5/trhdf5.c
 ) #  trhdf5.h
 
+#${IncDir}/hdf5.api : hdf5.def
+#	@echo "import-api hdf5.def -o ${IncDir}/hdf5.api"
+#	@import-api hdf5.def ${MDI_Inc} ${LDPath} -o ${IncDir}/hdf5.api
+
+set(tmp_input  ${CMAKE_CURRENT_SOURCE_DIR}/spokes/hdf5/hdf5.def)
+set(tmp_output ${IncDir}/hdf5.api)
+add_custom_command(
+    OUTPUT ${tmp_output}
+    DEPENDS import-api ${tmp_input}
+    COMMAND ${BinDir}/import-api
+       ${tmp_input}
+       ${MDI_Inc}
+       ${LDPath}
+       -o ${tmp_output}
+    COMMENT "import-api hdf5.def -o ${IncDir}/hdf5.api"
+)
+LIST(APPEND GSrcs ${tmp_output})
+
+##################################################
 set(llf_src
     spokes/llf/trlfw.c
     spokes/llf/trllf.c
 ) #  trllf.h
 
+##################################################
 set(nacf_src
     spokes/nacf/trnaca.c
 ) #   trnacf.h
 
+
+##################################################
 # mysql.def sqlite3.def
+
+#${IncDir}/sqlite3.api : sqlite3.def
+#       @echo "import-api sqlite3.def -o ${IncDir}/sqlite3.api"
+#       @import-api sqlite3.def ${MDI_Inc} ${LDPath} -o ${IncDir}/sqlite3.api
+
+#${IncDir}/mysql.api : mysql.def
+#       @echo "import-api mysql.def -o ${IncDir}/mysql.api"
+#       @import-api mysql.def ${MDI_Inc} ${LDPath} -o ${IncDir}/mysql.api
+
+set(tmp_input  ${CMAKE_CURRENT_SOURCE_DIR}/spokes/sql/sqlite3.def)
+set(tmp_output ${IncDir}/sqlite3.api)
+add_custom_command(
+    OUTPUT ${tmp_output}
+    DEPENDS import-api ${tmp_input}
+    COMMAND ${BinDir}/import-api
+       ${tmp_input}
+       ${MDI_Inc}
+       ${LDPath}
+       -o ${tmp_output}
+    COMMENT "import-api sqlite3.def -o ${IncDir}/sqlite3.api"
+)
+LIST(APPEND GSrcs ${tmp_output})
+
+set(tmp_input  ${CMAKE_CURRENT_SOURCE_DIR}/spokes/sql/mysql.def)
+set(tmp_output ${IncDir}/mysql.api)
+add_custom_command(
+    OUTPUT ${tmp_output}
+    DEPENDS import-api ${tmp_input}
+    COMMAND ${BinDir}/import-api
+       ${tmp_input}
+       ${MDI_Inc}
+       ${LDPath}
+       -o ${tmp_output}
+    COMMENT "import-api mysql.def -o ${IncDir}/mysql.api"
+)
+LIST(APPEND GSrcs ${tmp_output})
+
 set(sql_src
-#    spokes/sql/trsql.c
-#    spokes/sql/trsqlg.c
-#    spokes/sql/trmysql.c
-#    spokes/sql/trsqlite.c
+    spokes/sql/trsql.c
+    spokes/sql/trsqlg.c
+    spokes/sql/trmysql.c
+    spokes/sql/trsqlite.c
 ) # trsql.h
 
+##################################################
 set(xml_src 
     spokes/xml/trxml.c
     spokes/xml/trxmldtd.c
@@ -118,6 +179,7 @@ set(xml_src
     spokes/xml/trxmlxsd.c
 )  # trxml.h
 
+##################################################
 
 
 #
@@ -129,7 +191,9 @@ set(TGTInc ${Hdrs})   # XXX ppc.h
 #
 # Object Files
 #
-#--gcs = ${PACTTmpDir}/gc-pdb.c
+set(PACTTmpDir  ${CMAKE_CURRENT_BINARY_DIR})
+
+set(gcs ${PACTTmpDir}/gc-pdb.c)
 
 set(SPARC pnparc.c pnmpi.c)
 set(SNOIPC pnnil.c)
@@ -147,15 +211,18 @@ set(IPCDevicesO ${ArPOSIX})
 set(SrcsA pnet.c pnbin.c pnpio.c)
 set(SrcsN ${MPDevicesS} ${IPCDevicesS} ${SrcsA})
 
-
-set(Srcs
+# do not run bproto over extension files.
+set(bproto-Srcs
     pdb.c pdbaib.c pdcast.c pdfmt.c pdfmta.c pdfmtb.c pdfmtc.c pdsymt.c
     pdcomm.c pdbmp.c pdser.c pdlow.c pdrdwr.c pdptr.c
     pdmemb.c pdgs.c pdcsum.c pdflt.c pdblk.c pdbmm.c pdconv.c
     pdpath.c pdbfc.c pdbnet.c pdprnt.c pdshar.c pdtgt.c pdbx.c
     pdmap.c pdbdir.c pdszof.c pdpar.c pdparmp.c pdold.c
-    ${SrcsN}
-# ${gcs}
+    ${SrcsN} ${gcs}
+)
+
+set(Srcs
+    ${bproto-Srcs}
     ${hdf5_src} ${llf_src} ${nacf_src} ${sql_src} ${xml_src}
 )
 # XXX remove pdspoke.c, in GSrcs
@@ -213,7 +280,7 @@ set(Srcs
 add_custom_command(
     OUTPUT ${IncDir}/pdform.h
     DEPENDS template
-    COMMAND ${BinDir}/template
+    COMMAND template
         -t ${DB_TYPES}
         -desc 1
         -o ${IncDir}/pdform.h

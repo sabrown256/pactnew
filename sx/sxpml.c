@@ -2046,6 +2046,21 @@ static object *_SXI_union_polygon(SS_psides *si, object *argl)
 void SX_install_pml_funcs(SS_psides *si)
    {
 
+    SS_install_cf(si, "minimum-positive-float",
+                  "Variable: The smallest positive floating point number used",
+                  SS_acc_double,
+                  &PM_gs.limits[0]);
+
+    SS_install_cf(si, "maximum-positive-float",
+                  "Variable: The largest positive floating point number used",
+                  SS_acc_double,
+                  &PM_gs.limits[1]);
+
+    SS_install_cf(si, "standard-tolerance-float",
+                  "Variable: The standard floating point tolerance for comparisons",
+                  SS_acc_double,
+                  &PM_gs.limits[2]);
+
     SS_install(si, "find-index",
                "Returns the array of indeces for which a predicate it true",
                SS_nargs,

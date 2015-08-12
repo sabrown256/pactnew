@@ -399,7 +399,7 @@ static int test_5(void)
 
 /* TEST_6_LESS - sorting test predicate */
 
-static int test_6_less(void *a, void *b)
+static int test_6_less(const void *a, const void *b)
    {int ok;
     long la, lb;
 

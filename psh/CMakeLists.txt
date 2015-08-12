@@ -155,7 +155,12 @@ add_executable(tpstok tpstok.c)
 #--${BinDir}/template : template.c ${LibFiles}
 #--	@(echo "${PCAnnounce} template.c -o ${BinDir}/template" ; \
 #--	  ccw -DAF_LONG_DOUBLE_IO=${AF_LONG_DOUBLE_IO} -g template.c -o ${BinDir}/template)
+set_source_files_properties(
+    template.c PROPERTIES
+        COMPILE_DEFINITIONS AF_LONG_DOUBLE_IO=${AF_LONG_DOUBLE_IO}
+)
 add_executable(template template.c)
+#add_custom_target(template-hack DEPENDS template)
 
 #--link : ${InstallDep}
 
@@ -186,13 +191,14 @@ endforeach(file)
 
 add_custom_target(incinstall_psh_shell
     DEPENDS ${IncFiles_LIST}
-    COMMENT "incinstall shell in ${Package}"
+#    COMMENT "incinstall shell in ${Package}"
 )
 add_dependencies(incinstall_psh incinstall_psh_shell)
 
 # installed by 'dsys config'
 add_custom_target(pact-build-tools
     DEPENDS pco perdb gexec elide blang rpath template
+    COMMENT "pact-build-tools"
 )
 
 #--#

@@ -471,6 +471,26 @@ set(CMAKE_Fortran_MODULE_DIRECTORY
 
 ##############################
 # make-def
+# XXX 52
+# Site Dependent Graphics Information
+#
+set(GRAPHICS_Flags  -DOGL -DX11)
+set(MDGInc         )
+set(MDGLib      -lGL -lX11 -lpng -ljpeg)
+#   set in pgs/CMakeLists.txt set(GRDevicesS  ${SPS} ${SCGM} ${SMPG} ${SPNG} ${SJPG} ${SOGL} ${SX})
+##  unused set(GRDevicesO  ${ArPS} ${ArCGM} ${ArMPG} ${ArPNG} ${ArJPG} ${ArOGL} ${ArX})
+
+set(GRAPHICS_Windows X)
+
+
+# XXX = 206
+#set(AF_LONG_DOUBLE 2)
+#  env-pact.csh
+#  used in psh/template-render.c
+set(AF_LONG_DOUBLE_IO 2)
+
+
+# XXX - 248
 #LDPath     = -L/home/taylor16/gapps/gcc-4.9.0/lib64 -L/home/taylor16/gapps/gcc-4.9.0/lib -L/home/taylor16/pact/cmake/dev/lnx-2.12-o/lib -L/usr/lib64 -L/usr/lib
 #LDRPath    = -Wl,-rpath,/home/taylor16/gapps/gcc-4.9.0/lib64:/home/taylor16/gapps/gcc-4.9.0/lib:/home/taylor16/pact/cmake/dev/lnx-2.12-o/lib:/usr/lib64:/usr/lib
 #LDFLAGS    = -Wl,--disable-new-dtags -rdynamic ${LDRPath} ${LDPath}
@@ -478,27 +498,38 @@ set(CMAKE_Fortran_MODULE_DIRECTORY
 #MDInc      =   
 set(MDLib  -lz -lc -lm)
 #DPInc      = 
-#DPLib      = 
-#MDI_Inc    = -I/usr/include/openssl
-#MDI_Lib    = -lsqlite3 -lssl
+#DPLib      =
+
+# MDE_Inc 
+set(MDI_Inc  -I/usr/include/openssl)
+set(MDI_Lib  -lsqlite3 -lssl)
 set(MDE_Lib  /usr/lib64/libbfd.a -liberty -ldl)
 #FLib       = 
 
 
 ##############################
-
-# Copy file to dest directory using sinstall
-macro(sinstall_file file dest)
-    set(infile  ${CMAKE_CURRENT_SOURCE_DIR}/${file})
-    add_custom_target(
-        ${file}
-        COMMAND ${PSY_ScrDir}/sinstall ${infile} ${dest}
-        DEPENDS ${infile}
-#        COMMENT "XXXXXXXXX  Install ${file}"
-    )
-endmacro(sinstall_file)
-
-
+# Copy files to dest directory using sinstall
+#
+# subtarget : $(list)
+#    sinstall $(dest)
+# target : subtarget
+#
+macro(sinstall_target list dest subtarget target)
+    add_custom_target(${subtarget})
+    foreach(file ${list})
+        set(infile  ${CMAKE_CURRENT_SOURCE_DIR}/${file})
+        # strip off any directory info -- i.e. applications/pdbcp
+        get_filename_component(target-name ${file} NAME)
+        add_custom_target(
+            ${target-name}
+            COMMAND ${PSY_ScrDir}/sinstall ${infile} ${dest}
+            DEPENDS ${infile}
+#           COMMENT "XXXXXXXXX  Install ${target-name} ${file}"
+        )
+        add_dependencies(${subtarget} ${target-name})
+    endforeach(file)
+    set_property(GLOBAL APPEND PROPERTY ${target} ${subtarget})
+endmacro()
 
 
 

@@ -20,10 +20,12 @@
 
 ; test syscmnd running a shell for re expansion
 (printf nil "\nlist SCM files\n")
-(printf nil "-> %s\n" (syscmnd "ls -1 ../../sxpdb[a-z].c"))
+(define cmd (sprintf "ls -1 %s/sxpdb[a-z].c | sed 's|^.*/||'" (getenv "SrcDir")))
+(printf nil "-> %s\n" (syscmnd cmd))
 
 (printf nil "\ntest pipelines without a shell\n")
-(printf nil "expect: ../../sxpdbd.c ../../sxpdbf.c\n")
-(printf nil "-> %s\n" (syscmnd "ls -1 ../../sxpdb[a-z].c | head -n 4 | tail -n 2"))
+(printf nil "expect: sxpdbd.c sxpdbf.c\n")
+(define cmd (sprintf "ls -1 %s/sxpdb[a-z].c | sed 's|^.*/||' | head -n 4 | tail -n 2" (getenv "SrcDir")))
+(printf nil "-> %s\n" (syscmnd cmd))
 
 (quit)

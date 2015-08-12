@@ -184,6 +184,12 @@
 
   (define retval #t)
 
+; the first time through check for a .pdbdiffrc file and load it
+  (let* ((rc (sprintf "%s/.pdbdiffrc" (getenv "HOME"))))
+        (if (and first (file? rc))
+	    (load rc))
+	(set! first #f))
+
   (if (eqv? file1 file2)
       (begin (printf nil "\nFile names are the same\n\n")
 	     (set! retval #f))

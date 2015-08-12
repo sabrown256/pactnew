@@ -7,6 +7,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/manager/cmake" ${CMAKE_MODULE_PATH})
 # ASCTK ToolKit
 ################################
 project(PACT)
+enable_language(Fortran)  # OPTIONAL)
 
 ################################
 # Prevent in-source builds
@@ -49,29 +50,30 @@ add_subdirectory(pgs)
 
 add_subdirectory(scheme)
 add_subdirectory(panacea)
-#add_subdirectory(sx)
+add_subdirectory(sx)  #dependencies to generate gs-score.h first
 
-#add_subdirectory(doc)
 add_subdirectory(fortran)
 #add_subdirectory(python)
 
+#add_subdirectory(doc)
+
 
 get_property(generate_target_list GLOBAL PROPERTY generate_target) 
-#message(STATUS "generate_target_list = ${generate_target_list}")
 add_custom_target(generate
     DEPENDS pact-build-tools ${generate_target_list}
+    COMMENT "generate - ${generate_target_list}"
     )
 
 get_property(incinstall_target_list GLOBAL PROPERTY incinstall_target) 
-message(STATUS "incinstall_target_list = ${incinstall_target_list}")
 add_custom_target(incinstall
-    DEPENDS generate ${incinstall_target_list}
+    DEPENDS pact-build-tools generate ${incinstall_target_list}
+    COMMENT "incinstall  - ${incinstall_target_list}"
     )
 
 get_property(devlib_target_list GLOBAL PROPERTY devlib_target) 
-#message(STATUS "devlib_target_list = ${devlib_target_list}")
 add_custom_target(devlib ALL
     DEPENDS incinstall ${devlib_target_list}
+    COMMENT "devlib ${devlib_target_list}"
     )
 
 ################################

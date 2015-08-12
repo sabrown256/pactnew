@@ -178,11 +178,11 @@ ${BinDir}/tscls : tscls.c ${InstallDep}
 
 # PDB tests
 
-pdb : ${BinDir}/tpdf ${BinDir}/tpdfw ${BinDir}/tpdfg ${BinDir}/tpdfhy \
+pdb : ${BinDir}/tpdff ${BinDir}/tpdfw ${BinDir}/tpdfg ${BinDir}/tpdfhy \
       ${BinDir}/tpcf
 
-${BinDir}/tpdf : tpdf.f ${InstallDep}
-	${AFC} ${LdFlags} tpdf.f -o ${BinDir}/tpdf ${Libs}
+${BinDir}/tpdff : tpdff.f ${InstallDep}
+	${AFC} ${LdFlags} tpdff.f -o ${BinDir}/tpdff ${Libs}
 
 ${BinDir}/tpdfw : tpdfw.f ${InstallDep}
 	${AFC} ${LdFlags} tpdfw.f -o ${BinDir}/tpdfw ${Libs}
@@ -196,10 +196,10 @@ ${BinDir}/tpdfhy : tpdfhy.f ${InstallDep}
 ${BinDir}/tpcf : tpcf.f ${InstallDep}
 	${AFC} ${LdFlags} tpcf.f -o ${BinDir}/tpcf ${Libs}
 
-fdp : ${BinDir}/tpdfd
+fdp : ${BinDir}/tpdffd
 
-${BinDir}/tpdfd : tpdfd.f ${InstallDep}
-	${AFC} ${LdFlags} tpdfd.f -o ${BinDir}/tpdfd ${Libs}
+${BinDir}/tpdffd : tpdffd.f ${InstallDep}
+	${AFC} ${LdFlags} tpdffd.f -o ${BinDir}/tpdffd ${Libs}
 
 
 # PGS tests

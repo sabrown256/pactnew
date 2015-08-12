@@ -83,13 +83,15 @@ set(Hdrs ${TGTInc} ${hdrf})
 #
 # Object Files
 #
-#--gcs = ${PACTTmpDir}/gc-panacea.c
+set(PACTTmpDir  ${CMAKE_CURRENT_BINARY_DIR})
+
+set(gcs ${PACTTmpDir}/gc-panacea.c)
 
 set(Srcs
     padef.c pacpp.c papkg.c pagnrd.c pahand.c pafi.c
     panacea.c pashar.c pashas.c paccess.c padsys.c pamm.c
     pavars.c papp.c padump.c pasrc.c pastr.c pasmp.c panth.c
-#--         ${gcs}
+    ${gcs}
 )
 
 #--gco = gc-panacea.o
@@ -124,7 +126,7 @@ set(Srcs
 add_custom_command(
     OUTPUT ${IncDir}/pasrc.h
     DEPENDS template ${CMAKE_CURRENT_SOURCE_DIR}/pasrc.t
-    COMMAND ${BinDir}/template
+    COMMAND template
         ${CMAKE_CURRENT_SOURCE_DIR}/pasrc.t
         -t ${DB_TYPES}
         -o ${IncDir}/pasrc.h

@@ -1,5 +1,5 @@
 #
-# CMakeList.txt for PFTN
+# CMakeList.txt for fortran
 #
 # Files and Directories
 #
@@ -72,17 +72,47 @@ set(TGTLib  fpact)
 #
 set(Hdrs fpact.h)
 
+set(PACTTmpDir ${CMAKE_CURRENT_BINARY_DIR})
+
 set(gfs
-    ${PACTTmpDir}/gf-score.c ${PACTTmpDir}/gf-pml.c ${PACTTmpDir}/gf-pdb.c
-    ${PACTTmpDir}/gf-pgs.c ${PACTTmpDir}/gf-panacea.c
-    ${PACTTmpDir}/gf-scheme.c ${PACTTmpDir}/gf-fortran.c
+    ${PACTTmpDir}/gf-score.c
+    ${PACTTmpDir}/gf-pml.c
+    ${PACTTmpDir}/gf-pdb.c
+    ${PACTTmpDir}/gf-pgs.c
+    ${PACTTmpDir}/gf-panacea.c
+    ${PACTTmpDir}/gf-scheme.c
+    ${PACTTmpDir}/gf-fortran.c
 )
 
 set(gms
-    ${PACTTmpDir}/gm-score.f ${PACTTmpDir}/gm-pml.f ${PACTTmpDir}/gm-pdb.f
-    ${PACTTmpDir}/gm-pgs.f ${PACTTmpDir}/gm-panacea.f
-    ${PACTTmpDir}/gm-scheme.f ${PACTTmpDir}/gm-fortran.f
+    ${PACTTmpDir}/gm-score.f
+    ${PACTTmpDir}/gm-pml.f
+    ${PACTTmpDir}/gm-pdb.f
+    ${PACTTmpDir}/gm-pgs.f
+    ${PACTTmpDir}/gm-panacea.f
+    ${PACTTmpDir}/gm-scheme.f
+    ${PACTTmpDir}/gm-fortran.f
 )
+
+set_source_files_properties(
+    ${gfs} ${gms} PROPERTIES GENERATED TRUE
+)
+
+#Command: mv gs-fortran.c ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gs-fortran.h ../../../sx/z-lnx-2.12-o/obj
+#Command: mv gp-fortran.c ../../../python/z-lnx-2.12-o/obj
+#Command: mv gp-fortran.h ../../../python/z-lnx-2.12-o/obj
+#Command: mv gh-fortran.html ../../../doc
+#set(GenTargets
+#    bproto-score
+#    bproto-pml
+#    bproto-pdb
+#    bproto-pgs
+#    bproto-panacea
+#    bproto-scheme
+##    bproto-sx   include automatically
+#)
+
 
 set(FSrcs ${gms} flibc.f fapdprm.f)
 
@@ -139,11 +169,6 @@ set(Srcs ${CSrcs} ${FSrcs})
 #--	@rm -rf ${PSY_TmpDir}
 
 
-#Command: mv gs-fortran.c ../../../sx/z-lnx-2.12-o/obj
-#Command: mv gs-fortran.h ../../../sx/z-lnx-2.12-o/obj
-#Command: mv gp-fortran.c ../../../python/z-lnx-2.12-o/obj
-#Command: mv gp-fortran.h ../../../python/z-lnx-2.12-o/obj
-#Command: mv gh-fortran.html ../../../doc
 
 
 #--${PACTTmpDir}/gm-${LibName}.f : ${PACTSrcDir}/flibc.f
@@ -158,9 +183,13 @@ set(Srcs ${CSrcs} ${FSrcs})
 #--SDir = ${PACTSrcDir}
 #--LibAction = @(cd ${PACTTmpDir} ; pact SDir=\"${SDir}\" PACTSrcDir=\".\" PACTTmpDir=\".\" LibAction=\"\" -f ../../pre-Make Hdrs=../../fpact.h modules)
 
-#--SLibs = ${DPLib} ${FLib} ${MDLib}
-#--Libs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
-#--NGLibs = -lfpact ${LPANACEA} ${LPGS} ${MDGLib} ${LPDB} ${LPML} ${LSCORE} ${SLibs}
+set(SLibs  ${DPLib} ${FLib} ${MDLib})
+set(Libs   fpact panacea pgs ${MDGLib} pdb pml score ${SLibs})
+set(NGLibs fpact panacea pgs ${MDGLib} pdb pml score ${SLibs})
+
+set(do-bproto TRUE)
+
+include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 
 #--build :
 #--	@rm -f *.mod >& /dev/null
@@ -180,17 +209,24 @@ set(Srcs ${CSrcs} ${FSrcs})
 
 #--${BinDir}/tscfh : tscfh.f ${InstallDep}
 #--	${AFC} ${LdFlags} tscfh.f -o ${BinDir}/tscfh ${Libs}
+add_executable(tscfh tscfh.f)
+target_link_libraries(tscfh ${Libs})
 
 #--omp : ${BinDir}/tscfomp
 
 #--${BinDir}/tscfomp : tscfomp.f ${InstallDep}
 #--	${AFC} ${LdFlags} tscfomp.f -o ${BinDir}/tscfomp ${Libs}
+#add_executable(tscfomp tscfomp.f)
+#target_link_libraries(tscfomp ${Libs})
 
 #--scan : ${BinDir}/tscls
 
 #--${BinDir}/tscls : tscls.c ${InstallDep}
 #--	@(echo "${CCAnnounce} tscls.c -o ${BinDir}/tscls" ; \
 #--	  ${CLD} ${LdFlags} tscls.c -o ${BinDir}/tscls ${Libs})
+add_executable(tscls tscls)
+target_link_libraries(tscls ${Libs})
+
 
 # PDB tests
 
@@ -199,15 +235,21 @@ set(Srcs ${CSrcs} ${FSrcs})
 
 #--${BinDir}/tpdf : tpdf.f ${InstallDep}
 #--	${AFC} ${LdFlags} tpdf.f -o ${BinDir}/tpdf ${Libs}
+add_executable(tpdf2 tpdf.f)
+target_link_libraries(tpdf2 ${Libs})
 
 #--${BinDir}/tpdfw : tpdfw.f ${InstallDep}
 #--	${AFC} ${LdFlags} tpdfw.f -o ${BinDir}/tpdfw ${Libs}
 
 #--${BinDir}/tpdfg : tpdfg.f ${InstallDep}
 #--	${AFC} ${LdFlags} tpdfg.f -o ${BinDir}/tpdfg ${Libs}
+add_executable(tpdfg tpdfg.f)
+target_link_libraries(tpdfg ${Libs})
 
 #--${BinDir}/tpdfhy : tpdfhy.f ${InstallDep}
 #--	${AFC} ${LdFlags} tpdfhy.f -o ${BinDir}/tpdfhy ${Libs}
+add_executable(tpdfhy tpdfhy.f)
+target_link_libraries(tpdfhy ${Libs})
 
 #--${BinDir}/tpcf : tpcf.f ${InstallDep}
 #--	${AFC} ${LdFlags} tpcf.f -o ${BinDir}/tpcf ${Libs}
@@ -216,6 +258,8 @@ set(Srcs ${CSrcs} ${FSrcs})
 
 #--${BinDir}/tpdfd : tpdfd.f ${InstallDep}
 #--	${AFC} ${LdFlags} tpdfd.f -o ${BinDir}/tpdfd ${Libs}
+#add_executable(tpdfd2 tpdfd.f)   # MPI
+#target_link_libraries(tpdfd2 ${Libs})
 
 
 # PGS tests
@@ -224,14 +268,20 @@ set(Srcs ${CSrcs} ${FSrcs})
 
 #--${BinDir}/tgsf : tgsf.f ${InstallDep}
 #--	${AFC} ${LdFlags} tgsf.f -o ${BinDir}/tgsf ${NGLibs}
+add_executable(tgsf tgsf.f)
+target_link_libraries(tgsf ${NGLibs})
 
 #--${BinDir}/tgsfg : tgsfg.f ${InstallDep}
 #--	${AFC} ${LdFlags} tgsfg.f -o ${BinDir}/tgsfg ${NGLibs}
+add_executable(tgsfg tgsfg.f)
+target_link_libraries(tgsfg ${NGLibs})
 
 #--contour : ${BinDir}/tgsfc
 
 #--${BinDir}/tgsfc : tgsfc.f ${InstallDep}
 #--	${AFC} ${LdFlags} tgsfc.f -o ${BinDir}/tgsfc ${NGLibs}
+add_executable(tgsfc tgsfc.f)
+target_link_libraries(tgsfc ${NGLibs})
 
 #
 # PANACEA tests
@@ -241,9 +291,24 @@ set(Srcs ${CSrcs} ${FSrcs})
 #--${BinDir}/tpath : tpath.c ${InstallDep}
 #--	@(echo "${CCAnnounce} tpath.c -o ${BinDir}/tpath" ; \
 #--	  ${CLD} ${LdFlags} tpath.c -o ${BinDir}/tpath ${NGLibs})
+add_executable(tpath tgsfg.c)
+target_link_libraries(tpath ${NGLibs})
 
 #--${BinDir}/tpafth : tpafth.f ${InstallDep}
 #--	${AFC} ${LdFlags} tpafth.f -o ${BinDir}/tpafth ${NGLibs}
+
+
+set_target_properties(
+    ${TGTLib} tscfh
+# tscfomp
+    tscls
+
+    tpdf2 tpdfg tpdfhy #tpdfd2
+    tgsf tgsfg tgsfc
+    PROPERTIES Fortran_FORMAT "FREE")
+
+#set_property(GLOBAL PROPERTY Fortran_FORMAT "FREE")
+
 
 #
 # link 

@@ -30,12 +30,11 @@ NoteD $Log ""
 NoteD $Log -n "                    $msg"
 Note $Log ""
 
-set ref  = ../../tests/ref/mats
+set ref  = $PSY_Base/psh/tests/ref/mats
 set tdir = $cwd
 
-flog $Log pushd ../..
-flog $Log ./ccw -I. tests/mats.c -o $tdir/mats
-flog $Log popd
+flog $Log cd $TestDir
+flog $Log $PSY_Base/psh/ccw -I$PSY_Base/psh $PSY_Base/psh/tests/mats.c -o mats
 
 flog $Log (./mats >&! mats.res)
 

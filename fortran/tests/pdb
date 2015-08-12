@@ -49,7 +49,7 @@ if ($xstatus == 0) then
    if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Cannot build PDB FORTRAN Test Program"
-      flog $Log rm -f $BinDir/tpdf
+      flog $Log rm -f $BinDir/tpdff
       flog $Log rm -f $BinDir/tpdfg
       flog $Log rm -f $BinDir/tpdfhy
    else
@@ -61,7 +61,7 @@ if ($xstatus == 0) then
       NoteD $Log -n "                        manual ......................... "
       Note $Log ""
 
-      set exe = $BinDir/tpdf
+      set exe = $BinDir/tpdff
       set rpf = none
       set opt = ( -p )
       set io  = flog
@@ -124,7 +124,7 @@ if ($xstatus == 0) then
          NoteD $Log -n "                        dp ............................. "
          Note $Log ""
 
-         set exe = $BinDir/tpdfd
+         set exe = $BinDir/tpdffd
          set rpf = none
          set opt = ( -p 4 $exe )
          set io  = flog

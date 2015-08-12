@@ -1014,6 +1014,33 @@ static object *_SSI_pr_obj_map(SS_psides *si)
 /*--------------------------------------------------------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/* _SSI_RENAME - binding of rename system call */
+
+static object *_SSI_rename(SS_psides *si, object *argl)
+   {int st;
+    char *fa, *fb;
+    object *rv;
+
+    fa = NULL;
+    fb = NULL;
+
+    SS_args(si, argl,
+	    G_STRING_I, &fa,
+	    G_STRING_I, &fb,
+	    0);
+
+    if ((fa != NULL) && (fb != NULL))
+       st = rename(fa, fb);
+    else
+       st = 1;
+
+    rv = (st == 0) ? SS_t : SS_f;
+
+    return(rv);}
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------*/
+
 /* _SS_INST_PRM - install the Scheme primitives */
 
 void _SS_inst_prm(SS_psides *si)
@@ -1048,6 +1075,11 @@ void _SS_inst_prm(SS_psides *si)
                "Procedure: Exit from Scheme",
                SS_znargs,
                _SSI_quit, SS_PR_PROC);
+
+    SS_install(si, "rename",
+               "Procedure: Rename file FA to FB\n     Usage: rename <fa> <fb>",
+               SS_nargs,
+               _SSI_rename, SS_PR_PROC);
 
     SS_install(si, "reset",
                "Procedure: unwinds the Error/Break stack and returns to top level",

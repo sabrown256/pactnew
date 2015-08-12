@@ -121,7 +121,9 @@ set(patch-fpe  mlfpex86.c mlfpegnu.c)
 #
 # Object Files
 #
-#--gcs = ${PACTTmpDir}/gc-pml.c
+set(PACTTmpDir  ${CMAKE_CURRENT_BINARY_DIR})
+
+set(gcs ${PACTTmpDir}/gc-pml.c)
 
 set(Srcs  mlconst.c mlmath.c mlsrch.c mlrand.c mlnls.c mlmatr.c
        mlrfnc.c mlcfnc.c mlsfnc.c mlqfnc.c
@@ -131,7 +133,7 @@ set(Srcs  mlconst.c mlmath.c mlsrch.c mlrand.c mlnls.c mlmatr.c
        mlintm.c mlintp.c mlints.c
        mlchksm.c mlmesh.c mlmsrch.c mlcmsh.c mlmextr.c
        mlvect.c mlsmp.c  ${patch-fpe}
-#       ${gcs}
+       ${gcs}
     )
 
 #--gco = gc-pml.o
@@ -177,7 +179,7 @@ set(Srcs  mlconst.c mlmath.c mlsrch.c mlrand.c mlnls.c mlmatr.c
 add_custom_command(
     OUTPUT ${IncDir}/mlsrch.h
     DEPENDS template ${CMAKE_CURRENT_SOURCE_DIR}/mlsrch.t
-    COMMAND ${BinDir}/template
+    COMMAND template
         ${CMAKE_CURRENT_SOURCE_DIR}/mlsrch.t
         -t ${DB_TYPES}
         -o ${IncDir}/mlsrch.h

@@ -64,12 +64,9 @@ set(TGTEtc
 #--generate : ${bindf} ${hdrf}
 
 #--IncAction = sinstall ${TGTEtc} ${EtcDir}
-add_custom_target(incinstall_scripts_bin)
+sinstall_target("${TGTEtc}" ${EtcDir} incinstall_scripts_etc incinstall)
 
-foreach(file ${TGTScr})
-  sinstall_file(${file} ${BinDir})
-  add_dependencies(incinstall_scripts_bin ${file})
-endforeach(file)
+sinstall_target("${TGTScr}" ${BinDir} incinstall_scripts_bin incinstall)
 
 ## These are runtime dependencies
 #add_dependencies(do-automake pwhere)
@@ -84,17 +81,6 @@ add_dependencies(import-api elide perdb functions-pact.csh)
 #add_dependencies(update-sys pwhere)
 #add_dependencies(update-watch pwhere)
 add_dependencies(bproto elide blang functions-pact.csh)
-
-
-add_custom_target(incinstall_scripts_etc)
-set_property(GLOBAL APPEND PROPERTY incinstall_target incinstall_scripts_etc)
-
-
-# target per file
-foreach(file ${TGTEtc})
-  sinstall_file(${file} ${EtcDir})
-  add_dependencies(incinstall_scripts_etc ${file})
-endforeach(file)
 
 
 #add_dependencies(incinstall_scripts incinstall_scripts_IncAction)

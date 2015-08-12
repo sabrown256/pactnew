@@ -37,9 +37,9 @@ if ($xstatus == 0) then
    if ($xstatus != 0) then
       NoteD $Log ""
       NoteD $Log "                         Cannot build PGS FORTRAN Test Program"
-      flog $Log rm -f $BinDir/tpdf
-      flog $Log rm -f $BinDir/tpdfg
-      flog $Log rm -f $BinDir/tpdfhy
+      flog $Log rm -f $BinDir/tgsf
+      flog $Log rm -f $BinDir/tgsfg
+      flog $Log rm -f $BinDir/tgsfc
    else
 
 #--------------------------------------------------------------------------

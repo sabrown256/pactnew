@@ -82,7 +82,9 @@ set(TGTInc ${Hdrs} ${XHdr})
 #
 # Object Files
 #
-#--gcs = ${PACTTmpDir}/gc-pgs.c
+set(PACTTmpDir  ${CMAKE_CURRENT_BINARY_DIR})
+
+set(gcs ${PACTTmpDir}/gc-pgs.c)
 
 set(SPS  gsdv_ps.c gspr_ps.c)
 set(SCGM gsdv_cgm.c gspr_cgm.c)
@@ -93,18 +95,9 @@ set(SJPG gsdv_jpg.c)
 set(SMPG gsdv_mpg.c gspr_mpg.c gsmpeg.c)
 set(SPNG gsdv_png.c)
 
-##############################
-# make-def
-#
-# Site Dependent Graphics Information
-#
-set(GRAPHICS_Flags  -DOGL -DX11)
-set(MDGInc         )
-set(MDGLib      -lGL -lX11 -lpng -ljpeg)
+# XXX - configuration decides which backends to use
 set(GRDevicesS  ${SPS} ${SCGM} ${SMPG} ${SPNG} ${SJPG} ${SOGL} ${SX})
-set(GRDevicesO  ${ArPS} ${ArCGM} ${ArMPG} ${ArPNG} ${ArJPG} ${ArOGL} ${ArX})
 
-set(GRAPHICS_Windows X)
 ##############################
 
 set(Srcs
@@ -115,7 +108,7 @@ set(Srcs
     gsncnt.c gsvect.c gsimag.c gssurf.c gsdvb.c gspolf.c
     gsgrot.c gshls.c gsscat.c gsclr.c gsold.c gssfnt.c
     ${SPS} ${SCGM} ${SMPG} ${GRDevicesS}
-#    ${gcs}
+    ${gcs}
 )
 
 
@@ -194,7 +187,7 @@ set(Libs pgs ${MDGLib} pdb pml score ${MDLib})
 add_custom_command(
     OUTPUT ${IncDir}/gsimag.h
     DEPENDS template gsimag.t
-    COMMAND ${BinDir}/template
+    COMMAND template
         ${CMAKE_CURRENT_SOURCE_DIR}/gsimag.t
         -t ${DB_TYPES}
         -o ${IncDir}/gsimag.h

@@ -28,7 +28,7 @@ while ($#argv > 0)
    shift
 end
 
-InitLog Log $TestDir/log.template.$LogSfx
+#InitLog Log $TestDir/log.templ.$LogSfx
 
 flog $Log pushd $SrcDir
 flog $Log $MAKE -i template

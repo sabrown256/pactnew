@@ -109,6 +109,10 @@ set(APIs ${IncDir}/bfd.api)
 #
 # Source Files
 #
+set(PACTTmpDir  ${CMAKE_CURRENT_BINARY_DIR})
+
+set(gcs ${PACTTmpDir}/gc_type.c ${PACTTmpDir}/gc-score.c)
+#GSrcs = ${PACTTmpDir}/gc_type.c ${PACTTmpDir}/gc-score.c
 
 set(DSrcs scmkdp.c scmkpr.c scar.c sctar.c scfcnr.c)
 
@@ -137,14 +141,30 @@ set(UnxSrcs sclppsx.c scunix.c scaix.c scbgl.c scpcc.c sccyg.c scbsd.c scbeos.c)
 # XXXX make-def, add conditional here
 set(OSSrcs ${UnxSrcs})
 
-set(Srcs ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs}
+set(Srcs ${gcs} ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs}
     scctl.c scapi.c scfnca.c scfncb.c scfnct.c
     scarrd.c scarrs.c
     schash.c sctree.c sctab.c
     scstr.c scrsca.c scrscb.c
     sclexs.c sctrk.c sclog.c scold.c
-#    scf77lr.l
+    scf77lr.c
     )
+
+##################################################
+set(lex_in ${CMAKE_CURRENT_SOURCE_DIR}/scf77lr.l)
+set(lex_tmp ${CMAKE_CURRENT_BINARY_DIR}/tmp-scf77lr.c)
+set(lex_out ${CMAKE_CURRENT_BINARY_DIR}/scf77lr.c)
+ADD_CUSTOM_COMMAND(
+    COMMAND rm -f errlog
+    COMMAND touch errlog
+    COMMAND ${LEX_EXECUTABLE} -o${lex_tmp} ${lex_in} 2>> errlog
+#    COMMAND sed \"s|lex.yy.c|scf77lr.c|\" ${lex_tmp} | sed \"s|yy|scf77lr_|g\" > ${lex_out}
+#    COMMAND sed \"s|${lex_in}|${lex_out}|\" ${lex_tmp} | sed \"s|yy|scf77lr_|g\" > ${lex_out}
+    COMMAND sed \"s|yy|scf77lr_|g\" ${lex_tmp} > ${lex_out}
+    DEPENDS ${lex_in}
+    OUTPUT  ${lex_out}
+)
+##################################################
        
 #--#${LibDep} : ${hdrf} ${HDrs}
 #--${LibDep} : ${PACTTmpDir}/gc_type.c ${hdrf} ${TGTInc}
@@ -161,25 +181,36 @@ set(Srcs ${DSrcs} ${ESrcs} ${MSrcs} ${PSrcs} ${TSrcs} ${OSSrcs}
 #--	  ${CROSS_FE} template -gc -t ${EtcDir}/types.db -o ${PACTTmpDir}/gc_type.c)
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gc_type.c
-    DEPENDS ${BinDir}/template
-    COMMAND ${BinDir}/template
+    DEPENDS template
+    COMMAND template
         -gc
         -t ${DB_TYPES}
         -o ${CMAKE_CURRENT_BINARY_DIR}/gc_type.c
     COMMENT "template gc_type.c"
     )
-LIST(APPEND GSrcs ${CMAKE_CURRENT_BINARY_DIR}/gc_type.c)
+##LIST(APPEND GSrcs ${CMAKE_CURRENT_BINARY_DIR}/gc_type.c)
 
 #--${PACTTmpDir}/gc_type.h :
 #--	@(echo "template -gh -o ${PACTTmpDir}/gc_type.h" ; \
 #--	  ${BinDir}/template -gh -t ${EtcDir}/types.db -o ${PACTTmpDir}/gc_type.h)
+#
+# gc_type.h : template
+#     template -gh
+#
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gc_type.h
-    COMMAND ${BinDir}/template -gh -t ${EtcDir}/types.db -o ${CMAKE_CURRENT_BINARY_DIR}/gc_type.h
+    COMMAND template -gh -t ${EtcDir}/types.db -o ${CMAKE_CURRENT_BINARY_DIR}/gc_type.h
     DEPENDS template
     COMMENT "template gc_type.h"
     )
+# Add target used by other directories to call bproto
+add_custom_target(
+    template-${Package}
+#    ALL
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/gc_type.h
+)
 LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc_type.h)
+LIST(APPEND GenTargets template-${Package})
 #LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc_score.h)
 
 #--${IncDir}/scfnca.h : scfnca.t
@@ -188,7 +219,7 @@ LIST(APPEND GenInc ${CMAKE_CURRENT_BINARY_DIR}/gc_type.h)
 add_custom_command(
     OUTPUT ${IncDir}/scfnca.h
     DEPENDS template ${CMAKE_CURRENT_SOURCE_DIR}/scfnca.t
-    COMMAND ${BinDir}/template ${CMAKE_CURRENT_SOURCE_DIR}/scfnca.t
+    COMMAND template ${CMAKE_CURRENT_SOURCE_DIR}/scfnca.t
             -t ${DB_TYPES}
             -o ${IncDir}/scfnca.h
     COMMENT "template scfnca.h"
@@ -200,24 +231,6 @@ set(ExcludeType  -excl omp_lockdes)
 #set(LExcludeType ${ExcludeType})
 
 
-#Command: mv gf-score.c ../../../fortran/z-lnx-2.12-o/obj
-#Command: mv gm-score.f ../../../fortran/z-lnx-2.12-o/obj
-#Command: mv gs-score.c ../../../sx/z-lnx-2.12-o/obj
-#Command: mv gs-score.h ../../../sx/z-lnx-2.12-o/obj
-#Command: mv gp-score.c ../../../python/z-lnx-2.12-o/obj
-#Command: mv gp-score.h ../../../python/z-lnx-2.12-o/obj
-#Command: mv gh-score.html ../../../doc
-set(bproto-output
-#    ${PSY_build}/score/gc-score.c
-#    ${PSY_build}/score/gc-score.h
-    ${PSY_build}/fortran/gf-score.c
-    ${PSY_build}/fortran/gm-score.f
-    ${PSY_build}/sx/gs-score.c
-    ${PSY_build}/sx/gs-score.h
-    ${PSY_build}/python/gp-score.c
-    ${PSY_build}/python/gp-score.h
-#    ${PSY_base}/doc/gh-score.html
-)
 set(do-bproto TRUE)
 
 include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
@@ -227,7 +240,7 @@ include(${PACT_MANAGER_DIR}/cmake/pact_targets.cmake)
 #--	@import-api bfd.def ${MDE_Inc} ${LDPath} -o ${IncDir}/bfd.api
 add_custom_command(
     OUTPUT ${IncDir}/bfd.api
-    DEPENDS ${BinDir}/import-api ${CMAKE_CURRENT_SOURCE_DIR}/bfd.def
+    DEPENDS import-api ${CMAKE_CURRENT_SOURCE_DIR}/bfd.def
     COMMAND ${BinDir}/import-api
        ${CMAKE_CURRENT_SOURCE_DIR}/bfd.def
        ${MDE_Inc}
@@ -256,6 +269,7 @@ add_dependencies(score import_bfd)
 #--          ${AR} ${AROpt} ${MMLib} scmemr.o 2> /dev/null ; \
 #--          ${RM} scmemr.o 2> /dev/null )
 add_library(psmm scmemr.c)
+add_dependencies(psmm incinstall_score)
 
 #--mmlib :
 #--	pact ${MMLib}
@@ -271,6 +285,7 @@ add_library(psmm scmemr.c)
 #--	  ${Shared_LD_Exe} ${Shared_LD_Flags} -o $@ scmemo.o ${Shared_LD_Lib} -L${LibDir} -lscore ; \
 #--          ${RM} scmemo.o 2> /dev/null )
 add_library(osmm SHARED scmemo.c)
+add_dependencies(osmm incinstall_score)
 
 #--omlib :
 #--	pact ${OMLib}
@@ -424,6 +439,8 @@ target_link_libraries(tscthr ${Libs})
 #--${BinDir}/tsctl : tsctl.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tsctl.c -o ${BinDir}/tsctl" ; \
 #--	  ${CLD} ${LdFlags} tsctl.c -o ${BinDir}/tsctl ${Libs})
+add_executable(tsctl tsctl.c)
+target_link_libraries(tsctl ${Libs})
 
 #--${BinDir}/tscsmp : tscsmp.c ${TGTLib}
 #--	@(echo "${CCAnnounce} tscsmp.c -o ${BinDir}/tscsmp" ; \
@@ -598,10 +615,14 @@ target_link_libraries(tscstr ${Libs})
 #--${BinDir}/tscctl : ${TGTLib} tscctl.c
 #--	@(echo "${CCAnnounce} tscctl.c -o ${BinDir}/tscctl" ; \
 #--	  ${CLD} ${LdFlags} tscctl.c -o ${BinDir}/tscctl ${Libs})
+add_executable(tscctl tscctl.c)
+target_link_libraries(tscctl ${Libs})
 
 #--${BinDir}/tscmemc : ${TGTLib} tscmemc.c
 #--	@(echo "${CCAnnounce} tscmemc.c -o ${BinDir}/tscmemc" ; \
 #--	  ${CLD} ${LdFlags} tscmemc.c -o ${BinDir}/tscmemc ${Libs})
+add_executable(tscmemc tscmemc.c)
+target_link_libraries(tscmemc ${Libs})
 
 #--${BinDir}/interact : ${TGTLib} interact.c
 #--	@(echo "${CCAnnounce} interact.c -o ${BinDir}/interact" ; \
@@ -610,6 +631,8 @@ target_link_libraries(tscstr ${Libs})
 #--${BinDir}/tscvs : ${TGTLib} tscvs.c
 #--	@(echo "${CCAnnounce} tscvs.c -o ${BinDir}/tscvs" ; \
 #--	  ${CLD} ${LdFlags} tscvs.c -o ${BinDir}/tscvs ${Libs})
+add_executable(tscvs tscvs.c)
+target_link_libraries(tscvs ${Libs})
 
 #--${BinDir}/dmake : ${TGTLib} scmkut.c
 #--	@(echo "${CCAnnounce} ${LdFlags} scmkut.c -o ${BinDir}/dmake" ; \

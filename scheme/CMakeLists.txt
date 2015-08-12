@@ -190,8 +190,9 @@ do_lex_bison(shlrm shgrm)
 #
 # Object Files
 #
+set(PACTTmpDir  ${CMAKE_CURRENT_BINARY_DIR})
 
-#--gcs = ${PACTTmpDir}/gc-scheme.c
+set(gcs ${PACTTmpDir}/gc-scheme.c)
 
 #--GSrcs = shcsup.c shfsup.c shmsup.c
 

@@ -2,6 +2,9 @@
 #
 # CCW - wrapper for C compiler to manifest POSIX compliance
 #
+set ldir   = `dirname $0`
+set ldir   = `cd $ldir && pwd`       # ensure absolute path
+setenv PSY_Base `dirname $ldir`
 
 unsetenv COMPILER_FAMILY
 unsetenv COMPILER_VERSION
@@ -33,9 +36,9 @@ switch ($os)
    default:
 #        set path = ( /sw/bin /usr/bin $path )
         set path = ( /usr/bin /sw/bin $path )
-        set cc   = ( `../scripts/pwhere -n 1 gcc` )
+        set cc   = ( `$PSY_Base/scripts/pwhere -n 1 gcc` )
 	if (!(-x "$cc")) then
-           set cc = ( `../scripts/pwhere -n 1 cc` )
+           set cc = ( `$PSY_Base/scripts/pwhere -n 1 cc` )
 	   if (!(-x "$cc")) then
               set cc = none
            endif
